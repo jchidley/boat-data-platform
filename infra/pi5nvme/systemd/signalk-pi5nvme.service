@@ -1,0 +1,22 @@
+[Unit]
+Description=Signal K Server on pi5nvme fat app host
+Documentation=https://signalk.org
+Wants=network-online.target
+After=network-online.target postgresql.service grafana-server.service
+
+[Service]
+Type=simple
+User=jack
+Group=jack
+WorkingDirectory=/srv/boat/signalk
+Environment=HOME=/home/jack
+Environment=SIGNALK_NODE_CONFIG_DIR=/srv/boat/signalk
+Environment=PORT=3001
+Environment=EXTERNALPORT=3001
+Environment=EXTERNALHOST=pi5nvme
+ExecStart=/usr/bin/signalk-server
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

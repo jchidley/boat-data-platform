@@ -8,6 +8,9 @@
 - TimescaleDB extension for PostgreSQL
 - Grafana 13.1.0
 - `rsync` raw-log mirror from `picanm`
+- Node.js 24
+- A separate "fat" Signal K server on port 3001
+- Initial Signal K webapps on the fat server: KIP, Freeboard-SK, Instrumentpanel
 
 ## Storage layout
 
@@ -100,6 +103,46 @@ The admin password was randomized and stored root-only in:
 
 A provisioned PostgreSQL datasource named `Boat TimescaleDB` points at the `boatdata` database with TimescaleDB mode enabled.
 
+## Fat Signal K on pi5nvme
+
+A separate Signal K server is running on `pi5nvme`:
+
+```text
+http://pi5nvme:3001/
+ws://pi5nvme:3001/signalk/v1/stream
+```
+
+It is intentionally separate from Grafana, which uses port 3000.
+
+Service:
+
+```text
+/etc/systemd/system/signalk-pi5nvme.service
+```
+
+Configuration directory:
+
+```text
+/srv/boat/signalk/
+```
+
+The fat server consumes the minimal `picanm` Signal K stream as a remote Signal K provider:
+
+```text
+picanm:3000 → pi5nvme:3001
+```
+
+Installed webapps:
+
+```text
+http://pi5nvme:3001/@mxtommy/kip/
+http://pi5nvme:3001/@signalk/freeboard-sk/
+http://pi5nvme:3001/@signalk/instrumentpanel/
+http://pi5nvme:3001/@signalk/app-dock/
+```
+
+This keeps dashboards/apps/plugins off the memory-constrained `picanm` host.
+
 ## Repository support files
 
 The repo now contains install/configuration assets under:
@@ -112,20 +155,24 @@ Important files:
 
 ```text
 infra/pi5nvme/install-pi5nvme.sh
+infra/pi5nvme/install-signalk-fat.sh
 infra/pi5nvme/boat-raw-log-mirror.sh
+infra/pi5nvme/signalk-settings.json
 infra/pi5nvme/systemd/boat-raw-log-mirror.service
 infra/pi5nvme/systemd/boat-raw-log-mirror.timer
+infra/pi5nvme/systemd/signalk-pi5nvme.service
 infra/pi5nvme/sql/001_init_timescale.sql
 ```
 
 ## Current gap
 
-TimescaleDB and Grafana are installed and ready, but the live Signal K collector is not yet implemented. Until that collector exists, Grafana will have the datasource but little/no measurement data except metadata we import later.
+TimescaleDB and Grafana are installed and ready, and the fat Signal K server is already consuming live `picanm` data. The remaining database gap is that live Signal K deltas are not yet being inserted into TimescaleDB.
 
-Next step: add a collector that subscribes to:
+Next step: add a collector that subscribes to one of:
 
 ```text
-ws://picanm:3000/signalk/v1/stream
+ws://picanm:3000/signalk/v1/stream    # closest to the gateway
+ws://pi5nvme:3001/signalk/v1/stream   # after fat-server plugins/derived values
 ```
 
 and inserts deltas into `signal_k_measurements`.

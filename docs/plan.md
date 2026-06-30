@@ -163,6 +163,9 @@ Feed clients from `pi5nvme` where possible; use `picanm` directly only for minim
 - Initial `signal_k_measurements` hypertable created.
 - Grafana installed and provisioned with a `Boat TimescaleDB` datasource.
 - Raw-log mirror timer installed to pull completed logs from `picanm` into `/srv/boat/raw-n2k`.
+- Fat Signal K server installed on `pi5nvme:3001`.
+- Fat Signal K consumes `picanm:3000` as a remote Signal K provider.
+- Initial Signal K webapps installed on `pi5nvme`: KIP, Freeboard-SK, Instrumentpanel, App Dock.
 
 ## Near-term next steps
 

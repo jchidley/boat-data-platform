@@ -6,7 +6,7 @@ Boat NMEA 2000 gateway, logging, Signal K, TimescaleDB/Grafana, and analysis pla
 
 This repository tracks the boat-data architecture and supporting code. The live gateway is `picanm`, a Raspberry Pi 3 A+ with a PiCAN-M HAT. It collects NMEA 2000 data, exposes a minimal Signal K server, and writes compact raw CAN logs.
 
-`pi5nvme` is now the heavier processing host: PostgreSQL + TimescaleDB, Grafana, and raw-log mirroring from `picanm` are installed. The next major code task is the live Signal K → TimescaleDB collector.
+`pi5nvme` is now the heavier processing host: PostgreSQL + TimescaleDB, Grafana, raw-log mirroring from `picanm`, and a separate fat Signal K server with webapps are installed. The next major code task is the live Signal K → TimescaleDB collector.
 
 See:
 

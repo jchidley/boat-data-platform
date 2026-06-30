@@ -13,6 +13,7 @@ See:
 - [picanm setup summary](docs/2026-06-30-picanm-setup-summary.md)
 - [pi5nvme setup summary](docs/2026-06-30-pi5nvme-setup-summary.md)
 - [live instrument inventory](docs/2026-06-30-live-instrument-inventory.md)
+- [Mastervolt MasterBus tooling](docs/2026-06-30-masterbus-tooling.md)
 - [platform plan](docs/plan.md)
 
 ## About This Code

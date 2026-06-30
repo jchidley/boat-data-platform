@@ -25,6 +25,26 @@
           }
         }
       ]
+    },
+    {
+      "id": "masterbus-signalk-tcp",
+      "enabled": true,
+      "pipeElements": [
+        {
+          "type": "providers/simple",
+          "options": {
+            "logging": false,
+            "type": "SignalK",
+            "subOptions": {
+              "type": "tcp",
+              "providerId": "masterbus-signalk-tcp",
+              "description": "Mastervolt MasterBus Signal K sidecar on localhost:3009",
+              "host": "127.0.0.1",
+              "port": 3009
+            }
+          }
+        }
+      ]
     }
   ],
   "interfaces": {},
@@ -41,5 +61,7 @@
       "groups": "resources-provider"
     }
   },
-  "courseApi": { "apiOnly": false }
+  "courseApi": {
+    "apiOnly": false
+  }
 }

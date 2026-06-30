@@ -1,0 +1,3 @@
+# Mastervolt MasterBus USB Interface vendor id. Let the jack user inspect with masterbus-tui.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1a64", MODE="0660", GROUP="plugdev", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="1a64", MODE="0660", GROUP="plugdev", TAG+="uaccess"

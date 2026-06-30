@@ -156,12 +156,18 @@ Feed clients from `pi5nvme` where possible; use `picanm` directly only for minim
 - Should `picanm` publish raw logs over HTTP, or is rsync over SSH enough?
 - Do we need alerts/notifications, and if so where should they run?
 
+## Completed pi5nvme base work
+
+- PostgreSQL 15 installed on `pi5nvme`.
+- TimescaleDB installed and enabled in the `boatdata` database.
+- Initial `signal_k_measurements` hypertable created.
+- Grafana installed and provisioned with a `Boat TimescaleDB` datasource.
+- Raw-log mirror timer installed to pull completed logs from `picanm` into `/srv/boat/raw-n2k`.
+
 ## Near-term next steps
 
-1. Install PostgreSQL + TimescaleDB on `pi5nvme`.
-2. Install Grafana on `pi5nvme`.
-3. Add an rsync-based raw-log mirror from `picanm` to `pi5nvme`.
-4. Write a small Signal K WebSocket collector.
-5. Store decoded Signal K values in TimescaleDB.
-6. Build the first Grafana dashboard.
-7. Build a device/PGN inventory report from raw logs.
+1. Write a small Signal K WebSocket collector.
+2. Store decoded Signal K values in TimescaleDB.
+3. Build the first Grafana dashboard.
+4. Build a device/PGN inventory report from raw logs.
+5. Add batch import/replay tooling for mirrored raw candump logs.

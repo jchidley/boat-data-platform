@@ -1,0 +1,13 @@
+[Unit]
+Description=Mirror completed raw NMEA 2000 logs from picanm
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=jack
+Group=jack
+Environment=SOURCE_HOST=picanm
+Environment=SOURCE_DIR=/var/log/n2k/
+Environment=DEST_DIR=/srv/boat/raw-n2k/
+ExecStart=/usr/local/bin/boat-raw-log-mirror

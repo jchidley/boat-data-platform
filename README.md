@@ -1,6 +1,15 @@
 # boat-data-platform
 
-[Your project description here]
+Boat NMEA 2000 gateway, logging, Signal K, TimescaleDB/Grafana, and analysis platform.
+
+## Current Status
+
+This repository tracks the boat-data architecture and supporting code. The live gateway is `picanm`, a Raspberry Pi 3 A+ with a PiCAN-M HAT. It collects NMEA 2000 data, exposes a minimal Signal K server, and writes compact raw CAN logs. Heavier processing is planned for `pi5nvme`.
+
+See:
+
+- [picanm setup summary](docs/2026-06-30-picanm-setup-summary.md)
+- [platform plan](docs/plan.md)
 
 ## About This Code
 

@@ -38,6 +38,6 @@ These files record point-in-time setup or evidence. Do not use them as current p
 - `archive/2026-06-30-masterbus-tooling.md`
 - `archive/2026-06-30-masterbus-live.md`
 - `archive/2026-07-03-decoding-and-postgres-status.md`
-- `2026-07-03-migration-plan-review.md`
+- `archive/2026-07-03-migration-plan-review.md`
 
 When facts change, update the current docs first. Leave historical docs intact unless adding a stale-status note.

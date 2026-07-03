@@ -653,4 +653,4 @@ This preserves current functionality while keeping the raw source-of-truth intac
 
 ## Review notes
 
-Plan review, gaps, YAGNI decisions, and go/no-go rationale are preserved in [migration plan review](2026-07-03-migration-plan-review.md).
+Plan review, gaps, YAGNI decisions, and go/no-go rationale are preserved in [migration plan review](archive/2026-07-03-migration-plan-review.md).

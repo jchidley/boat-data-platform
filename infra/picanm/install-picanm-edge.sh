@@ -15,13 +15,17 @@ install -d -m 0755 /var/log/n2k
 install -m 0755 "$SCRIPT_DIR/scripts/n2k-raw-log-writer.sh" /usr/local/bin/n2k-raw-log-writer
 install -m 0755 "$SCRIPT_DIR/scripts/n2k-raw-forwarder.sh" /usr/local/bin/n2k-raw-forwarder
 install -m 0755 "$SCRIPT_DIR/scripts/check-picanm-health.sh" /usr/local/bin/check-picanm-health
+install -m 0755 "$SCRIPT_DIR/scripts/check-raw-spool-space.sh" /usr/local/bin/check-raw-spool-space
 install -m 0644 "$SCRIPT_DIR/systemd/can0-nmea2000.service" /etc/systemd/system/can0-nmea2000.service
 install -m 0644 "$SCRIPT_DIR/systemd/n2k-raw-logger.service" /etc/systemd/system/n2k-raw-logger.service
 install -m 0644 "$SCRIPT_DIR/systemd/n2k-raw-forwarder.service" /etc/systemd/system/n2k-raw-forwarder.service
+install -m 0644 "$SCRIPT_DIR/systemd/n2k-raw-spool-health.service" /etc/systemd/system/n2k-raw-spool-health.service
+install -m 0644 "$SCRIPT_DIR/systemd/n2k-raw-spool-health.timer" /etc/systemd/system/n2k-raw-spool-health.timer
 
 systemctl daemon-reload
 systemctl enable --now chrony.service || true
-systemctl enable can0-nmea2000.service n2k-raw-logger.service n2k-raw-forwarder.service
+systemctl enable can0-nmea2000.service n2k-raw-logger.service n2k-raw-forwarder.service n2k-raw-spool-health.timer
 systemctl restart can0-nmea2000.service n2k-raw-logger.service n2k-raw-forwarder.service
+systemctl start n2k-raw-spool-health.timer
 
 echo "picanm N2K edge services installed. Check with: check-picanm-health"

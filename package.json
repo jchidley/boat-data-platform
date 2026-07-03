@@ -8,8 +8,11 @@
     "collect:signalk": "node scripts/collect-signalk-to-timescale.mjs",
     "import:n2k": "node scripts/import-raw-n2k.mjs",
     "inventory:n2k": "node scripts/n2k-inventory.mjs",
+    "compare:signalk-sources": "node scripts/compare-signalk-sources.mjs",
     "health:picanm": "bash infra/picanm/scripts/check-picanm-health.sh",
-    "health:pi5": "bash infra/pi5nvme/scripts/check-pi5-boat-health.sh"
+    "health:picanm-spool": "bash infra/picanm/scripts/check-raw-spool-space.sh",
+    "health:pi5": "bash infra/pi5nvme/scripts/check-pi5-boat-health.sh",
+    "incident:pi5": "bash infra/pi5nvme/scripts/pi5nvme-incident-diagnostics.sh"
   },
   "dependencies": {
     "pg": "^8.16.3",

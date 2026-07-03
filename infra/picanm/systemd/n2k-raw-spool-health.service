@@ -1,0 +1,6 @@
+[Unit]
+Description=Check picanm raw N2K spool disk health
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/check-raw-spool-space

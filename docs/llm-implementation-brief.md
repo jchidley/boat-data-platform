@@ -68,7 +68,7 @@ Before any further `pi5nvme` implementation, investigate the overload/thermal in
 
 Do not run importers, backfills, canboat/analyzer bulk jobs, database-heavy jobs, or service restarts on `pi5nvme` until the incident is understood and resource limits are in place.
 
-`picanm` remains the safe active acquisition edge and is still writing raw N2K logs locally.
+`picanm` remains the safe active acquisition edge and is still writing raw N2K logs locally. While `pi5nvme` is unavailable, use `docs/picanm-offline-operations.md` and only run low-impact picanm health/spool checks.
 
 ## Proven in latest implementation slice
 

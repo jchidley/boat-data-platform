@@ -162,17 +162,29 @@ boatdata.data_quality_observations
 
 ### 5. Re-import raw N2K
 
-Use the raw importer:
+Raw N2K import/backfill is a high CPU, memory, disk I/O, and PostgreSQL workload. On `2026-07-03`, a manual importer run likely overloaded `pi5nvme`; see `docs/2026-07-03-pi5nvme-incident-and-picanm-status.md`.
 
-```text
-npm run import:n2k
+Do **not** run import/backfill during live validation or without an approved import window.
+
+Safety gates now in place:
+
+- `boat-raw-n2k-import.timer` is installed but disabled by default.
+- `boat-raw-n2k-import.service` requires `/etc/boat-data-platform/allow-raw-n2k-import`.
+- `scripts/import-raw-n2k.mjs` requires `ALLOW_RAW_N2K_IMPORT=1` or `--yes-really-import`.
+- The systemd service has CPU, memory, task, and idle I/O limits.
+
+Approved manual import procedure only after checking temperature/load/free memory/disk:
+
+```bash
+sudo touch /etc/boat-data-platform/allow-raw-n2k-import
+sudo systemctl start boat-raw-n2k-import.service
+sudo rm -f /etc/boat-data-platform/allow-raw-n2k-import
 ```
 
-or the systemd timer/service:
+Or, for a foreground run in a controlled shell:
 
-```text
-boat-raw-n2k-import.service
-boat-raw-n2k-import.timer
+```bash
+ALLOW_RAW_N2K_IMPORT=1 LIMIT_FILES=1 npm run import:n2k
 ```
 
 The importer should be idempotent: rerunning should not duplicate rows for the same raw file/segment.

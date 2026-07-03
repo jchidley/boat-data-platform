@@ -68,7 +68,7 @@ Before any further `pi5nvme` implementation, read the overload/thermal incident 
 
 `pi5nvme` has rebooted and the live raw stream is restored. The raw importer remains disabled/gated. Do not run importers, backfills, canboat/analyzer bulk jobs, or database-heavy jobs on `pi5nvme` without explicit approval and resource limits.
 
-`picanm` remains the safe active acquisition edge and is still writing raw N2K logs locally. While `pi5nvme` is unavailable, use `docs/picanm-offline-operations.md` and only run low-impact picanm health/spool checks.
+`picanm` remains the safe active acquisition edge and is still writing raw N2K logs locally. While `pi5nvme` is unavailable, use `docs/picanm-offline-operations.md` and only run low-impact picanm health/spool checks. For Starlink LAN hostname behaviour, mDNS, and WSL caveats, read `docs/starlink-lan-name-resolution.md`.
 
 ## Proven in latest implementation slice
 

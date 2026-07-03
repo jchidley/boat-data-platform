@@ -6,7 +6,7 @@ After=can0-nmea2000.service network-online.target
 [Service]
 Type=simple
 Environment=IFACE=can0
-Environment=DEST_HOST=192.168.1.135
+Environment=DEST_HOST=pi5nvme.local
 Environment=DEST_PORT=20200
 Environment=RETRY_SEC=30
 ExecStart=/usr/local/bin/n2k-raw-forwarder

@@ -47,12 +47,12 @@ It runs the disk/spool check periodically and logs output to the journal.
 
 ## Forwarder retry behaviour
 
-The deployed forwarder uses IPv4 `DEST_HOST=192.168.1.135` because `pi5nvme` currently resolves to IPv6 addresses from `picanm`, while the raw receiver listens on IPv4 `0.0.0.0:20200`.
+The deployed forwarder uses mDNS `DEST_HOST=pi5nvme.local`. On the Starlink LAN, bare `pi5nvme` currently resolves to IPv6 addresses first, while the raw receiver listens on IPv4 `0.0.0.0:20200`. `pi5nvme.local` resolves via mDNS to IPv4 from `picanm` and avoids the Starlink DNS IPv6 preference.
 
 While `pi5nvme` is offline, the raw forwarder retries every 30 seconds:
 
 ```text
-n2k raw forwarder cannot connect to 192.168.1.135:20200; retrying in 30s
+n2k raw forwarder cannot connect to pi5nvme.local:20200; retrying in 30s
 ```
 
 This is expected. Local raw logging is independent and continues.

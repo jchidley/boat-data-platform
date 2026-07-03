@@ -85,7 +85,7 @@ Checked again at about `2026-07-03T17:25+01:00` after `pi5nvme` was rebooted.
 
 Observed reboot history includes reboots at about `16:52`, `16:57`, and `17:18`. Journald reported an unclean previous shutdown and replaced a corrupted journal file. The 12:05 importer run is visible in retained logs and imported one compressed raw file with about `771532` decoded rows in about 76 seconds, consuming about 46 seconds CPU. Kernel logs retained after the reboot did not show a clear OOM/thermal/undervoltage smoking gun, so the precise failure mechanism remains unproven. The safest conclusion remains: raw import/backfill is a high-impact workload and must stay gated/resource-limited.
 
-A forwarding gap after reboot was traced to name resolution: on `picanm`, `pi5nvme` resolved to IPv6 addresses, while `boat-n2k-raw-receiver` listens on IPv4 `0.0.0.0:20200`. Direct IPv4 to `192.168.1.135:20200` worked. The deployed and committed `picanm` forwarder now uses `DEST_HOST=192.168.1.135`.
+A forwarding gap after reboot was traced to name resolution: on `picanm`, bare `pi5nvme` resolved to IPv6 addresses from Starlink/local DNS, while `boat-n2k-raw-receiver` listens on IPv4 `0.0.0.0:20200`. Direct IPv4 worked, and mDNS `pi5nvme.local` resolved to IPv4 `192.168.1.135`. The deployed and committed `picanm` forwarder now uses `DEST_HOST=pi5nvme.local`.
 
 `picanm` remains stable and preserving raw N2K source material.
 
@@ -118,7 +118,7 @@ Checked at `2026-07-03T12:23:34+01:00`.
 
 After the outage, the deployed `picanm` forwarder retry interval was reduced from 5 seconds to 30 seconds by setting `RETRY_SEC=30` in `n2k-raw-forwarder.service`. This reduces log spam and connection churn while `pi5nvme` is down.
 
-After `pi5nvme` rebooted, `picanm` still failed to reconnect by hostname because `pi5nvme` resolved to IPv6 addresses and the receiver is IPv4-only. The deployed `n2k-raw-forwarder.service` now uses `DEST_HOST=192.168.1.135`, and the TCP stream is established again:
+After `pi5nvme` rebooted, `picanm` still failed to reconnect by bare hostname because `pi5nvme` resolved to IPv6 addresses and the receiver is IPv4-only. `.local` mDNS resolution works on the Starlink LAN, so the deployed `n2k-raw-forwarder.service` now uses `DEST_HOST=pi5nvme.local`, which resolves to IPv4. The TCP stream is established again:
 
 ```text
 picanm 192.168.1.235:xxxxx -> pi5nvme 192.168.1.135:20200 ESTABLISHED

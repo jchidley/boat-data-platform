@@ -14,7 +14,7 @@ Preserve these first:
 picanm:/var/log/n2k/        raw NMEA 2000 candump spool
 pi5nvme:/srv/boat/raw-n2k/  mirrored/received raw NMEA 2000 archive
 pi5nvme:/srv/boat/masterbus/ MasterBus discovery/config/snapshots
-repo docs/scripts/sql/systemd
+repo: docs/, scripts/, SQL migrations, systemd units, config templates
 ```
 
 Treat these as derived and rebuildable while experimental:
@@ -32,14 +32,15 @@ optional sidecar files
 
 ```text
 picanm:
-  can0 + raw logs + raw forwarder + minimal Signal K on :3000
+  can0 + raw candump logger + raw forwarder connected to pi5nvme:20200 + minimal Signal K on :3000
 
 pi5nvme:
-  fat Signal K on :3001
+  fat Signal K on :3001 fed by picanm Signal K during transition
   MasterBus USB via masterbus-signalk
   PostgreSQL/TimescaleDB
   Grafana
   raw log mirror/importers/collectors
+  live raw candump receiver on :20200 writing /srv/boat/raw-n2k/live/
 ```
 
 ## Target architecture
@@ -61,12 +62,21 @@ pi5nvme:
   import/inventory/rebuild tooling
 ```
 
+## Proven in latest implementation slice
+
+- `picanm` raw logger/forwarder services are deployed and active.
+- `pi5nvme` raw receiver is deployed and active on TCP `20200`.
+- Live raw candump lines are being written under `/srv/boat/raw-n2k/live/`.
+- `analyzerjs` decoded a received live-stream sample.
+- MasterBus snapshot capture ran under `/srv/boat/masterbus/`.
+
 ## Do next
 
-1. Prove pi5 Signal K can consume the raw stream or document the bridge needed.
-2. Run old and new feeds in parallel.
-3. Compare PGNs, Signal K paths, timestamps, and key values.
-4. Disable `picanm` Signal K only after the go/no-go checklist passes.
+1. Determine the exact Signal K/canboat input method for consuming the raw stream on `pi5nvme`.
+2. Configure pi5 Signal K to consume that raw stream without using `picanm:3000` as the N2K source.
+3. Run old and new feeds in parallel.
+4. Compare PGNs, Signal K paths, timestamps, and key values.
+5. Disable `picanm` Signal K only after the go/no-go checklist passes.
 
 ## Do not do yet
 

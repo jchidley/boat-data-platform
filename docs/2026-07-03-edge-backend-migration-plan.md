@@ -73,8 +73,9 @@ Derived stores are allowed to be disposable. Signal K state, Timescale decoded r
 Currently:
 
 - owns the PiCAN-M / `can0` NMEA 2000 interface
-- runs raw `candump` logging under `/var/log/n2k/`
-- runs `n2k-raw-forwarder.service`, which will connect when `pi5nvme` exposes the raw receiver
+- runs `can0-nmea2000.service`
+- runs `n2k-raw-logger.service` and writes raw candump logs under `/var/log/n2k/`
+- runs `n2k-raw-forwarder.service` and is connected to `pi5nvme:20200`
 - runs a minimal Signal K server on port `3000`
 - is memory constrained but working
 
@@ -83,12 +84,14 @@ Currently:
 Currently:
 
 - runs the fat Signal K server on port `3001`
-- consumes `picanm:3000` as an upstream Signal K provider
+- consumes `picanm:3000` as an upstream Signal K provider during transition
 - runs MasterBus USB integration through `masterbus-signalk`
 - runs PostgreSQL/TimescaleDB
 - runs Grafana
 - mirrors raw N2K logs from `picanm:/var/log/n2k/` to `/srv/boat/raw-n2k/`
 - receives the live raw candump stream on TCP `20200` and writes `/srv/boat/raw-n2k/live/*.tmp`
+- has a verified live raw stream sample decoded by `analyzerjs`
+- has a MasterBus snapshot captured at `/srv/boat/masterbus/20260703T105249Z`
 - stores Signal K deltas in `boatdata.signal_k_measurements`
 - imports decoded raw N2K messages into `boatdata.n2k_decoded_messages`
 
@@ -324,13 +327,19 @@ Responsibilities:
 - failure does not stop local logging
 - should be simple: no decoding, database writes, or plugins
 
-Possible implementations to evaluate:
+Implemented transport:
 
-1. TCP line stream from `candump`/SocketCAN to a listener on `pi5nvme`.
-2. `socketcand`/SocketCAN-over-TCP if Signal K/canboat tooling consumes it cleanly.
-3. A tiny Node or shell forwarder that tails the active raw stream and reconnects.
+```text
+picanm candump -L can0
+  → n2k-raw-forwarder.service
+  → TCP pi5nvme:20200
+  → boat-n2k-raw-receiver.service
+  → /srv/boat/raw-n2k/live/can0-YYYYMMDDTHH0000Z.candump.log.tmp
+```
 
-Choose the implementation that is easiest to supervise and replay. Preserve candump-compatible text so the same stream can feed importers and Signal K/canboat tooling.
+The live file is a `.tmp` while being written. It may contain a partial final line during active writes. Treat completed rotated/compressed files as archive segments; use live `.tmp` files only for current-stream validation.
+
+`analyzerjs` has decoded a received live sample, so the remaining unknown is Signal K's exact raw-stream input/bridge configuration, not basic decoder compatibility.
 
 ## Phase 2 — make pi5nvme the only heavy Signal K host
 
@@ -644,9 +653,9 @@ This preserves current functionality while keeping the raw source-of-truth intac
 
 ## Immediate next implementation tasks
 
-1. Prove exactly how pi5 Signal K/canboat will consume the raw stream.
-2. Configure pi5 Signal K/canboat input from that raw stream.
-3. Run old and new paths in parallel and compare.
+1. Determine Signal K's exact raw-stream input method for candump/canboat data on `pi5nvme`.
+2. Configure pi5 Signal K/canboat input from that raw stream without depending on `picanm:3000`.
+3. Run old and new paths in parallel and compare PGNs, Signal K paths, timestamps, and key values.
 4. Disable `picanm` Signal K only after validation.
 
 ## Review notes

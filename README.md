@@ -15,6 +15,7 @@ See:
 - [live instrument inventory](docs/2026-06-30-live-instrument-inventory.md)
 - [Mastervolt MasterBus tooling](docs/2026-06-30-masterbus-tooling.md)
 - [MasterBus live status](docs/2026-06-30-masterbus-live.md)
+- [decoding and PostgreSQL status](docs/2026-07-03-decoding-and-postgres-status.md)
 - [platform plan](docs/plan.md)
 
 ## About This Code

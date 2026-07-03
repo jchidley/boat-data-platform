@@ -1,0 +1,15 @@
+[Unit]
+Description=Import mirrored raw NMEA 2000 logs into PostgreSQL
+After=postgresql.service boat-raw-log-mirror.service
+Wants=postgresql.service
+
+[Service]
+Type=oneshot
+User=jack
+Group=jack
+WorkingDirectory=/home/jack/boat-data-platform
+EnvironmentFile=/etc/boat-data-platform/db.env
+Environment=RAW_N2K_DIR=/srv/boat/raw-n2k
+# Backfill gradually: a single compressed hour can expand to hundreds of thousands of decoded rows.
+Environment=LIMIT_FILES=1
+ExecStart=/usr/bin/node scripts/import-raw-n2k.mjs

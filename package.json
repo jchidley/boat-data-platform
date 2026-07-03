@@ -1,0 +1,16 @@
+{
+  "name": "boat-data-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT OR Apache-2.0",
+  "scripts": {
+    "collect:signalk": "node scripts/collect-signalk-to-timescale.mjs",
+    "import:n2k": "node scripts/import-raw-n2k.mjs",
+    "inventory:n2k": "node scripts/n2k-inventory.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.16.3",
+    "ws": "^8.18.3"
+  }
+}

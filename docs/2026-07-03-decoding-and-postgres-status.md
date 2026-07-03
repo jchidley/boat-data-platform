@@ -1,6 +1,8 @@
 # Decoding and PostgreSQL status — 2026-07-03
 
-## Current PostgreSQL vs Signal K status
+> Point-in-time status note. Use `docs/plan.md` and `docs/2026-07-03-edge-backend-migration-plan.md` for current architecture and next steps. Use this file as evidence of decoder/database state on 2026-07-03.
+
+## PostgreSQL vs Signal K status at capture time
 
 PostgreSQL/TimescaleDB is no longer just an empty schema.
 
@@ -133,7 +135,7 @@ Observed traffic includes switch-bank state and proprietary control/status frame
 
 Signal K exposes the binary switch bank states, but not necessarily all CZone/BEP semantics.
 
-## Current gaps
+## Gaps observed at capture time
 
 1. PostgreSQL history is now flowing, but backfill is incomplete.
 2. `n2k_decoded_messages` has only started importing archived logs.

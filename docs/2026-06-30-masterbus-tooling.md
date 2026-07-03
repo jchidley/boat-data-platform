@@ -1,5 +1,7 @@
 # Mastervolt MasterBus tooling — 2026-06-30
 
+> Historical setup note. Use `docs/plan.md` and `docs/rebuild-from-source-material.md` for current rules. Preserve MasterBus discovery/config snapshots because MasterBus cannot be rebuilt from N2K candump logs.
+
 `pi5nvme` has been prepared to read a Mastervolt MasterBus system via a Mastervolt USB Interface / MasterBus USB Link.
 
 ## Why USB, not NMEA 2000?

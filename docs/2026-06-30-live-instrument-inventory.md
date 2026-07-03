@@ -1,5 +1,7 @@
 # Live instrument inventory — 2026-06-30
 
+> Historical inventory. Use `docs/2026-07-03-boat-discovery-and-decoder-inventory.md` for the current device/decoder inventory.
+
 This is a point-in-time inventory from the currently powered/connected NMEA 2000 segment. It is not yet a complete inventory of the whole boat.
 
 ## Decoded Signal K paths currently visible

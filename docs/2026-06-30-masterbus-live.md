@@ -1,5 +1,7 @@
 # MasterBus live status — 2026-06-30
 
+> Historical status note. Use `docs/2026-07-03-boat-discovery-and-decoder-inventory.md` for current MasterBus inventory and `docs/rebuild-from-source-material.md` for snapshot/rebuild rules.
+
 After moving `pi5nvme` and plugging in the Mastervolt USB interface, the interface was detected successfully.
 
 ## USB detection

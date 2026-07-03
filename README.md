@@ -4,19 +4,31 @@ Boat NMEA 2000 gateway, logging, Signal K, TimescaleDB/Grafana, and analysis pla
 
 ## Current Status
 
-This repository tracks the boat-data architecture and supporting code. The live gateway is `picanm`, a Raspberry Pi 3 A+ with a PiCAN-M HAT. It collects NMEA 2000 data, exposes a minimal Signal K server, and writes compact raw CAN logs.
+This is an experimental boat data platform.
 
-`pi5nvme` is now the heavier processing host: PostgreSQL + TimescaleDB, Grafana, raw-log mirroring from `picanm`, and a separate fat Signal K server with webapps are installed. The next major code task is the live Signal K → TimescaleDB collector.
+Current target:
 
-See:
+```text
+picanm  = raw NMEA 2000 acquisition edge
+pi5nvme = Signal K, MasterBus, TimescaleDB/Postgres, Grafana, import, analysis
+```
 
-- [picanm setup summary](docs/2026-06-30-picanm-setup-summary.md)
-- [pi5nvme setup summary](docs/2026-06-30-pi5nvme-setup-summary.md)
-- [live instrument inventory](docs/2026-06-30-live-instrument-inventory.md)
-- [Mastervolt MasterBus tooling](docs/2026-06-30-masterbus-tooling.md)
-- [MasterBus live status](docs/2026-06-30-masterbus-live.md)
-- [decoding and PostgreSQL status](docs/2026-07-03-decoding-and-postgres-status.md)
+Preserve source material first:
+
+- raw NMEA 2000 candump logs for N2K;
+- MasterBus discovery/config snapshots for Mastervolt/MasterBus;
+- repo docs/scripts for rebuild.
+
+Treat Signal K state, TimescaleDB rows, inventories, summaries, and dashboards as derived/rebuildable while the system is experimental.
+
+Start here:
+
+- [documentation map](docs/README.md)
+- [LLM implementation brief](docs/llm-implementation-brief.md)
 - [platform plan](docs/plan.md)
+- [edge/backend migration plan](docs/2026-07-03-edge-backend-migration-plan.md)
+- [rebuild runbook](docs/rebuild-from-source-material.md)
+- [boat discovery and decoder inventory](docs/2026-07-03-boat-discovery-and-decoder-inventory.md)
 
 ## About This Code
 

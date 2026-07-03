@@ -1,176 +1,161 @@
 # Boat data platform plan
 
-## Architecture
+## Target architecture
 
 ```text
 NMEA 2000 backbone
     ↓
-PiCAN-M HAT on picanm
+PiCAN-M HAT on picanm / Pi 3 A+
     ↓
-picanm bare-bones gateway
+picanm raw acquisition edge
     ├─ can0 at 250 kbit/s
-    ├─ minimal Signal K server
-    └─ compact raw candump logs
-          ↓ live API / rsync
+    ├─ accurate edge timestamping
+    ├─ compact raw candump logs/spool in /var/log/n2k/
+    └─ lightweight raw CAN forwarding to pi5nvme
+          ↓ raw stream / rsync fallback
 pi5nvme data platform
-    ├─ raw log mirror
-    ├─ second/fat Signal K instance if useful
-    ├─ custom collectors and analysis code
+    ├─ primary/fat Signal K server
+    ├─ NMEA 2000 decoding via canboatjs/analyzerjs/Signal K
+    ├─ MasterBus/Mastervolt USB integration
     ├─ PostgreSQL + TimescaleDB
-    └─ Grafana dashboards
+    ├─ Grafana dashboards
+    ├─ Signal K web apps/plugins
+    └─ replay/import/inventory tooling
           ↓
 iPad / iPhone / Android / Windows Surface / WSL clients
 ```
 
+Detailed migration plan: [2026-07-03 edge/backend migration plan](2026-07-03-edge-backend-migration-plan.md).
+
+Current boat/device/decoder inventory: [2026-07-03 boat discovery and decoder inventory](2026-07-03-boat-discovery-and-decoder-inventory.md).
+
+Rebuild runbook: [rebuild from source material](rebuild-from-source-material.md).
+
 ## Design principles
 
-1. `picanm` must stay simple and robust.
-2. `picanm` should keep collecting even when `pi5nvme` is off.
-3. Raw NMEA 2000 logs are the source of truth for replay and reprocessing.
-4. Heavier plugins, dashboards, databases, and experiments belong on `pi5nvme`.
-5. Start read-only. Treat NMEA 2000 transmission as a separate safety-critical project.
-6. Prefer reproducible scripts and committed configuration over one-off manual changes.
+1. Keep `picanm` simple and robust.
+2. Keep collecting on `picanm` when `pi5nvme` is off.
+3. Treat raw NMEA 2000 logs as the source of truth for N2K replay and reprocessing.
+4. Preserve a MasterBus discovery/config snapshot trail; MasterBus cannot be rebuilt from N2K raw logs.
+5. Timestamp frames as close to acquisition as possible on `picanm`.
+6. Run heavier plugins, dashboards, databases, and experiments on `pi5nvme`.
+7. Start read-only. Treat NMEA 2000 transmission as a separate safety-critical project.
+8. Prefer reproducible scripts and committed configuration over one-off manual changes.
 
 ## picanm responsibilities
 
+Steady-state target:
+
 - Maintain `can0` at 250 kbit/s.
-- Run minimal Signal K for live decoded output.
-- Write compact raw candump logs to `/var/log/n2k`.
-- Expose Signal K API/WebSocket on port 3000.
-- Avoid heavy analysis, databases, GUI tools, or plugin experiments.
+- Write edge-timestamped raw candump logs to `/var/log/n2k`.
+- Rotate/compress logs safely.
+- Forward a live raw CAN/candump stream to `pi5nvme`.
+- Keep a local spool so collection survives `pi5nvme` outages.
+- Expose only health/diagnostic information.
+- Avoid Signal K apps, plugin experiments, databases, Grafana, or analysis jobs.
+
+Current transition state:
+
+- `picanm` still runs a minimal Signal K server on port `3000`.
+- The migration plan is to replace this as the primary upstream with raw CAN forwarding to `pi5nvme`, then disable Signal K on `picanm` after validation.
 
 ## pi5nvme responsibilities
 
-### Phase 1 — mirror and inspect
+- Mirror raw logs from `picanm:/var/log/n2k/` to `/srv/boat/raw-n2k/`.
+- Receive the live raw CAN stream from `picanm`.
+- Run the primary Signal K server on port `3001`.
+- Decode NMEA 2000 data on the Pi 5, not on the Pi 3 A+.
+- Run MasterBus/Mastervolt USB tooling and publish it into Signal K.
+- Preserve MasterBus discovery/config snapshots when devices or mappings change.
+- Store normalized Signal K values in TimescaleDB.
+- Store decoded raw N2K PGN history in TimescaleDB.
+- Run Grafana and Signal K applications/plugins.
+- Run inventory, replay, decoder comparison, and analysis tooling.
 
-- Create local archive directory, e.g. `/srv/boat/raw-n2k`.
-- Periodically pull completed raw log files from `picanm`:
+## Database layers
 
-```bash
-rsync -av --ignore-existing picanm:/var/log/n2k/ /srv/boat/raw-n2k/
-```
+Use PostgreSQL with TimescaleDB on `pi5nvme`.
 
-- Write a small inventory tool to summarize:
-  - source addresses
-  - PGNs seen
-  - first/last seen
-  - message rates
-  - address claims / NAME fields
-  - unknown/proprietary PGNs
-
-### Phase 2 — live collector
-
-- Connect to:
+### Signal K normalized values
 
 ```text
-ws://picanm:3000/signalk/v1/stream
+boatdata.signal_k_measurements
 ```
 
-- Store Signal K deltas into PostgreSQL/TimescaleDB.
-- Keep the collector idempotent and tolerant of `picanm` or `pi5nvme` restarts.
+Purpose: app-friendly historical path/value data from Signal K.
 
-### Phase 3 — TimescaleDB schema
+### Decoded N2K messages
 
-Use PostgreSQL with the TimescaleDB extension.
-
-Initial generic table:
-
-```sql
-CREATE TABLE signal_k_measurements (
-  time timestamptz NOT NULL,
-  path text NOT NULL,
-  source text,
-  pgn integer,
-  value_double double precision,
-  value_text text,
-  value_json jsonb
-);
-
-SELECT create_hypertable('signal_k_measurements', 'time');
-
-CREATE INDEX ON signal_k_measurements (path, time DESC);
-CREATE INDEX ON signal_k_measurements (source, time DESC);
-CREATE INDEX ON signal_k_measurements (pgn, time DESC);
+```text
+boatdata.n2k_decoded_messages
 ```
 
-Rationale: Signal K paths evolve over time. A generic path/value table lets us start quickly without over-modelling the boat.
+Purpose: decoded PGN-level history from raw candump logs/streams.
 
-Later, add derived/materialized tables for common domains:
+### Raw file/import inventory
 
-- navigation track
-- wind
-- depth
-- GNSS quality
-- heading and attitude
-- electrical systems
-- engine systems
-- alarms/events
+```text
+boatdata.raw_n2k_log_files
+```
 
-### Phase 4 — Grafana
+Purpose: track mirrored raw files, import status, first/last timestamps, checksums, and errors.
 
-Install Grafana on `pi5nvme` and connect it to PostgreSQL/TimescaleDB.
+### MasterBus snapshots
 
-Initial dashboards:
+```text
+boatdata.masterbus_snapshots
+```
 
-- Current boat state
+Purpose: track MasterBus/Mastervolt discovery/config snapshots, because MasterBus cannot be rebuilt from N2K raw logs.
+
+Future option: add a raw CAN frame hypertable if direct SQL access to every raw frame is useful.
+
+## Grafana priorities
+
+Build health/freshness dashboards before presentation dashboards:
+
+- latest raw frame received from `picanm`
+- latest mirrored raw log age
+- CAN RX errors/drops
+- picanm disk, memory, and clock offset
+- Signal K path freshness
+- Timescale collector freshness
+- raw importer backlog
+
+Boat/instrument dashboards:
+
 - GPS track and GNSS quality
-- Wind speed/angle history
-- Depth and water temperature
-- Heading vs COG
+- wind speed/angle history
+- depth and water temperature
+- heading vs COG
 - SOG vs STW
-- Rudder angle
-- CAN bus/source activity
-- Data freshness / stale sensors
+- rudder angle
+- AIS activity
+- electrical/MasterBus state of charge and inverter/charger status
 
-### Phase 5 — second Signal K on pi5nvme
-
-Optionally run a second, heavier Signal K instance on `pi5nvme`.
-
-Potential uses:
-
-- plugin experiments
-- dashboards that are too heavy for `picanm`
-- data exports
-- integrations with OpenCPN or other clients
-
-Important: avoid feedback loops. Do not bridge data back to `picanm`/NMEA 2000 unless deliberately designed.
-
-### Phase 6 — OpenCPN and client apps
-
-Potential clients:
-
-- Windows Surface running OpenCPN
-- iPad/iPhone/Android browser dashboards
-- OpenCPN mobile where useful
-- Signal K web apps such as KIP / Freeboard-SK
-
-Feed clients from `pi5nvme` where possible; use `picanm` directly only for minimal live access.
-
-## Open questions
-
-- Which NMEA 2000 devices correspond to the observed source addresses?
-- Which boat systems are not on the currently connected N2K segment?
-- Should raw logs be mirrored only, or also decoded batch-wise into TimescaleDB?
-- Which Signal K plugins are worth running on `pi5nvme`?
-- What is the desired long-term storage retention and compression policy on `pi5nvme`?
-- Should `picanm` publish raw logs over HTTP, or is rsync over SSH enough?
-- Do we need alerts/notifications, and if so where should they run?
-
-## Completed pi5nvme base work
+## Completed work
 
 - PostgreSQL 15 installed on `pi5nvme`.
 - TimescaleDB installed and enabled in the `boatdata` database.
-- Initial `signal_k_measurements` hypertable created.
-- Grafana installed and provisioned with a `Boat TimescaleDB` datasource.
+- Initial Signal K hypertable created.
+- Grafana installed and provisioned with a Boat TimescaleDB datasource.
 - Raw-log mirror timer installed to pull completed logs from `picanm` into `/srv/boat/raw-n2k`.
 - Fat Signal K server installed on `pi5nvme:3001`.
-- Fat Signal K consumes `picanm:3000` as a remote Signal K provider.
+- Fat Signal K currently consumes `picanm:3000` as a remote Signal K provider.
 - Initial Signal K webapps installed on `pi5nvme`: KIP, Freeboard-SK, Instrumentpanel, App Dock.
+- MasterBus USB tooling installed on `pi5nvme` and feeding Signal K.
+- Signal K WebSocket collector installed and writing to TimescaleDB.
+- Raw N2K log decoder/importer installed and writing decoded PGNs to TimescaleDB.
+- N2K inventory tooling added.
 
 ## Near-term next steps
 
-1. Write a small Signal K WebSocket collector.
-2. Store decoded Signal K values in TimescaleDB.
-3. Build the first Grafana dashboard.
-4. Build a device/PGN inventory report from raw logs.
-5. Add batch import/replay tooling for mirrored raw candump logs.
+1. Add committed `picanm` raw logger/forwarder service definitions.
+2. Add clock-sync/timestamping checks for `picanm` and `pi5nvme`.
+3. Add MasterBus snapshot/export capture on `pi5nvme`.
+4. Add `pi5nvme` raw stream receiver service.
+5. Test raw stream capture into files on `pi5nvme`.
+6. Prove how pi5 Signal K/canboat will consume the raw stream.
+7. Feed pi5 Signal K from the raw stream instead of `picanm` Signal K.
+8. Run old and new feeds in parallel and compare path/PGN coverage.
+9. Disable Signal K on `picanm` after validation.

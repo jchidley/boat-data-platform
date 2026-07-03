@@ -1,5 +1,7 @@
 # pi5nvme setup summary — 2026-06-30
 
+> Historical setup note. Use `docs/plan.md` and `docs/2026-07-03-edge-backend-migration-plan.md` for current architecture and next steps. Some gaps listed here have since been closed.
+
 `pi5nvme` is now the heavier boat-data platform host. `picanm` remains the bare-bones NMEA 2000 gateway/logger.
 
 ## Installed on pi5nvme
@@ -164,15 +166,6 @@ infra/pi5nvme/systemd/signalk-pi5nvme.service
 infra/pi5nvme/sql/001_init_timescale.sql
 ```
 
-## Current gap
+## Historical gap now closed
 
-TimescaleDB and Grafana are installed and ready, and the fat Signal K server is already consuming live `picanm` data. The remaining database gap is that live Signal K deltas are not yet being inserted into TimescaleDB.
-
-Next step: add a collector that subscribes to one of:
-
-```text
-ws://picanm:3000/signalk/v1/stream    # closest to the gateway
-ws://pi5nvme:3001/signalk/v1/stream   # after fat-server plugins/derived values
-```
-
-and inserts deltas into `signal_k_measurements`.
+At the time of this setup note, live Signal K deltas were not yet inserted into TimescaleDB. That gap was later closed by `boat-signalk-collector.service`; see `docs/2026-07-03-decoding-and-postgres-status.md`.

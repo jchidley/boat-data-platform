@@ -1,6 +1,8 @@
 # picanm setup summary — 2026-06-30
 
-This file records the current boat data setup and the decisions made so far.
+> Historical setup note. Use `docs/plan.md` and `docs/2026-07-03-edge-backend-migration-plan.md` for current architecture and next steps. Use `docs/2026-07-03-boat-discovery-and-decoder-inventory.md` for the current device/decoder inventory.
+
+This file records the picanm setup and the decisions made at the time.
 
 ## Goal
 
@@ -164,7 +166,7 @@ This suggests that the currently visible NMEA 2000 subset includes at least:
 - rudder angle / steering-related source
 - environmental pressure source
 
-Not yet confirmed in the visible subset:
+Not yet confirmed in this early visible subset:
 
 - engine data
 - fuel/tank data
@@ -172,6 +174,8 @@ Not yet confirmed in the visible subset:
 - AIS
 - autopilot command/control state
 - alarms
+
+Later samples did show AIS and more autopilot/control-related traffic. Use the current discovery inventory for up-to-date coverage.
 - route/waypoint state
 
 ## Network/device observations

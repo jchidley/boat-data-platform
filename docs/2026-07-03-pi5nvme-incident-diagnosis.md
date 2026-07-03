@@ -54,7 +54,7 @@ So the clean reboot at `16:56` was user/operator initiated after serial access, 
 
 ## Current state after diagnosis
 
-At diagnosis time:
+After subsequent reboot/recovery:
 
 - `boat-raw-n2k-import.service`: inactive
 - `boat-raw-n2k-import.timer`: inactive/disabled
@@ -62,10 +62,10 @@ At diagnosis time:
 - `boat-n2k-raw-receiver`: active
 - `postgresql`: active
 - `ssh`: active
-- temperature: ~46.6 C
-- throttling status since current boot: `throttled=0x0`
-- disk: `/` about 36% used, ~144 GiB available
-- memory: ~3.0 GiB available
+- `masterbus-signalk`: active and enabled for boot
+- `picanm` raw forwarder is connected to `pi5nvme.local:20200` over IPv4
+- MasterBus bridge listens on `0.0.0.0:3009` and Signal K sees the `masterbus` source
+- temperature/throttling/memory/disk checks were healthy after recovery
 
 ## Importer safeguard deployment
 
@@ -88,21 +88,21 @@ Guard dry-check on `pi5nvme` returned `rc=2` with:
 Refusing to run raw N2K import: set ALLOW_RAW_N2K_IMPORT=1 or pass --yes-really-import after confirming host resources and approval.
 ```
 
-## MasterBus side issue
+## MasterBus side issue resolved
 
-Current boot also shows `masterbus-signalk` repeatedly failing because no MasterBus USB Link is detected:
+During serial recovery, `masterbus-signalk` repeatedly failed because no MasterBus USB Link was detected:
 
 ```text
 masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
 ```
 
-`lsusb` did not show the MasterBus USB Link during the current check, although an earlier boot log did show:
+That explained Signal K `ECONNREFUSED 127.0.0.1:3009` messages at the time. After the USB Link was visible again and the Pi was rebooted/rechecked, `lsusb` showed:
 
 ```text
-Mastervolt International B.V. MasterBus USB Link
+ID 1a64:0000 Mastervolt MasterBus Link
 ```
 
-This explains Signal K `ECONNREFUSED 127.0.0.1:3009` messages. It is probably unrelated to the raw importer crash, but should be checked physically or via USB after the incident is stable.
+`masterbus-signalk` was started and re-enabled for boot. It connected to MasterBus, listened on `0.0.0.0:3009`, and streamed 94 mapped fields from 8 devices. This issue appears separate from the raw importer incident.
 
 ## Conclusion
 
@@ -113,7 +113,7 @@ The evidence is strong by timing and symptoms, but not absolute because the cras
 ## Recommended next safe actions
 
 1. Keep `boat-raw-n2k-import.timer` disabled.
-2. Do not manually start `boat-raw-n2k-import.service` until safeguards are deployed.
-3. Deploy the repo's guarded/limited importer unit before any future import/backfill.
-4. Keep backfill as a supervised maintenance task with resource limits, not an automatic live workload.
-5. Investigate why the MasterBus USB Link is no longer detected, separately from the importer incident.
+2. Keep `/etc/boat-data-platform/allow-raw-n2k-import` absent except during an approved import window.
+3. Do not manually start `boat-raw-n2k-import.service` except as a supervised maintenance task with the deployed resource limits active.
+4. Avoid broad live Postgres aggregate checks during validation; treat them as maintenance-window work if tables are large.
+5. Continue normal MasterBus operation via `masterbus-signalk`; if the USB Link disappears again, stop the service before troubleshooting to avoid a restart loop.

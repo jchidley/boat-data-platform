@@ -15,7 +15,7 @@ Expected while `pi5nvme` is offline:
 
 - `can0-nmea2000` active/exited successfully.
 - `n2k-raw-logger` active/running.
-- `n2k-raw-forwarder` active/running but retrying `pi5nvme:20200`.
+- `n2k-raw-forwarder` active/running but retrying `pi5nvme.local:20200`.
 - raw `.candump.log.tmp` grows under `/var/log/n2k/`.
 - completed `.candump.log.gz` files remain under `/var/log/n2k/`.
 
@@ -59,13 +59,13 @@ This is expected. Local raw logging is independent and continues.
 
 ## When pi5nvme returns
 
-First investigate the Pi 5 incident before doing implementation. See:
+If this is a new outage, first check the Pi 5 incident notes before doing implementation. See:
 
 ```text
 docs/2026-07-03-pi5nvme-incident-and-picanm-status.md
 ```
 
-Once `pi5nvme` raw receiver is back, the forwarder should reconnect automatically and live files should resume under:
+Once `pi5nvme` raw receiver is back, the forwarder should reconnect automatically via `pi5nvme.local:20200` and live files should resume under:
 
 ```text
 pi5nvme:/srv/boat/raw-n2k/live/

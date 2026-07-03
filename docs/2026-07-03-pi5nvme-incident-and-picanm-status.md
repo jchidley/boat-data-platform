@@ -19,9 +19,9 @@ Observed sequence after serial recovery and journal inspection:
 
 Current best diagnosis: the live host likely hard-hung or reset shortly after the import/backfill plus repeated Postgres count/max checks. The importer completed, but it substantially increased database size and cache/I/O pressure; the final recorded operation was a database count/max query, not the importer process itself. There is no evidence of a Linux OOM kill or clean thermal shutdown in the journal.
 
-Current state after reboot: `pi5nvme` is reachable by SSH, temperature is normal (`47.2'C` at check), throttling state is `0x0`, memory/disk are healthy, raw receiver and Signal K are active, and importer service/timer are inactive/disabled. The repo safeguards below are not yet deployed to `/etc/systemd/system` on `pi5nvme`.
+Current state after subsequent reboot/recovery: `pi5nvme` is reachable by SSH, temperature/throttling/memory/disk are healthy, raw receiver and Signal K are active, MasterBus is active again, and importer service/timer are inactive/disabled. The repo importer safeguards have now been deployed to `/etc/systemd/system` and `scripts/import-raw-n2k.mjs` on `pi5nvme`.
 
-The MasterBus USB Link is not currently visible in `lsusb`; only USB root hubs were listed. `masterbus-signalk.service` was restart-looping every 5 seconds with `no MasterBus USB Link found`, so it was stopped for the current boot only. It remains enabled for future boots unless changed separately.
+The temporary MasterBus failure was caused by the MasterBus USB Link not being visible during serial recovery. After reconnect/reboot, `lsusb` shows `ID 1a64:0000 Mastervolt MasterBus Link`; `masterbus-signalk.service` starts cleanly, listens on `0.0.0.0:3009`, and streams 94 mapped fields from 8 devices. It is enabled for boot again.
 
 ## Mandatory next actions on pi5nvme
 
@@ -36,13 +36,10 @@ Importer service/timer are currently inactive/disabled.
 
 Before any further implementation or import/backfill work:
 
-1. Deploy the repo's importer safety hardening to `pi5nvme`:
-   - guarded importer service with `ConditionPathExists=/etc/boat-data-platform/allow-raw-n2k-import`;
-   - disabled/non-persistent timer;
-   - script-level `ALLOW_RAW_N2K_IMPORT=1` approval guard;
-   - systemd CPU/memory/IO limits.
-2. Stop or disable `masterbus-signalk.service` until the MasterBus USB Link is visible again, or adjust its restart policy to avoid a 5-second failure loop.
-3. Do not restart importers, run backfills, run analyzer jobs, or run broad database aggregate checks on the live host until resource limits are deployed and an explicit import window is approved.
+1. Keep `boat-raw-n2k-import.timer` disabled unless an explicit import window is approved.
+2. Keep `/etc/boat-data-platform/allow-raw-n2k-import` absent except during an approved import window.
+3. Do not restart importers, run backfills, run analyzer jobs, or run broad database aggregate checks on the live host unless resource limits are active and the import/query window is explicitly approved.
+4. Treat `masterbus-signalk.service` as normal active infrastructure now that the USB Link is visible again; if the USB Link disappears, stop the service to avoid a restart loop before troubleshooting USB/power/wiring.
 
 ## Required safeguards now added in repo
 
@@ -114,9 +111,9 @@ Checked at `2026-07-03T12:23:34+01:00`.
 - completed raw segment present:
   - `/var/log/n2k/can0-20260703T100000Z.candump.log.gz`
 
-`n2k-raw-forwarder` is retrying `pi5nvme:20200`, as expected while `pi5nvme` is offline. Local raw logging is independent of forwarding and continues.
+At the initial outage check, `n2k-raw-forwarder` was retrying the then-configured `pi5nvme:20200`, as expected while `pi5nvme` was offline. Local raw logging is independent of forwarding and continued.
 
-After the outage, the deployed `picanm` forwarder retry interval was reduced from 5 seconds to 30 seconds by setting `RETRY_SEC=30` in `n2k-raw-forwarder.service`. This reduces log spam and connection churn while `pi5nvme` is down.
+After the outage, the deployed `picanm` forwarder retry interval was reduced from 5 seconds to 30 seconds by setting `RETRY_SEC=30` in `n2k-raw-forwarder.service`. This reduces log spam and connection churn if `pi5nvme` is down.
 
 After `pi5nvme` rebooted, `picanm` still failed to reconnect by bare hostname because `pi5nvme` resolved to IPv6 addresses and the receiver is IPv4-only. `.local` mDNS resolution works on the Starlink LAN, so the deployed `n2k-raw-forwarder.service` now uses `DEST_HOST=pi5nvme.local`, which resolves to IPv4. The TCP stream is established again:
 

@@ -75,7 +75,7 @@ Currently:
 - owns the PiCAN-M / `can0` NMEA 2000 interface
 - runs `can0-nmea2000.service`
 - runs `n2k-raw-logger.service` and writes raw candump logs under `/var/log/n2k/`
-- runs `n2k-raw-forwarder.service` and is connected to `pi5nvme:20200`
+- runs `n2k-raw-forwarder.service` and is connected to `pi5nvme.local:20200`
 - runs a minimal Signal K server on port `3000`
 - is memory constrained but working
 
@@ -94,7 +94,7 @@ Currently:
 - has pi5 Signal K consuming the raw stream via canboat `n2k-ip-gateway-canboatjs` from `127.0.0.1:20201` with `format: candump3`, while the old `picanm:3000` Signal K feed remains enabled for overlap
 - has a MasterBus snapshot captured at `/srv/boat/masterbus/20260703T105249Z`
 - stores Signal K deltas in `boatdata.signal_k_measurements`
-- imports decoded raw N2K messages into `boatdata.n2k_decoded_messages`
+- has decoded raw N2K import tooling for `boatdata.n2k_decoded_messages`; after the 2026-07-03 incident this importer is disabled by default and gated/resource-limited for approved import windows only
 
 ## Target data flows
 

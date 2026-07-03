@@ -147,7 +147,7 @@ Boat/instrument dashboards:
 - Initial Signal K webapps installed on `pi5nvme`: KIP, Freeboard-SK, Instrumentpanel, App Dock.
 - MasterBus USB tooling installed on `pi5nvme` and feeding Signal K.
 - Signal K WebSocket collector installed and writing to TimescaleDB.
-- Raw N2K log decoder/importer installed and writing decoded PGNs to TimescaleDB.
+- Raw N2K log decoder/importer installed and guarded; decoded PGN backfill is disabled by default and must run only in an approved, resource-limited import window.
 - N2K inventory tooling added.
 - Committed and deployed `picanm` raw edge services: `can0-nmea2000`, `n2k-raw-logger`, and `n2k-raw-forwarder`.
 - Committed and deployed `pi5nvme` raw receiver service: `boat-n2k-raw-receiver` on TCP `20200`.
@@ -155,7 +155,7 @@ Boat/instrument dashboards:
 - Verified `analyzerjs` decodes a received live-stream sample: 2000 raw lines produced 1238 decoded JSON messages.
 - Captured a MasterBus snapshot under `/srv/boat/masterbus/20260703T105249Z` with `/srv/boat/masterbus/latest` updated.
 - Determined and deployed the Signal K/canboat raw input method: `providers/simple` → `type: NMEA2000` → `subOptions.type: n2k-ip-gateway-canboatjs` with `format: candump3` connected to `127.0.0.1:20201`.
-- Replaced the Pi 5 raw receiver implementation with a Node receiver/fanout: picanm publishes to `pi5nvme:20200`; pi5 archives valid candump lines and broadcasts them read-only to local subscribers on `127.0.0.1:20201`.
+- Replaced the Pi 5 raw receiver implementation with a Node receiver/fanout: picanm publishes to `pi5nvme.local:20200`; pi5 archives valid candump lines and broadcasts them read-only to local subscribers on `127.0.0.1:20201`.
 - Enabled the new `picanm-raw-candump-fanout` Signal K provider while keeping the old `picanm-signalk-ws` provider enabled for overlap.
 - Verified Signal K sources include both the old N2K feed (`can0-nmea2000`) and the new raw feed (`picanm-raw-candump-fanout`).
 - Verified Timescale Signal K rows increased during the overlap check.

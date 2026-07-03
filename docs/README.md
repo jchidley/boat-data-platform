@@ -32,12 +32,12 @@ When implementation changes, update docs in this order:
 
 These files record point-in-time setup or evidence. Do not use them as current plans if they conflict with the current docs above.
 
-- `2026-06-30-picanm-setup-summary.md`
-- `2026-06-30-pi5nvme-setup-summary.md`
-- `2026-06-30-live-instrument-inventory.md`
-- `2026-06-30-masterbus-tooling.md`
-- `2026-06-30-masterbus-live.md`
-- `2026-07-03-decoding-and-postgres-status.md`
+- `archive/2026-06-30-picanm-setup-summary.md`
+- `archive/2026-06-30-pi5nvme-setup-summary.md`
+- `archive/2026-06-30-live-instrument-inventory.md`
+- `archive/2026-06-30-masterbus-tooling.md`
+- `archive/2026-06-30-masterbus-live.md`
+- `archive/2026-07-03-decoding-and-postgres-status.md`
 - `2026-07-03-migration-plan-review.md`
 
 When facts change, update the current docs first. Leave historical docs intact unless adding a stale-status note.

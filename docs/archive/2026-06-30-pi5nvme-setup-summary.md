@@ -168,4 +168,4 @@ infra/pi5nvme/sql/001_init_timescale.sql
 
 ## Historical gap now closed
 
-At the time of this setup note, live Signal K deltas were not yet inserted into TimescaleDB. That gap was later closed by `boat-signalk-collector.service`; see `docs/2026-07-03-decoding-and-postgres-status.md`.
+At the time of this setup note, live Signal K deltas were not yet inserted into TimescaleDB. That gap was later closed by `boat-signalk-collector.service`; see `docs/archive/2026-07-03-decoding-and-postgres-status.md`.

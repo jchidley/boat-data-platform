@@ -53,7 +53,7 @@ picanm:
   no Signal K after validation
 
 pi5nvme:
-  raw archive receiver
+  raw archive receiver active on TCP 20200
   primary Signal K
   MasterBus USB
   TimescaleDB/Postgres
@@ -63,15 +63,10 @@ pi5nvme:
 
 ## Do next
 
-1. Deploy the `pi5nvme` raw stream receiver and health scripts from `infra/pi5nvme/`.
-2. Verify edge timestamps and clock sync on both hosts.
-3. Capture forwarded raw candump lines into files on `pi5nvme`.
-4. Capture a MasterBus snapshot/export on `pi5nvme`.
-5. Prove canboatjs/analyzerjs decodes the received stream.
-6. Prove pi5 Signal K can consume the raw stream or document the bridge needed.
-7. Run old and new feeds in parallel.
-8. Compare PGNs, Signal K paths, timestamps, and key values.
-9. Disable `picanm` Signal K only after the go/no-go checklist passes.
+1. Prove pi5 Signal K can consume the raw stream or document the bridge needed.
+2. Run old and new feeds in parallel.
+3. Compare PGNs, Signal K paths, timestamps, and key values.
+4. Disable `picanm` Signal K only after the go/no-go checklist passes.
 
 ## Do not do yet
 

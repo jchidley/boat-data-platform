@@ -149,14 +149,14 @@ Boat/instrument dashboards:
 - Raw N2K log decoder/importer installed and writing decoded PGNs to TimescaleDB.
 - N2K inventory tooling added.
 - Committed and deployed `picanm` raw edge services: `can0-nmea2000`, `n2k-raw-logger`, and `n2k-raw-forwarder`.
+- Committed and deployed `pi5nvme` raw receiver service: `boat-n2k-raw-receiver` on TCP `20200`.
+- Verified forwarded raw candump lines are captured under `/srv/boat/raw-n2k/live/`.
+- Verified analyzerjs decodes a received live-stream sample.
+- Captured a MasterBus snapshot under `/srv/boat/masterbus/`.
 
 ## Near-term next steps
 
-1. Deploy updated `infra/pi5nvme/install-pi5nvme.sh` on `pi5nvme`.
-2. Verify clock sync and timestamp quality with `check-picanm-health` and `check-pi5-boat-health`.
-3. Test raw stream capture into files under `/srv/boat/raw-n2k/live/` on `pi5nvme`.
-4. Capture a MasterBus snapshot with `capture-masterbus-snapshot`.
-5. Prove how pi5 Signal K/canboat will consume the raw stream.
-6. Feed pi5 Signal K from the raw stream instead of `picanm` Signal K.
-7. Run old and new feeds in parallel and compare path/PGN coverage.
-8. Disable Signal K on `picanm` after validation.
+1. Prove how pi5 Signal K/canboat will consume the raw stream.
+2. Feed pi5 Signal K from the raw stream instead of `picanm` Signal K.
+3. Run old and new feeds in parallel and compare path/PGN coverage.
+4. Disable Signal K on `picanm` after validation.

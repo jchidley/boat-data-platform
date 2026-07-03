@@ -88,6 +88,7 @@ Currently:
 - runs PostgreSQL/TimescaleDB
 - runs Grafana
 - mirrors raw N2K logs from `picanm:/var/log/n2k/` to `/srv/boat/raw-n2k/`
+- receives the live raw candump stream on TCP `20200` and writes `/srv/boat/raw-n2k/live/*.tmp`
 - stores Signal K deltas in `boatdata.signal_k_measurements`
 - imports decoded raw N2K messages into `boatdata.n2k_decoded_messages`
 
@@ -643,13 +644,10 @@ This preserves current functionality while keeping the raw source-of-truth intac
 
 ## Immediate next implementation tasks
 
-1. Deploy updated `infra/pi5nvme/install-pi5nvme.sh` on `pi5nvme`.
-2. Verify raw stream capture into files on `pi5nvme` without touching Signal K.
-3. Capture a MasterBus snapshot/export on `pi5nvme`.
-4. Prove exactly how pi5 Signal K/canboat will consume the raw stream.
-5. Configure pi5 Signal K/canboat input from that raw stream.
-6. Run old and new paths in parallel and compare.
-7. Disable `picanm` Signal K only after validation.
+1. Prove exactly how pi5 Signal K/canboat will consume the raw stream.
+2. Configure pi5 Signal K/canboat input from that raw stream.
+3. Run old and new paths in parallel and compare.
+4. Disable `picanm` Signal K only after validation.
 
 ## Review notes
 

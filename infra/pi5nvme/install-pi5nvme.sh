@@ -7,7 +7,7 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 apt-get update
-apt-get install -y ca-certificates curl gnupg lsb-release rsync postgresql postgresql-contrib nodejs npm socat gzip chrony
+apt-get install -y ca-certificates curl gnupg lsb-release rsync postgresql postgresql-contrib nodejs socat gzip chrony
 
 install -d -m 0755 /etc/apt/keyrings
 if [ ! -f /etc/apt/keyrings/timescale.gpg ]; then

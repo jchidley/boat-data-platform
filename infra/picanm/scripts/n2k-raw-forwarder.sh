@@ -16,7 +16,7 @@ while true; do
   fi
 
   set +e
-  candump -L "$IFACE" | socat -u - "TCP:${DEST_HOST}:${DEST_PORT},connect-timeout=10"
+  socat -u "EXEC:candump -L ${IFACE}" "TCP:${DEST_HOST}:${DEST_PORT},connect-timeout=10"
   rc=$?
   set -e
   echo "n2k raw forwarder disconnected/exited rc=${rc}; retrying in ${RETRY_SEC}s" >&2

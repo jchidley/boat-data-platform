@@ -89,8 +89,9 @@ Currently:
 - runs PostgreSQL/TimescaleDB
 - runs Grafana
 - mirrors raw N2K logs from `picanm:/var/log/n2k/` to `/srv/boat/raw-n2k/`
-- receives the live raw candump stream on TCP `20200` and writes `/srv/boat/raw-n2k/live/*.tmp`
+- receives the live raw candump stream on TCP `20200`, writes `/srv/boat/raw-n2k/live/*.tmp`, and exposes a read-only local candump fanout on TCP `20201`
 - has a verified live raw stream sample decoded by `analyzerjs`
+- has pi5 Signal K consuming the raw stream via canboat `n2k-ip-gateway-canboatjs` from `127.0.0.1:20201` with `format: candump3`, while the old `picanm:3000` Signal K feed remains enabled for overlap
 - has a MasterBus snapshot captured at `/srv/boat/masterbus/20260703T105249Z`
 - stores Signal K deltas in `boatdata.signal_k_measurements`
 - imports decoded raw N2K messages into `boatdata.n2k_decoded_messages`
@@ -334,19 +335,24 @@ picanm candump -L can0
   → n2k-raw-forwarder.service
   → TCP pi5nvme:20200
   → boat-n2k-raw-receiver.service
-  → /srv/boat/raw-n2k/live/can0-YYYYMMDDTHH0000Z.candump.log.tmp
+      ├─ archive writer: /srv/boat/raw-n2k/live/can0-YYYYMMDDTHH0000Z.candump.log.tmp
+      └─ read-only local fanout: 127.0.0.1:20201
+  → signalk-pi5nvme provider picanm-raw-candump-fanout
+      type: NMEA2000
+      subOptions.type: n2k-ip-gateway-canboatjs
+      format: candump3
 ```
 
 The live file is a `.tmp` while being written. It may contain a partial final line during active writes. Treat completed rotated/compressed files as archive segments; use live `.tmp` files only for current-stream validation.
 
-`analyzerjs` has decoded a received live sample, so the remaining unknown is Signal K's exact raw-stream input/bridge configuration, not basic decoder compatibility.
+`analyzerjs` and Signal K/canboat have both decoded the received live stream. The raw-stream input method is no longer unknown; the remaining work is overlap comparison and go/no-go validation.
 
 ## Phase 2 — make pi5nvme the only heavy Signal K host
 
 On `pi5nvme`:
 
 - keep `signalk-pi5nvme.service` as the primary Signal K server
-- configure its NMEA 2000 input to consume the raw stream from `picanm`, not `picanm`'s Signal K server
+- configure its NMEA 2000 input to consume the raw stream from `picanm`, not `picanm`'s Signal K server; this is currently implemented as a local read-only candump fanout on `127.0.0.1:20201` consumed by canboat `n2k-ip-gateway-canboatjs` with `format: candump3`
 - keep MasterBus integration feeding this same Signal K instance
 - keep webapps/plugins on `pi5nvme`
 
@@ -653,9 +659,9 @@ This preserves current functionality while keeping the raw source-of-truth intac
 
 ## Immediate next implementation tasks
 
-1. Determine Signal K's exact raw-stream input method for candump/canboat data on `pi5nvme`.
-2. Configure pi5 Signal K/canboat input from that raw stream without depending on `picanm:3000`.
-3. Run old and new paths in parallel and compare PGNs, Signal K paths, timestamps, and key values.
+1. Run old and new paths in parallel and compare PGNs, Signal K paths, timestamps, and key values.
+2. Confirm completed raw receiver segments continue to import into decoded N2K Timescale rows.
+3. Keep MasterBus path validation in the overlap check.
 4. Disable `picanm` Signal K only after validation.
 
 ## Review notes

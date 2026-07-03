@@ -8,7 +8,9 @@ Type=simple
 User=jack
 Group=jack
 Environment=LISTEN_PORT=20200
+Environment=FANOUT_PORT=20201
 Environment=DEST_DIR=/srv/boat/raw-n2k/live
+Environment=IFACE=can0
 ExecStart=/usr/local/bin/boat-n2k-raw-receiver
 Restart=always
 RestartSec=5

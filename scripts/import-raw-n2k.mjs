@@ -4,14 +4,21 @@ import path from 'node:path'
 import { spawn } from 'node:child_process'
 import readline from 'node:readline'
 import crypto from 'node:crypto'
-import { makePool } from './db.mjs'
 
 const rawDir = process.env.RAW_N2K_DIR || '/srv/boat/raw-n2k'
 const analyzer = process.env.ANALYZERJS || '/usr/lib/node_modules/signalk-server/node_modules/@canboat/canboatjs/dist/bin/analyzerjs.js'
 const node = process.env.NODE || 'node'
-const pool = makePool('ingest')
 const limit = Number(process.env.LIMIT_FILES || process.argv[2] || 0)
 const tmpDir = process.env.TMPDIR || '/tmp'
+const approved = process.env.ALLOW_RAW_N2K_IMPORT === '1' || process.argv.includes('--yes-really-import')
+
+if (!approved) {
+  console.error('Refusing to run raw N2K import: set ALLOW_RAW_N2K_IMPORT=1 or pass --yes-really-import after confirming host resources and approval.')
+  process.exit(2)
+}
+
+const { makePool } = await import('./db.mjs')
+const pool = makePool('ingest')
 
 async function alreadyDone(file, st) {
   const r = await pool.query('select processed_at from raw_n2k_log_files where path=$1 and size_bytes=$2 and mtime=$3', [file, st.size, st.mtime])

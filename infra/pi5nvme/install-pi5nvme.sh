@@ -35,6 +35,7 @@ chown -R jack:jack /srv/boat
 install -m 0755 "$SCRIPT_DIR/boat-raw-log-mirror.sh" /usr/local/bin/boat-raw-log-mirror
 install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-stream-segment-writer.sh" /usr/local/bin/boat-n2k-stream-segment-writer
 install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-raw-receiver.sh" /usr/local/bin/boat-n2k-raw-receiver
+install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-raw-receiver.mjs" /usr/local/bin/boat-n2k-raw-receiver.mjs
 install -m 0755 "$SCRIPT_DIR/scripts/check-pi5-boat-health.sh" /usr/local/bin/check-pi5-boat-health
 install -m 0755 "$SCRIPT_DIR/scripts/capture-masterbus-snapshot.sh" /usr/local/bin/capture-masterbus-snapshot
 install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-log-mirror.service" /etc/systemd/system/boat-raw-log-mirror.service
@@ -95,7 +96,10 @@ fi
 
 systemctl daemon-reload
 systemctl enable --now chrony.service || true
-systemctl enable --now boat-raw-log-mirror.timer boat-raw-n2k-import.timer boat-n2k-raw-receiver.service grafana-server
+systemctl enable --now boat-raw-log-mirror.timer boat-n2k-raw-receiver.service grafana-server
+# Raw N2K import/backfill is intentionally opt-in after the 2026-07-03 pi5nvme
+# overload incident. Install the units, but do not enable the timer by default.
+systemctl disable --now boat-raw-n2k-import.timer boat-raw-n2k-import.service 2>/dev/null || true
 
 if ! grep -q '^GRAFANA_ADMIN_PASSWORD=' /etc/boat-data-platform/grafana.env 2>/dev/null; then
   umask 077

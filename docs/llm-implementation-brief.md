@@ -62,6 +62,14 @@ pi5nvme:
   import/inventory/rebuild tooling
 ```
 
+## Safety gate after 2026-07-03 pi5nvme incident
+
+Before any further `pi5nvme` implementation, investigate the overload/thermal incident documented in `docs/2026-07-03-pi5nvme-incident-and-picanm-status.md`.
+
+Do not run importers, backfills, canboat/analyzer bulk jobs, database-heavy jobs, or service restarts on `pi5nvme` until the incident is understood and resource limits are in place.
+
+`picanm` remains the safe active acquisition edge and is still writing raw N2K logs locally.
+
 ## Proven in latest implementation slice
 
 - `picanm` raw logger/forwarder services are deployed and active.
@@ -69,14 +77,16 @@ pi5nvme:
 - Live raw candump lines are being written under `/srv/boat/raw-n2k/live/`.
 - `analyzerjs` decoded a received live-stream sample.
 - MasterBus snapshot capture ran under `/srv/boat/masterbus/`.
+- Exact Signal K/canboat raw input method is proven: Signal K `providers/simple` with `type: "NMEA2000"`, `subOptions.type: "n2k-ip-gateway-canboatjs"`, `format: "candump3"`, connected to a read-only local fanout on `127.0.0.1:20201`.
+- `pi5nvme` raw receiver now archives the picanm stream from TCP `20200` and fans the same candump lines to Signal K on localhost `20201`.
+- pi5 Signal K has both feeds enabled for overlap: old `picanm:3000` Signal K and new raw candump/canboat feed.
 
 ## Do next
 
-1. Determine the exact Signal K/canboat input method for consuming the raw stream on `pi5nvme`.
-2. Configure pi5 Signal K to consume that raw stream without using `picanm:3000` as the N2K source.
-3. Run old and new feeds in parallel.
-4. Compare PGNs, Signal K paths, timestamps, and key values.
-5. Disable `picanm` Signal K only after the go/no-go checklist passes.
+1. Compare old and new feeds in parallel: PGNs, Signal K paths, timestamps, and key values.
+2. Confirm TimescaleDB decoded N2K import continues across completed raw segments from the new receiver.
+3. Confirm MasterBus paths remain present while the raw N2K feed is active.
+4. Disable `picanm` Signal K only after the go/no-go checklist passes.
 
 ## Do not do yet
 

@@ -1,7 +1,11 @@
 [Unit]
 Description=Import mirrored raw NMEA 2000 logs into PostgreSQL
+Documentation=file:/home/jack/boat-data-platform/docs/2026-07-03-pi5nvme-incident-and-picanm-status.md
 After=postgresql.service boat-raw-log-mirror.service
 Wants=postgresql.service
+# Safety gate: raw import/backfill is a high CPU, memory, disk I/O, and database workload.
+# Create this file only during an approved import window, after reviewing the incident doc.
+ConditionPathExists=/etc/boat-data-platform/allow-raw-n2k-import
 
 [Service]
 Type=oneshot
@@ -10,6 +14,15 @@ Group=jack
 WorkingDirectory=/home/jack/boat-data-platform
 EnvironmentFile=/etc/boat-data-platform/db.env
 Environment=RAW_N2K_DIR=/srv/boat/raw-n2k
+Environment=ALLOW_RAW_N2K_IMPORT=1
 # Backfill gradually: a single compressed hour can expand to hundreds of thousands of decoded rows.
 Environment=LIMIT_FILES=1
+# Resource limits are deliberately conservative for a live Raspberry Pi 5 boat host.
+Nice=10
+IOSchedulingClass=idle
+IOSchedulingPriority=7
+CPUQuota=50%
+MemoryMax=768M
+TasksMax=64
+TimeoutStartSec=20min
 ExecStart=/usr/bin/node scripts/import-raw-n2k.mjs

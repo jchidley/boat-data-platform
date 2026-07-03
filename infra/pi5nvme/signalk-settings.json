@@ -27,6 +27,29 @@
       ]
     },
     {
+      "id": "picanm-raw-candump-fanout",
+      "enabled": true,
+      "pipeElements": [
+        {
+          "type": "providers/simple",
+          "options": {
+            "logging": false,
+            "type": "NMEA2000",
+            "subOptions": {
+              "type": "n2k-ip-gateway-canboatjs",
+              "providerId": "picanm-raw-candump-fanout",
+              "description": "Read-only raw candump stream from picanm via local pi5 fanout",
+              "host": "127.0.0.1",
+              "port": 20201,
+              "format": "candump3",
+              "actAsCanDevice": false,
+              "disableDefaultTransmitPGNs": true
+            }
+          }
+        }
+      ]
+    },
+    {
       "id": "masterbus-signalk-tcp",
       "enabled": true,
       "pipeElements": [

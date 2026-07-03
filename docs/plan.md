@@ -64,9 +64,9 @@ Current transition state:
 ## pi5nvme responsibilities
 
 - Mirror raw logs from `picanm:/var/log/n2k/` to `/srv/boat/raw-n2k/`.
-- Receive the live raw CAN stream from `picanm` on TCP `20200` and write `/srv/boat/raw-n2k/live/`.
+- Receive the live raw CAN stream from `picanm` on TCP `20200`, write `/srv/boat/raw-n2k/live/`, and expose a read-only localhost candump fanout on TCP `20201` for Signal K/canboat.
 - Run the primary Signal K server on port `3001`.
-- Decode NMEA 2000 data on the Pi 5, not on the Pi 3 A+.
+- Decode NMEA 2000 data on the Pi 5 via Signal K/canboat `n2k-ip-gateway-canboatjs` using candump3 input from `127.0.0.1:20201`, not on the Pi 3 A+.
 - Run MasterBus/Mastervolt USB tooling and publish it into Signal K.
 - Preserve MasterBus discovery/config snapshots when devices or mappings change.
 - Store normalized Signal K values in TimescaleDB.
@@ -154,10 +154,15 @@ Boat/instrument dashboards:
 - Verified forwarded raw candump lines are captured under `/srv/boat/raw-n2k/live/`.
 - Verified `analyzerjs` decodes a received live-stream sample: 2000 raw lines produced 1238 decoded JSON messages.
 - Captured a MasterBus snapshot under `/srv/boat/masterbus/20260703T105249Z` with `/srv/boat/masterbus/latest` updated.
+- Determined and deployed the Signal K/canboat raw input method: `providers/simple` → `type: NMEA2000` → `subOptions.type: n2k-ip-gateway-canboatjs` with `format: candump3` connected to `127.0.0.1:20201`.
+- Replaced the Pi 5 raw receiver implementation with a Node receiver/fanout: picanm publishes to `pi5nvme:20200`; pi5 archives valid candump lines and broadcasts them read-only to local subscribers on `127.0.0.1:20201`.
+- Enabled the new `picanm-raw-candump-fanout` Signal K provider while keeping the old `picanm-signalk-ws` provider enabled for overlap.
+- Verified Signal K sources include both the old N2K feed (`can0-nmea2000`) and the new raw feed (`picanm-raw-candump-fanout`).
+- Verified Timescale Signal K rows increased during the overlap check.
 
 ## Near-term next steps
 
-1. Determine the exact Signal K/canboat input method for the live candump stream.
-2. Configure pi5 Signal K to consume the raw stream without using `picanm:3000` as the N2K source.
-3. Run old and new feeds in parallel and compare path/PGN coverage, timestamps, and key values.
+1. Compare old and new feeds in parallel: path/PGN coverage, timestamps, and key values.
+2. Confirm completed raw segments from the new receiver continue to import into decoded N2K Timescale rows.
+3. Keep MasterBus validation in the overlap check.
 4. Disable Signal K on `picanm` only after the go/no-go checklist passes.

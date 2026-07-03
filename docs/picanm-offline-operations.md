@@ -47,10 +47,12 @@ It runs the disk/spool check periodically and logs output to the journal.
 
 ## Forwarder retry behaviour
 
+The deployed forwarder uses IPv4 `DEST_HOST=192.168.1.135` because `pi5nvme` currently resolves to IPv6 addresses from `picanm`, while the raw receiver listens on IPv4 `0.0.0.0:20200`.
+
 While `pi5nvme` is offline, the raw forwarder retries every 30 seconds:
 
 ```text
-n2k raw forwarder cannot connect to pi5nvme:20200; retrying in 30s
+n2k raw forwarder cannot connect to 192.168.1.135:20200; retrying in 30s
 ```
 
 This is expected. Local raw logging is independent and continues.

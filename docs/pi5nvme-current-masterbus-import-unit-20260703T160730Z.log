@@ -1,0 +1,122 @@
+== current usb masterbus ==
+
+== masterbus status/log ==
+○ masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge
+     Loaded: loaded (/etc/systemd/system/masterbus-signalk.service; enabled; preset: enabled)
+     Active: inactive (dead) (Result: exit-code) since Fri 2026-07-03 17:03:45 BST; 3min 44s ago
+   Duration: 1ms
+       Docs: https://github.com/keesverruijt/masterbus
+   Main PID: 1420 (code=exited, status=2)
+        CPU: 49ms
+
+Jul 03 17:03:45 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:02:45 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:02:45 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:02:50 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 63.
+Jul 03 17:02:50 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:02:50 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:02:50 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:02:50 pi5nvme masterbus-signalk[1387]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:02:50 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:02:50 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:02:55 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 64.
+Jul 03 17:02:55 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:02:55 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:02:55 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:02:55 pi5nvme masterbus-signalk[1391]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:02:55 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:02:55 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:00 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 65.
+Jul 03 17:03:00 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:00 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:00 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:00 pi5nvme masterbus-signalk[1394]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:00 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:00 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:05 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 66.
+Jul 03 17:03:05 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:06 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:06 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:06 pi5nvme masterbus-signalk[1397]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:06 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:06 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:11 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 67.
+Jul 03 17:03:11 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:11 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:11 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:11 pi5nvme masterbus-signalk[1400]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:11 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:11 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:16 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 68.
+Jul 03 17:03:16 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:16 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:16 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:16 pi5nvme masterbus-signalk[1404]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:16 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:16 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:21 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 69.
+Jul 03 17:03:21 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:21 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:21 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:21 pi5nvme masterbus-signalk[1407]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:21 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:21 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:26 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 70.
+Jul 03 17:03:26 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:26 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:27 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:27 pi5nvme masterbus-signalk[1410]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:27 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:27 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:32 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 71.
+Jul 03 17:03:32 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:32 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:32 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:32 pi5nvme masterbus-signalk[1413]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:32 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:32 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:37 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 72.
+Jul 03 17:03:37 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:37 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:37 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:37 pi5nvme masterbus-signalk[1417]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:37 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:37 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:42 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 73.
+Jul 03 17:03:42 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:42 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 17:03:42 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 17:03:42 pi5nvme masterbus-signalk[1420]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 17:03:42 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 17:03:42 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 17:03:45 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+
+== import unit full cat ==
+# /etc/systemd/system/boat-raw-n2k-import.service
+[Unit]
+Description=Import mirrored raw NMEA 2000 logs into PostgreSQL
+After=postgresql.service boat-raw-log-mirror.service
+Wants=postgresql.service
+
+[Service]
+Type=oneshot
+User=jack
+Group=jack
+WorkingDirectory=/home/jack/boat-data-platform
+EnvironmentFile=/etc/boat-data-platform/db.env
+Environment=RAW_N2K_DIR=/srv/boat/raw-n2k
+# Backfill gradually: a single compressed hour can expand to hundreds of thousands of decoded rows.
+Environment=LIMIT_FILES=1
+ExecStart=/usr/bin/node scripts/import-raw-n2k.mjs
+
+# /etc/systemd/system/boat-raw-n2k-import.timer
+[Unit]
+Description=Import mirrored raw NMEA 2000 logs periodically
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,728 @@
+== prior boot kernel critical clues ==
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: SerialNumber: xhci-hcd.1
+Jul 03 09:17:01 pi5nvme kernel: hub 4-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 4-0:1.0: 1 port detected
+Jul 03 09:17:01 pi5nvme kernel: of_cfs_init
+Jul 03 09:17:01 pi5nvme kernel: of_cfs_init: OK
+Jul 03 09:17:01 pi5nvme kernel: clk: Disabling unused clocks
+Jul 03 09:17:01 pi5nvme kernel: PM: genpd: Disabling unused power domains
+Jul 03 09:17:01 pi5nvme kernel: Freeing unused kernel memory: 5696K
+Jul 03 09:17:01 pi5nvme kernel: Run /init as init process
+Jul 03 09:17:01 pi5nvme kernel:   with arguments:
+Jul 03 09:17:01 pi5nvme kernel:     /init
+Jul 03 09:17:01 pi5nvme kernel:   with environment:
+Jul 03 09:17:01 pi5nvme kernel:     HOME=/
+Jul 03 09:17:01 pi5nvme kernel:     TERM=linux
+Jul 03 09:17:01 pi5nvme kernel: input: pwr_button as /devices/platform/pwr_button/input/input0
+Jul 03 09:17:01 pi5nvme kernel: brcmstb-i2c 107d508200.i2c:  @97500hz registered in interrupt mode
+Jul 03 09:17:01 pi5nvme kernel: brcmstb-i2c 107d508280.i2c:  @97500hz registered in interrupt mode
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx8   gen() 12522 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx4   gen() 10533 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx2   gen()  8214 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx1   gen()  7461 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x8  gen()  5238 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x4  gen()  4920 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x2  gen()  3865 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x1  gen()  3692 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: using algorithm neonx8 gen() 12522 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: .... xor() 8119 MB/s, rmw enabled
+Jul 03 09:17:01 pi5nvme kernel: raid6: using neon recovery algorithm
+Jul 03 09:17:01 pi5nvme kernel: xor: measuring software checksum speed
+Jul 03 09:17:01 pi5nvme kernel:    8regs           : 15811 MB/sec
+Jul 03 09:17:01 pi5nvme kernel:    32regs          : 15679 MB/sec
+Jul 03 09:17:01 pi5nvme kernel:    arm64_neon      : 21619 MB/sec
+Jul 03 09:17:01 pi5nvme kernel: xor: using function: arm64_neon (21619 MB/sec)
+Jul 03 09:17:01 pi5nvme kernel: Btrfs loaded, zoned=no, fsverity=no
+Jul 03 09:17:01 pi5nvme kernel: EXT4-fs (nvme0n1p2): mounted filesystem ce208fd3-38a8-424a-87a2-cd44114eb820 ro with ordered data mode. Quota mode: none.
+Jul 03 09:17:01 pi5nvme systemd[1]: System time before build time, advancing clock.
+Jul 03 09:17:01 pi5nvme kernel: NET: Registered PF_INET6 protocol family
+Jul 03 09:17:01 pi5nvme kernel: Segment Routing with IPv6
+Jul 03 09:17:01 pi5nvme kernel: In-situ OAM (IOAM) with IPv6
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd 252.39-1~deb12u2 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
+Jul 03 09:17:01 pi5nvme systemd[1]: Detected architecture arm64.
+Jul 03 09:17:01 pi5nvme systemd[1]: Hostname set to <pi5nvme>.
+Jul 03 09:17:01 pi5nvme systemd[1]: Queued start job for default target multi-user.target.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-postgresql.slice - Slice /system/postgresql.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice user.slice - User and Session Slice.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+Jul 03 09:17:01 pi5nvme systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+Jul 03 09:17:01 pi5nvme systemd[1]: Expecting device dev-disk-by\x2dpartuuid-552b6058\x2d01.device - /dev/disk/by-partuuid/552b6058-01...
+Jul 03 09:17:01 pi5nvme systemd[1]: Expecting device dev-ttyAMA10.device - /dev/ttyAMA10...
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target paths.target - Path Units.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target slices.target - Slice Units.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target swap.target - Swaps.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target time-set.target - System Time Set.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-fsckd.socket - fsck to fsckd communication Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-initctl.socket - initctl Compatibility Named Pipe.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald.socket - Journal Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: dev-hugepages.mount - Huge Pages File System was skipped because of an unmet condition check (ConditionPathExists=/sys/kernel/mm/hugepages).
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: auth-rpcgss-module.service - Kernel Module supporting RPCSEC_GSS was skipped because of an unmet condition check (ConditionPathExists=/etc/krb5.keytab).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting fake-hwclock.service - Restore / save the current clock...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting keyboard-setup.service - Set the console keyboard layout...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@configfs.service - Load Kernel Module configfs...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@dm_mod.service - Load Kernel Module dm_mod...
+Jul 03 09:17:01 pi5nvme kernel: device-mapper: ioctl: 4.48.0-ioctl (2023-03-01) initialised: dm-devel@lists.linux.dev
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@drm.service - Load Kernel Module drm...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@fuse.service - Load Kernel Module fuse...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@loop.service - Load Kernel Module loop...
+Jul 03 09:17:01 pi5nvme kernel: fuse: init (API version 7.41)
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathExists=!/run/initramfs/fsck-root).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-journald.service - Journal Service...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-journald.service - Journal Service.
+Jul 03 09:17:01 pi5nvme kernel: EXT4-fs (nvme0n1p2): re-mounted ce208fd3-38a8-424a-87a2-cd44114eb820 r/w.
+Jul 03 09:17:01 pi5nvme systemd-journald[308]: Received client request to flush runtime journal.
+Jul 03 09:17:01 pi5nvme systemd-journald[308]: File /var/log/journal/57507218e3dd48ba81e7e162ed895ac9/system.journal corrupted or uncleanly shut down, renaming and replacing.
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 107d508500.gpiomem: window base 0x107d508500 size 0x00000040
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 107d508500.gpiomem: initialised 1 regions as /dev/gpiomem1
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 107d517c00.gpiomem: window base 0x107d517c00 size 0x00000040
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 107d517c00.gpiomem: initialised 1 regions as /dev/gpiomem2
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 107d504100.gpiomem: window base 0x107d504100 size 0x00000020
+Jul 03 09:17:01 pi5nvme kernel: rp1-firmware rp1_firmware: RP1 Firmware version eb39cfd516f8c90628aa9d91f52370aade5d0a55
+Jul 03 09:17:01 pi5nvme kernel: rp1-pio 1f00178000.pio: Created instance as pio0
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 107d504100.gpiomem: initialised 1 regions as /dev/gpiomem3
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 107d510700.gpiomem: window base 0x107d510700 size 0x00000020
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 107d510700.gpiomem: initialised 1 regions as /dev/gpiomem4
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 1f000d0000.gpiomem: window base 0x1f000d0000 size 0x00030000
+Jul 03 09:17:01 pi5nvme kernel: rpi-gpiomem 1f000d0000.gpiomem: initialised 1 regions as /dev/gpiomem0
+Jul 03 09:17:01 pi5nvme kernel: mc: Linux media interface: v0.10
+Jul 03 09:17:01 pi5nvme kernel: v3d 1002000000.v3d: [drm] Transparent Hugepage support is recommended for optimal performance on this platform!
+Jul 03 09:17:01 pi5nvme kernel: [drm] Initialized v3d 1.0.0 for 1002000000.v3d on minor 0
+Jul 03 09:17:01 pi5nvme kernel: cfg80211: Loading compiled-in X.509 certificates for regulatory database
+Jul 03 09:17:01 pi5nvme kernel: Loaded X.509 cert 'benh@debian.org: 577e021cb980e0e820821ba7b54b4961b8b4fadf'
+Jul 03 09:17:01 pi5nvme kernel: Loaded X.509 cert 'romain.perier@gmail.com: 3abbc6ec146e09d1b6016ab9d6cf71dd233f0328'
+Jul 03 09:17:01 pi5nvme kernel: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+Jul 03 09:17:01 pi5nvme kernel: Loaded X.509 cert 'wens: 61c038651aabdcf94bd0ac7ff06c7248db18c600'
+Jul 03 09:17:01 pi5nvme kernel: videodev: Linux video capture interface: v2.00
+Jul 03 09:17:01 pi5nvme kernel: brcmfmac: F1 signature read @0x18000000=0x15264345
+Jul 03 09:17:01 pi5nvme kernel: brcmfmac: brcmf_fw_alloc_request: using brcm/brcmfmac43455-sdio for chip BCM4345/6
+Jul 03 09:17:01 pi5nvme kernel: pispbe 1000880000.pisp_be: bcm2712_iommu_of_xlate: MMU 1000005100.iommu
+Jul 03 09:17:01 pi5nvme kernel: pispbe 1000880000.pisp_be: bcm2712_iommu_probe_device: MMU 1000005100.iommu
+Jul 03 09:17:01 pi5nvme kernel: pispbe 1000880000.pisp_be: bcm2712_iommu_device_group: MMU 1000005100.iommu
+Jul 03 09:17:01 pi5nvme kernel: pispbe 1000880000.pisp_be: Adding to iommu group 0
+Jul 03 09:17:01 pi5nvme kernel: pispbe 1000880000.pisp_be: bcm2712_iommu_attach_dev: MMU 1000005100.iommu
+Jul 03 09:17:01 pi5nvme kernel: rpi-hevc-dec 1000800000.codec: bcm2712_iommu_of_xlate: MMU 1000005100.iommu
+Jul 03 09:17:01 pi5nvme kernel: rpi-hevc-dec 1000800000.codec: bcm2712_iommu_probe_device: MMU 1000005100.iommu
+Jul 03 09:17:01 pi5nvme kernel: rpi-hevc-dec 1000800000.codec: bcm2712_iommu_device_group: MMU 1000005100.iommu
+Jul 03 09:17:01 pi5nvme kernel: rpi-hevc-dec 1000800000.codec: Adding to iommu group 0
+Jul 03 09:17:01 pi5nvme kernel: rpi-hevc-dec 1000800000.codec: bcm2712_iommu_attach_dev: MMU 1000005100.iommu
+Jul 03 09:17:01 pi5nvme kernel: usbcore: registered new interface driver brcmfmac
+Jul 03 09:17:01 pi5nvme kernel: rpi-hevc-dec 1000800000.codec: Device registered as /dev/video19
+Jul 03 09:17:01 pi5nvme kernel: vc4_hvs 107c580000.hvs: bcm2712_iommu_of_xlate: MMU 1000005200.iommu
+Jul 03 09:17:01 pi5nvme kernel: vc4_hvs 107c580000.hvs: bcm2712_iommu_probe_device: MMU 1000005200.iommu
+Jul 03 09:17:01 pi5nvme kernel: vc4_hvs 107c580000.hvs: bcm2712_iommu_device_group: MMU 1000005200.iommu
+Jul 03 09:17:01 pi5nvme kernel: vc4_hvs 107c580000.hvs: Adding to iommu group 1
+Jul 03 09:17:01 pi5nvme kernel: vc4_hvs 107c580000.hvs: bcm2712_iommu_attach_dev: MMU 1000005200.iommu
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bcm2712_iommu_of_xlate: MMU 1000005200.iommu
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bcm2712_iommu_probe_device: MMU 1000005200.iommu
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bcm2712_iommu_device_group: MMU 1000005200.iommu
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: Adding to iommu group 1
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bcm2712_iommu_attach_dev: MMU 1000005200.iommu
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: Core ver 2.22
+Jul 03 09:17:01 pi5nvme kernel: NET: Registered PF_BLUETOOTH protocol family
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: HCI device and connection manager initialized
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: HCI socket layer initialized
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: L2CAP socket layer initialized
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: SCO socket layer initialized
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bound 107c580000.hvs (ops vc4_hvs_ops [vc4])
+Jul 03 09:17:01 pi5nvme kernel: Registered IR keymap rc-cec
+Jul 03 09:17:01 pi5nvme kernel: rc rc0: vc4-hdmi-0 as /devices/platform/soc@107c000000/107c701400.hdmi/rc/rc0
+Jul 03 09:17:01 pi5nvme kernel: input: vc4-hdmi-0 as /devices/platform/soc@107c000000/107c701400.hdmi/rc/rc0/input1
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: HCI UART driver ver 2.3
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: HCI UART protocol H4 registered
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: HCI UART protocol Three-wire (H5) registered
+Jul 03 09:17:01 pi5nvme kernel: hci_uart_bcm serial0-0: supply vbat not found, using dummy regulator
+Jul 03 09:17:01 pi5nvme kernel: hci_uart_bcm serial0-0: supply vddio not found, using dummy regulator
+Jul 03 09:17:01 pi5nvme kernel: Bluetooth: HCI UART protocol Broadcom registered
+Jul 03 09:17:01 pi5nvme kernel: input: vc4-hdmi-0 HDMI Jack as /devices/platform/soc@107c000000/107c701400.hdmi/sound/card0/input2
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bound 107c701400.hdmi (ops vc4_hdmi_ops [vc4])
+Jul 03 09:17:01 pi5nvme kernel: Registered IR keymap rc-cec
+Jul 03 09:17:01 pi5nvme kernel: rc rc1: vc4-hdmi-1 as /devices/platform/soc@107c000000/107c706400.hdmi/rc/rc1
+Jul 03 09:17:01 pi5nvme kernel: input: vc4-hdmi-1 as /devices/platform/soc@107c000000/107c706400.hdmi/rc/rc1/input3
+Jul 03 09:17:01 pi5nvme kernel: input: vc4-hdmi-1 HDMI Jack as /devices/platform/soc@107c000000/107c706400.hdmi/sound/card1/input4
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bound 107c706400.hdmi (ops vc4_hdmi_ops [vc4])
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bound 107c500000.mop (ops vc4_txp_ops [vc4])
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bound 107c501000.moplet (ops vc4_txp_ops [vc4])
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bound 107c410000.pixelvalve (ops vc4_crtc_ops [vc4])
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: bound 107c411000.pixelvalve (ops vc4_crtc_ops [vc4])
+Jul 03 09:17:01 pi5nvme kernel: [drm] Initialized vc4 0.0.0 for axi:gpu on minor 1
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: [drm] Cannot find any crtc or sizes
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: [drm] Cannot find any crtc or sizes
+Jul 03 09:17:01 pi5nvme kernel: vc4-drm axi:gpu: [drm] Cannot find any crtc or sizes
+Jul 03 09:17:01 pi5nvme kernel: brcmfmac: brcmf_c_process_txcap_blob: no txcap_blob available (err=-2)
+Jul 03 09:17:01 pi5nvme kernel: brcmfmac: brcmf_c_preinit_dcmds: Firmware: BCM4345/6 wl0: Aug 29 2023 01:47:08 version 7.45.265 (28bca26 CY) FWID 01-b677b91b
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM: chip id 107
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM: features 0x2f
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM4345C0
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM4345C0 (003.001.025) build 0000
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM4345C0 'brcm/BCM4345C0.raspberrypi,5-model-b.hcd' Patch
+Jul 03 09:17:02 pi5nvme kernel: Adding 524272k swap on /var/swap.  Priority:-2 extents:9 across:2129920k SS
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: BNEP filters: protocol multicast
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: BNEP socket layer initialized
+Jul 03 09:17:02 pi5nvme kernel: macb 1f00100000.ethernet eth0: PHY [1f00100000.ethernet-ffffffff:01] driver [Broadcom BCM54213PE] (irq=POLL)
+Jul 03 09:17:02 pi5nvme kernel: macb 1f00100000.ethernet eth0: configuring for phy/rgmii-id link mode
+Jul 03 09:17:02 pi5nvme kernel: macb 1f00100000.ethernet: gem-ptp-timer ptp clock registered.
+Jul 03 09:17:02 pi5nvme kernel: brcmfmac: brcmf_cfg80211_set_power_mgmt: power save enabled
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM: features 0x2f
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM43455 37.4MHz Raspberry Pi 3+-0190
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM4345C0 (003.001.025) build 0382
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: hci0: BCM: Using default device address (43:45:c0:00:1f:ac)
+Jul 03 09:17:02 pi5nvme kernel: Bluetooth: MGMT ver 1.23
+Jul 03 09:17:02 pi5nvme kernel: NET: Registered PF_ALG protocol family
+Jul 03 09:17:08 pi5nvme systemd-journald[308]: File /var/log/journal/57507218e3dd48ba81e7e162ed895ac9/user-1000.journal corrupted or uncleanly shut down, renaming and replacing.
+Jul 03 16:56:56 pi5nvme kernel: watchdog: watchdog0: watchdog left running
+Jul 03 16:56:56 pi5nvme systemd-shutdown[1]: Using hardware watchdog 'Broadcom BCM2835 Watchdog timer', version 0, device /dev/watchdog0
+Jul 03 16:56:56 pi5nvme systemd-shutdown[1]: Watchdog running with a hardware timeout of 10min.
+Jul 03 16:56:56 pi5nvme systemd-shutdown[1]: Syncing filesystems and block devices.
+
+== prior boot around importer 12:04-12:08 ==
+-- No entries --
+
+== prior boot shutdown window 16:50-16:57 ==
+Jul 03 16:56:37 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 16:56:37 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 16:56:37 pi5nvme masterbus-signalk[1132]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 16:56:37 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 16:56:37 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 16:56:41 pi5nvme signalk-server[868]: TcpProvider:connect ECONNREFUSED 127.0.0.1:3009
+Jul 03 16:56:43 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 47.
+Jul 03 16:56:43 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 16:56:43 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 16:56:43 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 16:56:43 pi5nvme masterbus-signalk[1136]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 16:56:43 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 16:56:43 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 16:56:43 pi5nvme sudo[1139]:     jack : TTY=serial0 ; PWD=/home/jack ; USER=root ; COMMAND=/usr/bin/systemctl stop boat-raw-n2k-import.service
+Jul 03 16:56:43 pi5nvme sudo[1139]: pam_unix(sudo:session): session opened for user root(uid=0) by (uid=1000)
+Jul 03 16:56:43 pi5nvme sudo[1139]: pam_unix(sudo:session): session closed for user root
+Jul 03 16:56:43 pi5nvme sudo[1143]:     jack : TTY=serial0 ; PWD=/home/jack ; USER=root ; COMMAND=/usr/bin/systemctl disable --now boat-raw-n2k-import.timer
+Jul 03 16:56:43 pi5nvme sudo[1143]: pam_unix(sudo:session): session opened for user root(uid=0) by (uid=1000)
+Jul 03 16:56:43 pi5nvme systemd[1]: Reloading.
+Jul 03 16:56:43 pi5nvme systemd[1]: boat-raw-n2k-import.timer: Deactivated successfully.
+Jul 03 16:56:43 pi5nvme systemd[1]: Stopped boat-raw-n2k-import.timer - Import mirrored raw NMEA 2000 logs periodically.
+Jul 03 16:56:43 pi5nvme sudo[1143]: pam_unix(sudo:session): session closed for user root
+Jul 03 16:56:46 pi5nvme signalk-server[868]: TcpProvider:connect ECONNREFUSED 127.0.0.1:3009
+Jul 03 16:56:48 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 48.
+Jul 03 16:56:48 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 16:56:48 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 16:56:48 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 16:56:48 pi5nvme masterbus-signalk[1168]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 16:56:48 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 16:56:48 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 16:56:51 pi5nvme signalk-server[868]: TcpProvider:connect ECONNREFUSED 127.0.0.1:3009
+Jul 03 16:56:53 pi5nvme systemd[1]: masterbus-signalk.service: Scheduled restart job, restart counter is at 49.
+Jul 03 16:56:53 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 16:56:53 pi5nvme systemd[1]: Starting masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge...
+Jul 03 16:56:53 pi5nvme systemd[1]: Started masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 16:56:53 pi5nvme masterbus-signalk[1171]: masterbus-signalk: connect failed: connection error: no MasterBus USB Link found
+Jul 03 16:56:53 pi5nvme systemd[1]: masterbus-signalk.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+Jul 03 16:56:53 pi5nvme systemd[1]: masterbus-signalk.service: Failed with result 'exit-code'.
+Jul 03 16:56:55 pi5nvme sudo[1174]:     jack : TTY=serial0 ; PWD=/home/jack ; USER=root ; COMMAND=/usr/sbin/reboot
+Jul 03 16:56:55 pi5nvme sudo[1174]: pam_unix(sudo:session): session opened for user root(uid=0) by (uid=1000)
+Jul 03 16:56:55 pi5nvme systemd-logind[579]: The system will reboot now!
+Jul 03 16:56:55 pi5nvme systemd-logind[579]: System is rebooting.
+Jul 03 16:56:55 pi5nvme sudo[1174]: pam_unix(sudo:session): session closed for user root
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping session-1.scope - Session 1 of User jack...
+Jul 03 16:56:55 pi5nvme systemd[1]: Removed slice system-modprobe.slice - Slice /system/modprobe.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target bluetooth.target - Bluetooth Support.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target multi-user.target - Multi-User System.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target getty.target - Login Prompts.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target rpc_pipefs.target.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target sound.target - Sound Card.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target timers.target - Timer Units.
+Jul 03 16:56:55 pi5nvme systemd[1]: apt-daily-upgrade.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped apt-daily-upgrade.timer - Daily apt upgrade and clean activities.
+Jul 03 16:56:55 pi5nvme systemd[1]: apt-daily.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped apt-daily.timer - Daily apt download activities.
+Jul 03 16:56:55 pi5nvme systemd[1]: boat-raw-log-mirror.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped boat-raw-log-mirror.timer - Run boat raw NMEA 2000 log mirror periodically.
+Jul 03 16:56:55 pi5nvme systemd[1]: dpkg-db-backup.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped dpkg-db-backup.timer - Daily dpkg database backup timer.
+Jul 03 16:56:55 pi5nvme systemd[1]: e2scrub_all.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped e2scrub_all.timer - Periodic ext4 Online Metadata Check for All Filesystems.
+Jul 03 16:56:55 pi5nvme systemd[1]: fstrim.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped fstrim.timer - Discard unused blocks once a week.
+Jul 03 16:56:55 pi5nvme systemd[1]: logrotate.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped logrotate.timer - Daily rotation of log files.
+Jul 03 16:56:55 pi5nvme systemd[1]: man-db.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped man-db.timer - Daily man-db regeneration.
+Jul 03 16:56:55 pi5nvme systemd[1]: podman-auto-update.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped podman-auto-update.timer - Podman auto-update timer.
+Jul 03 16:56:55 pi5nvme systemd[1]: systemd-tmpfiles-clean.timer: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped systemd-tmpfiles-clean.timer - Daily Cleanup of Temporary Directories.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target time-sync.target - System Time Synchronized.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target time-set.target - System Time Set.
+Jul 03 16:56:55 pi5nvme systemd[1]: systemd-rfkill.socket: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Closed systemd-rfkill.socket - Load/Save RF Kill Switch Status /dev/rfkill Watch.
+Jul 03 16:56:55 pi5nvme systemd[1]: Unmounting run-rpc_pipefs.mount - RPC Pipe File System...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping ModemManager.service - Modem Manager...
+Jul 03 16:56:55 pi5nvme avahi-daemon[560]: Got SIGTERM, quitting.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping alsa-restore.service - Save/Restore Sound Card State...
+Jul 03 16:56:55 pi5nvme ModemManager[644]: <info>  caught signal, shutting down...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping avahi-daemon.service - Avahi mDNS/DNS-SD Stack...
+Jul 03 16:56:55 pi5nvme avahi-daemon[560]: Leaving mDNS multicast group on interface wlan0.IPv6 with address 2406:2d40:aa7:b10:7c47:45fb:609d:4786.
+Jul 03 16:56:55 pi5nvme bluetoothd[561]: Terminating
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping bluetooth.service - Bluetooth service...
+Jul 03 16:56:55 pi5nvme avahi-daemon[560]: Leaving mDNS multicast group on interface wlan0.IPv4 with address 192.168.1.135.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping boat-n2k-raw-receiver.service - Receive live raw NMEA 2000 candump stream from picanm...
+Jul 03 16:56:55 pi5nvme avahi-daemon[560]: Leaving mDNS multicast group on interface lo.IPv6 with address ::1.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping boat-signalk-collector.service - Collect Signal K deltas into TimescaleDB...
+Jul 03 16:56:55 pi5nvme avahi-daemon[560]: Leaving mDNS multicast group on interface lo.IPv4 with address 127.0.0.1.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping chrony.service - chrony, an NTP client/server...
+Jul 03 16:56:55 pi5nvme chronyd[687]: chronyd exiting
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping cron.service - Regular background program processing daemon...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping dphys-swapfile.service - dphys-swapfile - set up, mount/unmount, and delete a swap file...
+Jul 03 16:56:55 pi5nvme avahi-daemon[560]: avahi-daemon 0.8 exiting.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping getty@tty1.service - Getty on tty1...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped masterbus-signalk.service - Mastervolt MasterBus to Signal K bridge.
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.4942] modem-manager: ModemManager no longer available
+Jul 03 16:56:55 pi5nvme ModemManager[644]: <info>  ModemManager is shut down
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping podman-restart.service - Podman Start All Containers With Restart Policy Set To Always...
+Jul 03 16:56:55 pi5nvme systemd[1]: rpi-display-backlight.service - Turns off Raspberry Pi display backlight on shutdown/reboot was skipped because of an unmet condition check (ConditionPathIsDirectory=/proc/device-tree/rpi_backlight).
+Jul 03 16:56:55 pi5nvme systemd[1]: rpi-eeprom-update.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped rpi-eeprom-update.service - Check for Raspberry Pi EEPROM updates.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping serial-getty@ttyAMA10.service - Serial Getty on ttyAMA10...
+Jul 03 16:56:55 pi5nvme node[869]: websocket closed
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping ssh.service - OpenBSD Secure Shell server...
+Jul 03 16:56:55 pi5nvme sshd[691]: Received signal 15; terminating.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping systemd-random-seed.service - Load/Save Random Seed...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping triggerhappy.service - triggerhappy global hotkey daemon...
+Jul 03 16:56:55 pi5nvme systemd[1]: avahi-daemon.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped avahi-daemon.service - Avahi mDNS/DNS-SD Stack.
+Jul 03 16:56:55 pi5nvme systemd[1]: cron.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped cron.service - Regular background program processing daemon.
+Jul 03 16:56:55 pi5nvme systemd[1]: ModemManager.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped ModemManager.service - Modem Manager.
+Jul 03 16:56:55 pi5nvme systemd[1]: getty@tty1.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped getty@tty1.service - Getty on tty1.
+Jul 03 16:56:55 pi5nvme systemd[1]: chrony.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped chrony.service - chrony, an NTP client/server.
+Jul 03 16:56:55 pi5nvme systemd[1]: ssh.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped ssh.service - OpenBSD Secure Shell server.
+Jul 03 16:56:55 pi5nvme systemd[1]: boat-n2k-raw-receiver.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped boat-n2k-raw-receiver.service - Receive live raw NMEA 2000 candump stream from picanm.
+Jul 03 16:56:55 pi5nvme systemd[1]: boat-n2k-raw-receiver.service: Consumed 2.896s CPU time.
+Jul 03 16:56:55 pi5nvme systemd[1]: boat-signalk-collector.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped boat-signalk-collector.service - Collect Signal K deltas into TimescaleDB.
+Jul 03 16:56:55 pi5nvme bluetoothd[561]: Stopping SDP server
+Jul 03 16:56:55 pi5nvme systemd[1]: boat-signalk-collector.service: Consumed 2.621s CPU time.
+Jul 03 16:56:55 pi5nvme bluetoothd[561]: Exit
+Jul 03 16:56:55 pi5nvme systemd[1]: serial-getty@ttyAMA10.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped serial-getty@ttyAMA10.service - Serial Getty on ttyAMA10.
+Jul 03 16:56:55 pi5nvme systemd[1]: bluetooth.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped bluetooth.service - Bluetooth service.
+Jul 03 16:56:55 pi5nvme systemd[1]: run-rpc_pipefs.mount: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Unmounted run-rpc_pipefs.mount - RPC Pipe File System.
+Jul 03 16:56:55 pi5nvme systemd[1]: alsa-restore.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped alsa-restore.service - Save/Restore Sound Card State.
+Jul 03 16:56:55 pi5nvme systemd[1]: systemd-random-seed.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped systemd-random-seed.service - Load/Save Random Seed.
+Jul 03 16:56:55 pi5nvme systemd[1]: session-1.scope: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped session-1.scope - Session 1 of User jack.
+Jul 03 16:56:55 pi5nvme systemd-logind[579]: Session 1 logged out. Waiting for processes to exit.
+Jul 03 16:56:55 pi5nvme systemd[1]: Removed slice system-getty.slice - Slice /system/getty.
+Jul 03 16:56:55 pi5nvme systemd[1]: Removed slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping polkit.service - Authorization Manager...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping signalk-pi5nvme.service - Signal K Server on pi5nvme fat app host...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping systemd-logind.service - User Login Management...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping user@1000.service - User Manager for UID 1000...
+Jul 03 16:56:55 pi5nvme systemd[1036]: Activating special unit exit.target...
+Jul 03 16:56:55 pi5nvme systemd[1036]: Stopped target default.target - Main User Target.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Stopped target basic.target - Basic System.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Stopped target paths.target - Paths.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Stopped target sockets.target - Sockets.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Stopped target timers.target - Timers.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Closed dbus.socket - D-Bus User Message Bus Socket.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Closed dirmngr.socket - GnuPG network certificate management daemon.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Closed gpg-agent-browser.socket - GnuPG cryptographic agent and passphrase cache (access for web browsers).
+Jul 03 16:56:55 pi5nvme systemd[1036]: Closed gpg-agent-extra.socket - GnuPG cryptographic agent and passphrase cache (restricted).
+Jul 03 16:56:55 pi5nvme systemd[1036]: Closed gpg-agent-ssh.socket - GnuPG cryptographic agent (ssh-agent emulation).
+Jul 03 16:56:55 pi5nvme systemd[1036]: Closed gpg-agent.socket - GnuPG cryptographic agent and passphrase cache.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Removed slice app.slice - User Application Slice.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Reached target shutdown.target - Shutdown.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Finished systemd-exit.service - Exit the Session.
+Jul 03 16:56:55 pi5nvme systemd[1036]: Reached target exit.target - Exit the Session.
+Jul 03 16:56:55 pi5nvme systemd-logind[579]: Removed session 1.
+Jul 03 16:56:55 pi5nvme systemd[1]: var-swap.swap: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Deactivated swap var-swap.swap - /var/swap.
+Jul 03 16:56:55 pi5nvme systemd[1]: dphys-swapfile.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped dphys-swapfile.service - dphys-swapfile - set up, mount/unmount, and delete a swap file.
+Jul 03 16:56:55 pi5nvme systemd[1]: signalk-pi5nvme.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped signalk-pi5nvme.service - Signal K Server on pi5nvme fat app host.
+Jul 03 16:56:55 pi5nvme systemd[1]: signalk-pi5nvme.service: Consumed 27.764s CPU time.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping grafana-server.service - Grafana instance...
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=server t=2026-07-03T16:56:55.546900265+01:00 level=info msg="Shutdown started" reason="System signal: terminated"
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547032228+01:00 level=info msg="module stopped" module=*notifications.NotificationService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547065209+01:00 level=info msg="module stopped" module=*pluginexternal.Service
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547042969+01:00 level=info msg="module stopped" module=*dynamic.KeyRetriever
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547102728+01:00 level=info msg="module stopped" module=*authimpl.UserAuthTokenService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.54713758+01:00 level=info msg="module stopped" module=*remotecache.RemoteCache
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.54713958+01:00 level=info msg="module stopped" module=*updatemanager.PluginsService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547163154+01:00 level=info msg="module stopped" module=*migrations.SecretMigrationProviderImpl
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547175117+01:00 level=info msg="module stopped" module=*angulardetectorsprovider.Dynamic
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.54720282+01:00 level=info msg="module stopped" module=*updatemanager.GrafanaService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547204228+01:00 level=info msg="module stopped" module=*manager.ServiceAccountsService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.54722745+01:00 level=info msg="module stopped" module=*supportbundlesimpl.Service
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547268839+01:00 level=info msg="module stopped" module=*dualwrite.ZanzanaReconciler
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.54727408+01:00 level=info msg="module stopped" module=*ssosettingsimpl.Service
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547300839+01:00 level=info msg="module stopped" module=*rendering.RenderingService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.54734358+01:00 level=info msg="module stopped" module=*live.GrafanaLive
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547347858+01:00 level=info msg="module stopped" module=*metrics.InternalMetricsService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547357413+01:00 level=info msg="module stopped" module=*garbagecollectionworker.Worker
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547368969+01:00 level=info msg="module stopped" module=*service.DashboardUpdater
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547392098+01:00 level=info msg="module stopped" module=*manager.SecretsService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.54740095+01:00 level=info msg="module stopped" module=*statscollector.Service
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547403376+01:00 level=info msg="module stopped" module=*pushhttp.Gateway
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=ngalert.scheduler t=2026-07-03T16:56:55.547410728+01:00 level=info msg=stopped component=ticker last_tick=2026-07-03T16:56:50+01:00
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547430839+01:00 level=info msg="module stopped" module=*loginattemptimpl.Service
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547456339+01:00 level=info msg="module stopped" module=*anonimpl.AnonDeviceService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547468913+01:00 level=info msg="module stopped" module=*appregistry.Service
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547479283+01:00 level=info msg="module stopped" module=*api.HTTPServer
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547493543+01:00 level=info msg="module stopped" module=*metric.Service
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547502709+01:00 level=info msg="module stopped" module=*service.DashboardServiceImpl
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547514987+01:00 level=info msg="module stopped" module=*authz.EmbeddedZanzanaService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.54758095+01:00 level=info msg="module stopped" module=*service.UsageStats
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547664765+01:00 level=info msg="module stopped" module=*store.standardStorageService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.547717154+01:00 level=info msg="module stopped" module=*cleanup.CleanUpService
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.548593617+01:00 level=info msg="module stopped" module=*ngalert.AlertNG
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.548707524+01:00 level=info msg="module stopped" module=provisioning
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.548748802+01:00 level=info msg="module stopped" module=plugin.backgroundinstaller
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=plugin.elasticsearch t=2026-07-03T16:56:55.550337654+01:00 level=error msg="plugin process exited" plugin=/var/lib/grafana/plugins/elasticsearch/gpx_grafana_elasticsearch_datasource_linux_arm64 id=893 error="signal: terminated"
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=plugin.zipkin t=2026-07-03T16:56:55.551637487+01:00 level=error msg="plugin process exited" plugin=/var/lib/grafana/plugins/zipkin/gpx_grafana-zipkin-datasource_linux_arm64 id=902 error="signal: terminated"
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.551692209+01:00 level=info msg="module stopped" module=plugins.store
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.551857969+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.551843543+01:00 msg="job driver stopped" logger=concurrent-job-driver num_drivers=3 driver_id=2 logger=job-driver
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.55191458+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.551908654+01:00 msg="job driver stopped" logger=concurrent-job-driver num_drivers=3 driver_id=2
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.551764617+01:00 level=info msg="module stopped" module=grafana-apiserver
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.55197095+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.551951061+01:00 msg="Shutting down workers, draining queue" logger=provisioning-connection-controller
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=tracing t=2026-07-03T16:56:55.552025265+01:00 level=info msg="Closing tracing"
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.552054135+01:00 level=info msg="module stopped" module=tracing
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.55206658+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552059265+01:00 msg="Queue drained successfully" logger=provisioning-connection-controller
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552085969+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552081228+01:00 msg="Shutting down ConnectionController" logger=provisioning-connection-controller
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552126395+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552120135+01:00 msg="job cleanup controller stopping" logger=job-cleanup-controller
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=sqlstore t=2026-07-03T16:56:55.552138135+01:00 level=info msg="Closing database engine"
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552147543+01:00 level=error caller=logger.go:234 time=2026-07-03T16:56:55.552140487+01:00 msg="job cleanup controller failed" error="context canceled"
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552170191+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552165228+01:00 msg="job driver stopped" logger=concurrent-job-driver num_drivers=3 driver_id=1 logger=job-driver
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552189969+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552184709+01:00 msg="job driver stopped" logger=concurrent-job-driver num_drivers=3 driver_id=1
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552211746+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552207006+01:00 msg="job driver stopped" logger=concurrent-job-driver num_drivers=3 driver_id=0 logger=job-driver
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552229395+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552224283+01:00 msg="job driver stopped" logger=concurrent-job-driver num_drivers=3 driver_id=0
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.55225732+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552244802+01:00 msg="all job drivers gracefully stopped" logger=concurrent-job-driver num_drivers=3
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552288802+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552277376+01:00 msg="Shutting down workers, draining queue" logger=provisioning-repository-controller
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552322839+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552318135+01:00 msg="Queue drained successfully" logger=provisioning-repository-controller
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552338098+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552333672+01:00 msg="Shutting down RepositoryController" logger=provisioning-repository-controller
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=grafana-apiserver t=2026-07-03T16:56:55.552588728+01:00 level=info msg="StorageObjectCountTracker pruner is exiting"
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552664283+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552643783+01:00 msg="App runner exited without error" app=playlist
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552704598+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552690209+01:00 msg="App runner exited without error" app=quotas
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552735654+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552725802+01:00 msg="App runner exited without error" app=alerting-notifications
+Jul 03 16:56:55 pi5nvme grafana[867]: t=2026-07-03T16:56:55.552762969+01:00 level=info caller=logger.go:214 time=2026-07-03T16:56:55.552754209+01:00 msg="App runner exited without error" app=advisor
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.552895746+01:00 level=info msg="module stopped" module=*sqlstore.SQLStore
+Jul 03 16:56:55 pi5nvme grafana[867]: logger=backgroundsvcs.managerAdapter t=2026-07-03T16:56:55.552927709+01:00 level=info msg="All modules stopped"
+Jul 03 16:56:55 pi5nvme systemd[1]: var-lib-containers-storage-overlay.mount: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: polkit.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped polkit.service - Authorization Manager.
+Jul 03 16:56:55 pi5nvme systemd[1]: grafana-server.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped grafana-server.service - Grafana instance.
+Jul 03 16:56:55 pi5nvme systemd[1]: grafana-server.service: Consumed 4.280s CPU time.
+Jul 03 16:56:55 pi5nvme systemd[1]: systemd-logind.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped systemd-logind.service - User Login Management.
+Jul 03 16:56:55 pi5nvme systemd[1]: postgresql.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped postgresql.service - PostgreSQL RDBMS.
+Jul 03 16:56:55 pi5nvme sh[1209]: time="2026-07-03T16:56:55+01:00" level=info msg="/usr/bin/podman filtering at log level info"
+Jul 03 16:56:55 pi5nvme sh[1209]: Error: you must provide at least one name or id
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping postgresql@15-main.service - PostgreSQL Cluster 15-main...
+Jul 03 16:56:55 pi5nvme systemd[1]: podman-restart.service: Control process exited, code=exited, status=125/n/a
+Jul 03 16:56:55 pi5nvme systemd[1]: podman-restart.service: Failed with result 'exit-code'.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped podman-restart.service - Podman Start All Containers With Restart Policy Set To Always.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target network-online.target - Network is Online.
+Jul 03 16:56:55 pi5nvme systemd[1]: NetworkManager-wait-online.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped NetworkManager-wait-online.service - Network Manager Wait Online.
+Jul 03 16:56:55 pi5nvme systemd[1]: user@1000.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped user@1000.service - User Manager for UID 1000.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping systemd-user-sessions.service - Permit User Sessions...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping user-runtime-dir@1000.service - User Runtime Directory /run/user/1000...
+Jul 03 16:56:55 pi5nvme systemd[1]: run-user-1000.mount: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Unmounted run-user-1000.mount - /run/user/1000.
+Jul 03 16:56:55 pi5nvme systemd[1]: systemd-user-sessions.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped systemd-user-sessions.service - Permit User Sessions.
+Jul 03 16:56:55 pi5nvme systemd[1]: user-runtime-dir@1000.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped user-runtime-dir@1000.service - User Runtime Directory /run/user/1000.
+Jul 03 16:56:55 pi5nvme systemd[1]: Removed slice user-1000.slice - User Slice of UID 1000.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target remote-fs.target - Remote File Systems.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target remote-fs-pre.target - Preparation for Remote File Systems.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target nfs-client.target - NFS client services.
+Jul 03 16:56:55 pi5nvme systemd[1]: postgresql@15-main.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped postgresql@15-main.service - PostgreSQL Cluster 15-main.
+Jul 03 16:56:55 pi5nvme systemd[1]: postgresql@15-main.service: Consumed 8.109s CPU time.
+Jul 03 16:56:55 pi5nvme systemd[1]: Removed slice system-postgresql.slice - Slice /system/postgresql.
+Jul 03 16:56:55 pi5nvme systemd[1]: system-postgresql.slice: Consumed 8.109s CPU time.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped target network.target - Network.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping NetworkManager.service - Network Manager...
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopping wpa_supplicant.service - WPA supplicant...
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7258] caught SIGTERM, shutting down normally.
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7280] device (wlan0): state change: activated -> deactivating (reason 'unmanaged', sys-iface-state: 'managed')
+Jul 03 16:56:55 pi5nvme wpa_supplicant[596]: p2p-dev-wlan0: CTRL-EVENT-DSCP-POLICY clear_all
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7283] manager: NetworkManager state is now DISCONNECTING
+Jul 03 16:56:55 pi5nvme wpa_supplicant[596]: p2p-dev-wlan0: CTRL-EVENT-DSCP-POLICY clear_all
+Jul 03 16:56:55 pi5nvme wpa_supplicant[596]: nl80211: deinit ifname=p2p-dev-wlan0 disabled_11b_rates=0
+Jul 03 16:56:55 pi5nvme dbus-daemon[563]: [system] Activating via systemd: service name='org.freedesktop.nm_dispatcher' unit='dbus-org.freedesktop.nm-dispatcher.service' requested by ':1.7' (uid=0 pid=592 comm="/usr/sbin/NetworkManager --no-daemon")
+Jul 03 16:56:55 pi5nvme dbus-daemon[563]: [system] Activation via systemd failed for unit 'dbus-org.freedesktop.nm-dispatcher.service': Refusing activation, D-Bus is shutting down.
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <warn>  [1783094215.7297] dispatcher: (10) failed (after 0.000 sec): Refusing activation, D-Bus is shutting down.
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7299] device (wlan0): state change: deactivating -> unmanaged (reason 'removed', sys-iface-state: 'managed')
+Jul 03 16:56:55 pi5nvme dbus-daemon[563]: [system] Activating via systemd: service name='org.freedesktop.nm_dispatcher' unit='dbus-org.freedesktop.nm-dispatcher.service' requested by ':1.7' (uid=0 pid=592 comm="/usr/sbin/NetworkManager --no-daemon")
+Jul 03 16:56:55 pi5nvme dbus-daemon[563]: [system] Activation via systemd failed for unit 'dbus-org.freedesktop.nm-dispatcher.service': Refusing activation, D-Bus is shutting down.
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7519] dhcp4 (wlan0): canceled DHCP transaction
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7519] dhcp4 (wlan0): activation: beginning transaction (timeout in 45 seconds)
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7519] dhcp4 (wlan0): state changed no lease
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7520] dhcp6 (wlan0): canceled DHCP transaction
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7520] dhcp6 (wlan0): activation: beginning transaction (timeout in 45 seconds)
+Jul 03 16:56:55 pi5nvme NetworkManager[592]: <info>  [1783094215.7521] dhcp6 (wlan0): state changed no lease
+Jul 03 16:56:55 pi5nvme wpa_supplicant[596]: p2p-dev-wlan0: CTRL-EVENT-TERMINATING
+Jul 03 16:56:55 pi5nvme wpa_supplicant[596]: wlan0: CTRL-EVENT-DISCONNECTED bssid=46:87:18:35:27:8e reason=3 locally_generated=1
+Jul 03 16:56:55 pi5nvme wpa_supplicant[596]: wlan0: CTRL-EVENT-DSCP-POLICY clear_all
+Jul 03 16:56:55 pi5nvme systemd[1]: triggerhappy.service: Deactivated successfully.
+Jul 03 16:56:55 pi5nvme systemd[1]: Stopped triggerhappy.service - triggerhappy global hotkey daemon.
+Jul 03 16:56:56 pi5nvme NetworkManager[592]: <info>  [1783094216.3323] manager: NetworkManager state is now DISCONNECTED
+Jul 03 16:56:56 pi5nvme NetworkManager[592]: <info>  [1783094216.3332] device (p2p-dev-wlan0): state change: disconnected -> unmanaged (reason 'removed', sys-iface-state: 'removed')
+Jul 03 16:56:56 pi5nvme dbus-daemon[563]: [system] Activating via systemd: service name='org.freedesktop.nm_dispatcher' unit='dbus-org.freedesktop.nm-dispatcher.service' requested by ':1.7' (uid=0 pid=592 comm="/usr/sbin/NetworkManager --no-daemon")
+Jul 03 16:56:56 pi5nvme dbus-daemon[563]: [system] Activation via systemd failed for unit 'dbus-org.freedesktop.nm-dispatcher.service': Refusing activation, D-Bus is shutting down.
+Jul 03 16:56:56 pi5nvme wpa_supplicant[596]: wlan0: CTRL-EVENT-DSCP-POLICY clear_all
+Jul 03 16:56:56 pi5nvme wpa_supplicant[596]: nl80211: deinit ifname=wlan0 disabled_11b_rates=0
+Jul 03 16:56:56 pi5nvme NetworkManager[592]: <info>  [1783094216.3397] exiting (success)
+Jul 03 16:56:56 pi5nvme wpa_supplicant[596]: wlan0: CTRL-EVENT-TERMINATING
+Jul 03 16:56:56 pi5nvme systemd[1]: wpa_supplicant.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped wpa_supplicant.service - WPA supplicant.
+Jul 03 16:56:56 pi5nvme systemd[1]: NetworkManager.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped NetworkManager.service - Network Manager.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopping dbus.service - D-Bus System Message Bus...
+Jul 03 16:56:56 pi5nvme systemd[1]: dbus.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped dbus.service - D-Bus System Message Bus.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target basic.target - Basic System.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target paths.target - Path Units.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target slices.target - Slice Units.
+Jul 03 16:56:56 pi5nvme systemd[1]: Removed slice user.slice - User and Session Slice.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target sockets.target - Socket Units.
+Jul 03 16:56:56 pi5nvme systemd[1]: avahi-daemon.socket: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Closed avahi-daemon.socket - Avahi mDNS/DNS-SD Stack Activation Socket.
+Jul 03 16:56:56 pi5nvme systemd[1]: dbus.socket: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Closed dbus.socket - D-Bus System Message Bus Socket.
+Jul 03 16:56:56 pi5nvme systemd[1]: podman.socket: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Closed podman.socket - Podman API Socket.
+Jul 03 16:56:56 pi5nvme systemd[1]: triggerhappy.socket: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Closed triggerhappy.socket.
+Jul 03 16:56:56 pi5nvme systemd[1]: uuidd.socket: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Closed uuidd.socket - UUID daemon activation socket.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target sysinit.target - System Initialization.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target cryptsetup.target - Local Encrypted Volumes.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-ask-password-console.path: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-ask-password-wall.path: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target integritysetup.target - Local Integrity Protected Volumes.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target swap.target - Swaps.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target veritysetup.target - Local Verity Protected Volumes.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopping fake-hwclock.service - Restore / save the current clock...
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopping systemd-binfmt.service - Set Up Additional Binary Formats...
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-sysctl.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-sysctl.service - Apply Kernel Variables.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-modules-load.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-modules-load.service - Load Kernel Modules.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopping systemd-update-utmp.service - Record System Boot/Shutdown in UTMP...
+Jul 03 16:56:56 pi5nvme systemd[1]: run-credentials-systemd\x2dsysctl.service.mount: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounted run-credentials-systemd\x2dsysctl.service.mount - /run/credentials/systemd-sysctl.service.
+Jul 03 16:56:56 pi5nvme systemd[1]: fake-hwclock.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped fake-hwclock.service - Restore / save the current clock.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-binfmt.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-binfmt.service - Set Up Additional Binary Formats.
+Jul 03 16:56:56 pi5nvme systemd[1]: proc-sys-fs-binfmt_misc.automount: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Unset automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-update-utmp.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-update-utmp.service - Record System Boot/Shutdown in UTMP.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-tmpfiles-setup.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-tmpfiles-setup.service - Create System Files and Directories.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target local-fs.target - Local File Systems.
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounting boot-firmware.mount - /boot/firmware...
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounting run-credentials-systemd\x2dsysusers.service.mount - /run/credentials/systemd-sysusers.service...
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounting run-credentials-systemd\x2dtmpfiles\x2dsetup.service.mount - /run/credentials/systemd-tmpfiles-setup.service...
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounting run-credentials-systemd\x2dtmpfiles\x2dsetup\x2ddev.service.mount - /run/credentials/systemd-tmpfiles-setup-dev.service...
+Jul 03 16:56:56 pi5nvme systemd[1]: proc-sys-fs-binfmt_misc.mount: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: boot-firmware.mount: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounted boot-firmware.mount - /boot/firmware.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-fsck@dev-disk-by\x2dpartuuid-552b6058\x2d01.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-fsck@dev-disk-by\x2dpartuuid-552b6058\x2d01.service - File System Check on /dev/disk/by-partuuid/552b6058-01.
+Jul 03 16:56:56 pi5nvme systemd[1]: Removed slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
+Jul 03 16:56:56 pi5nvme systemd[1]: run-credentials-systemd\x2dsysusers.service.mount: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounted run-credentials-systemd\x2dsysusers.service.mount - /run/credentials/systemd-sysusers.service.
+Jul 03 16:56:56 pi5nvme umount[1232]: umount: /run/credentials/systemd-tmpfiles-setup.service: no mount point specified.
+Jul 03 16:56:56 pi5nvme systemd[1]: run-credentials-systemd\x2dtmpfiles\x2dsetup\x2ddev.service.mount: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounted run-credentials-systemd\x2dtmpfiles\x2dsetup\x2ddev.service.mount - /run/credentials/systemd-tmpfiles-setup-dev.service.
+Jul 03 16:56:56 pi5nvme systemd[1]: run-credentials-systemd\x2dtmpfiles\x2dsetup.service.mount: Mount process exited, code=exited, status=32/n/a
+Jul 03 16:56:56 pi5nvme systemd[1]: run-credentials-systemd\x2dtmpfiles\x2dsetup.service.mount: Mount disappeared even though umount process failed, continuing.
+Jul 03 16:56:56 pi5nvme systemd[1]: run-credentials-systemd\x2dtmpfiles\x2dsetup.service.mount: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Unmounted run-credentials-systemd\x2dtmpfiles\x2dsetup.service.mount - /run/credentials/systemd-tmpfiles-setup.service.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped target local-fs-pre.target - Preparation for Local File Systems.
+Jul 03 16:56:56 pi5nvme systemd[1]: Reached target umount.target - Unmount All Filesystems.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-tmpfiles-setup-dev.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-sysusers.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-sysusers.service - Create System Users.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-remount-fs.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Stopped systemd-remount-fs.service - Remount Root and Kernel File Systems.
+Jul 03 16:56:56 pi5nvme systemd[1]: Reached target shutdown.target - System Shutdown.
+Jul 03 16:56:56 pi5nvme systemd[1]: Reached target final.target - Late Shutdown Services.
+Jul 03 16:56:56 pi5nvme systemd[1]: systemd-reboot.service: Deactivated successfully.
+Jul 03 16:56:56 pi5nvme systemd[1]: Finished systemd-reboot.service - System Reboot.
+Jul 03 16:56:56 pi5nvme systemd[1]: Reached target reboot.target - System Reboot.
+Jul 03 16:56:56 pi5nvme systemd[1]: Shutting down.
+Jul 03 16:56:56 pi5nvme systemd[1]: Using hardware watchdog 'Broadcom BCM2835 Watchdog timer', version 0, device /dev/watchdog0
+Jul 03 16:56:56 pi5nvme systemd[1]: Watchdog running with a hardware timeout of 10min.
+Jul 03 16:56:56 pi5nvme kernel: watchdog: watchdog0: watchdog left running
+Jul 03 16:56:56 pi5nvme systemd-shutdown[1]: Using hardware watchdog 'Broadcom BCM2835 Watchdog timer', version 0, device /dev/watchdog0
+Jul 03 16:56:56 pi5nvme systemd-shutdown[1]: Watchdog running with a hardware timeout of 10min.
+Jul 03 16:56:56 pi5nvme systemd-shutdown[1]: Syncing filesystems and block devices.
+Jul 03 16:56:56 pi5nvme systemd-journald[308]: Journal stopped
+
+== previous previous boot end if exists ==
+Jul 03 09:17:01 pi5nvme kernel:     TERM=linux
+Jul 03 09:17:01 pi5nvme kernel: input: pwr_button as /devices/platform/pwr_button/input/input0
+Jul 03 09:17:01 pi5nvme kernel: brcmstb-i2c 107d508200.i2c:  @97500hz registered in interrupt mode
+Jul 03 09:17:01 pi5nvme kernel: brcmstb-i2c 107d508280.i2c:  @97500hz registered in interrupt mode
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: new full-speed USB device number 2 using xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: New USB device found, idVendor=1a64, idProduct=0000, bcdDevice= 3.00
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: Product: MasterBus USB Link
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: Manufacturer: Mastervolt International B.V.
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: SerialNumber: S110H0212
+Jul 03 09:17:01 pi5nvme kernel: hid-generic 0003:1A64:0000.0001: hiddev96,hidraw0: USB HID v1.01 Device [Mastervolt International B.V. MasterBus USB Link] on usb-xhci-hcd.1-2/input0
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx8   gen() 12521 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx4   gen() 10552 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx2   gen()  8170 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx1   gen()  7398 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x8  gen()  5236 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x4  gen()  4924 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x2  gen()  3861 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x1  gen()  3682 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: using algorithm neonx8 gen() 12521 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: .... xor() 8157 MB/s, rmw enabled
+Jul 03 09:17:01 pi5nvme kernel: raid6: using neon recovery algorithm
+Jul 03 09:17:01 pi5nvme kernel: xor: measuring software checksum speed
+Jul 03 09:17:01 pi5nvme kernel:    8regs           : 15738 MB/sec
+Jul 03 09:17:01 pi5nvme kernel:    32regs          : 15706 MB/sec
+Jul 03 09:17:01 pi5nvme kernel:    arm64_neon      : 21711 MB/sec
+Jul 03 09:17:01 pi5nvme kernel: xor: using function: arm64_neon (21711 MB/sec)
+Jul 03 09:17:01 pi5nvme kernel: Btrfs loaded, zoned=no, fsverity=no
+Jul 03 09:17:01 pi5nvme kernel: EXT4-fs (nvme0n1p2): mounted filesystem ce208fd3-38a8-424a-87a2-cd44114eb820 ro with ordered data mode. Quota mode: none.
+Jul 03 09:17:01 pi5nvme systemd[1]: System time before build time, advancing clock.
+Jul 03 09:17:01 pi5nvme kernel: NET: Registered PF_INET6 protocol family
+Jul 03 09:17:01 pi5nvme kernel: Segment Routing with IPv6
+Jul 03 09:17:01 pi5nvme kernel: In-situ OAM (IOAM) with IPv6
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd 252.39-1~deb12u2 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
+Jul 03 09:17:01 pi5nvme systemd[1]: Detected architecture arm64.
+Jul 03 09:17:01 pi5nvme systemd[1]: Hostname set to <pi5nvme>.
+Jul 03 09:17:01 pi5nvme systemd[1]: Queued start job for default target multi-user.target.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-postgresql.slice - Slice /system/postgresql.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice user.slice - User and Session Slice.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+Jul 03 09:17:01 pi5nvme systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+Jul 03 09:17:01 pi5nvme systemd[1]: Expecting device dev-disk-by\x2dpartuuid-552b6058\x2d01.device - /dev/disk/by-partuuid/552b6058-01...
+Jul 03 09:17:01 pi5nvme systemd[1]: Expecting device dev-ttyAMA10.device - /dev/ttyAMA10...
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target paths.target - Path Units.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target slices.target - Slice Units.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target swap.target - Swaps.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target time-set.target - System Time Set.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-fsckd.socket - fsck to fsckd communication Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-initctl.socket - initctl Compatibility Named Pipe.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald.socket - Journal Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: dev-hugepages.mount - Huge Pages File System was skipped because of an unmet condition check (ConditionPathExists=/sys/kernel/mm/hugepages).
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: auth-rpcgss-module.service - Kernel Module supporting RPCSEC_GSS was skipped because of an unmet condition check (ConditionPathExists=/etc/krb5.keytab).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting fake-hwclock.service - Restore / save the current clock...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting keyboard-setup.service - Set the console keyboard layout...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@configfs.service - Load Kernel Module configfs...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@dm_mod.service - Load Kernel Module dm_mod...
+Jul 03 09:17:01 pi5nvme kernel: device-mapper: ioctl: 4.48.0-ioctl (2023-03-01) initialised: dm-devel@lists.linux.dev
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@drm.service - Load Kernel Module drm...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@fuse.service - Load Kernel Module fuse...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@loop.service - Load Kernel Module loop...
+Jul 03 09:17:01 pi5nvme kernel: fuse: init (API version 7.41)
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathExists=!/run/initramfs/fsck-root).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-journald.service - Journal Service...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+Jul 03 09:17:01 pi5nvme systemd-journald[313]: Journal started
+Jul 03 09:17:01 pi5nvme systemd-journald[313]: Runtime Journal (/run/log/journal/57507218e3dd48ba81e7e162ed895ac9) is 8.0M, max 81.0M, 73.0M free.
+Jul 03 09:17:01 pi5nvme fake-hwclock[294]: Fri  3 Jul 08:17:01 UTC 2026
+Jul 03 09:17:01 pi5nvme kernel: EXT4-fs (nvme0n1p2): re-mounted ce208fd3-38a8-424a-87a2-cd44114eb820 r/w.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-journald.service - Journal Service.
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished fake-hwclock.service - Restore / save the current clock.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished keyboard-setup.service - Set the console keyboard layout.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@configfs.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@configfs.service - Load Kernel Module configfs.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@dm_mod.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@dm_mod.service - Load Kernel Module dm_mod.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@drm.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@drm.service - Load Kernel Module drm.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@efi_pstore.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@efi_pstore.service - Load Kernel Module efi_pstore.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@fuse.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@fuse.service - Load Kernel Module fuse.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@loop.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@loop.service - Load Kernel Module loop.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-config.mount - Kernel Configuration File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-firstboot.service - First Boot Wizard was skipped because of an unmet condition check (ConditionFirstBoot=yes).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-journal-flush.service - Flush Journal to Persistent Storage...
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-pstore.service - Platform Persistent Storage Archival was skipped because of an unmet condition check (ConditionDirectoryNotEmpty=/sys/fs/pstore).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-random-seed.service - Load/Save Random Seed...
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-repart.service - Repartition Root Disk was skipped because no trigger condition checks were met.
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-sysusers.service - Create System Users...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted sys-kernel-config.mount - Kernel Configuration File System.
+Jul 03 09:17:01 pi5nvme systemd-journald[313]: Time spent on flushing to /var/log/journal/57507218e3dd48ba81e7e162ed895ac9 is 4.164ms for 539 entries.

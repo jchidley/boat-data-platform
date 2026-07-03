@@ -1,0 +1,463 @@
+== boot list ==
+ -4 2e57502183794595aa46784ef01c1067 Fri 2026-06-12 07:27:58 BST Tue 2026-06-30 07:42:31 BST
+ -3 2d6308857620446a9610fa31b87b4e14 Tue 2026-06-30 07:42:31 BST Fri 2026-07-03 09:18:07 BST
+ -2 4261dfdf7bc24cb5a477fbe68d044ea2 Fri 2026-07-03 09:17:01 BST Fri 2026-07-03 12:07:11 BST
+ -1 0fe7413170ad40fc85878d51c68e9a7a Fri 2026-07-03 09:17:08 BST Fri 2026-07-03 16:56:56 BST
+  0 9f4c1b0625d44785b3c1d8af584dfaee Fri 2026-07-03 16:57:12 BST Fri 2026-07-03 17:07:18 BST
+
+== boot -2 importer window ==
+-- No entries --
+
+== boot -2 end ==
+Jul 03 09:17:01 pi5nvme kernel: pci 0001:00:00.0: bridge window [mem 0x1b80000000-0x1b800fffff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0001:01:00.0: BAR 0 [mem 0x1b80000000-0x1b80003fff 64bit]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0001:00:00.0: PCI bridge to [bus 01]
+Jul 03 09:17:01 pi5nvme kernel: pci 0001:00:00.0:   bridge window [mem 0x1b80000000-0x1b800fffff]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0001:00: resource 4 [mem 0x1b80000000-0x1bffffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0001:00: resource 5 [mem 0x1800000000-0x1b7fffffff pref]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0001:01: resource 1 [mem 0x1b80000000-0x1b800fffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0001:00:00.0: Max Payload Size set to  256/ 512 (was  128), Max Read Rq  512
+Jul 03 09:17:01 pi5nvme kernel: pci 0001:01:00.0: Max Payload Size set to  256/ 256 (was  128), Max Read Rq  512
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0001:00:00.0: enabling device (0000 -> 0002)
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0001:00:00.0: PME: Signaling with IRQ 38
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0001:00:00.0: AER: enabled with IRQ 38
+Jul 03 09:17:01 pi5nvme kernel: nvme nvme0: pci function 0001:01:00.0
+Jul 03 09:17:01 pi5nvme kernel: nvme 0001:01:00.0: enabling device (0000 -> 0002)
+Jul 03 09:17:01 pi5nvme kernel: nvme nvme0: missing or invalid SUBNQN field.
+Jul 03 09:17:01 pi5nvme kernel: hwmon hwmon1: temp1_input not attached to any thermal zone
+Jul 03 09:17:01 pi5nvme kernel: hwmon hwmon1: temp2_input not attached to any thermal zone
+Jul 03 09:17:01 pi5nvme kernel: hwmon hwmon1: temp3_input not attached to any thermal zone
+Jul 03 09:17:01 pi5nvme kernel: nvme nvme0: 4/0/0 default/read/poll queues
+Jul 03 09:17:01 pi5nvme kernel:  nvme0n1: p1 p2
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie: host bridge /axi/pcie@1000120000 ranges:
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:   No bus range found for /axi/pcie@1000120000, using [bus 00-ff]
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:      MEM 0x1f00000000..0x1ffffffffb -> 0x0000000000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:      MEM 0x1c00000000..0x1effffffff -> 0x0400000000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:   IB MEM 0x1f00000000..0x1f003fffff -> 0x0000000000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:   IB MEM 0x0000000000..0x0fffffffff -> 0x1000000000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:   IB MEM 0x1000130000..0x1000130fff -> 0xfffffff000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie: PCI host bridge to bus 0002:00
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: root bus resource [bus 00-ff]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: root bus resource [mem 0x1f00000000-0x1ffffffffb] (bus address [0x00000000-0xfffffffb])
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: root bus resource [mem 0x1c00000000-0x1effffffff pref] (bus address [0x400000000-0x6ffffffff])
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: [14e4:2712] type 01 class 0x060400 PCIe Root Port
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: PCI bridge to [bus 00]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0:   bridge window [mem 0x1f80000000-0x1fbfffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: PME# supported from D0 D3hot
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: bridge configuration invalid ([bus 00-00]), reconfiguring
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie: clkreq-mode set to default
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie: link up, 5.0 GT/s PCIe x4 (!SSC)
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: [1de4:0001] type 00 class 0x020000 PCIe Endpoint
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 0 [mem 0xffffc000-0xffffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 1 [mem 0xffc00000-0xffffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 2 [mem 0xffff0000-0xffffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: supports D1
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: PME# supported from D0 D1 D3hot D3cold
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:01: busn_res: [bus 01-ff] end is updated to 01
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: bridge window [mem 0x1f00000000-0x1f005fffff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 1 [mem 0x1f00000000-0x1f003fffff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 2 [mem 0x1f00400000-0x1f0040ffff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 0 [mem 0x1f00410000-0x1f00413fff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: PCI bridge to [bus 01]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0:   bridge window [mem 0x1f00000000-0x1f005fffff]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: resource 4 [mem 0x1f00000000-0x1ffffffffb]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: resource 5 [mem 0x1c00000000-0x1effffffff pref]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:01: resource 1 [mem 0x1f00000000-0x1f005fffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: Max Payload Size set to  256/ 512 (was  128), Max Read Rq  512
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: Max Payload Size set to  256/ 256 (was  128), Max Read Rq  512
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0002:00:00.0: enabling device (0000 -> 0002)
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0002:00:00.0: PME: Signaling with IRQ 44
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0002:00:00.0: AER: enabled with IRQ 44
+Jul 03 09:17:01 pi5nvme kernel: rp1 0002:01:00.0: bar0 len 0x4000, start 0x1f00410000, end 0x1f00413fff, flags, 0x40200
+Jul 03 09:17:01 pi5nvme kernel: rp1 0002:01:00.0: bar1 len 0x400000, start 0x1f00000000, end 0x1f003fffff, flags, 0x40200
+Jul 03 09:17:01 pi5nvme kernel: rp1 0002:01:00.0: enabling device (0000 -> 0002)
+Jul 03 09:17:01 pi5nvme kernel: rp1 0002:01:00.0: chip_id 0x20001927
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005100.iommu: IOVA aperture 0xa00000000..0xb00000000 including DMA offset 0x0
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005100.iommu: bcm2712_iommu_init: DEBUG_INFO = 0x20804774
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005200.iommu: IOVA aperture 0xa00000000..0xa80000000 including DMA offset 0x0
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005200.iommu: bcm2712_iommu_init: DEBUG_INFO = 0x20804774
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005280.iommu: IOVA aperture 0x1a00000000..0x1a80000000 including DMA offset 0x1000000000
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005280.iommu: bcm2712_iommu_init: DEBUG_INFO = 0x20804774
+Jul 03 09:17:01 pi5nvme kernel: genirq: irq_chip rp1_irq_chip did not update eff. affinity mask of irq 106
+Jul 03 09:17:01 pi5nvme kernel: sdhci-brcmstb 1000fff000.mmc: Got CD GPIO
+Jul 03 09:17:01 pi5nvme kernel: mmc1: CQHCI version 5.10
+Jul 03 09:17:01 pi5nvme kernel: mmc0: CQHCI version 5.10
+Jul 03 09:17:01 pi5nvme kernel: macb 1f00100000.ethernet eth0: Cadence GEM rev 0x00070109 at 0x1f00100000 irq 112 (2c:cf:67:91:0a:69)
+Jul 03 09:17:01 pi5nvme kernel: dw_axi_dmac_platform 1f00188000.dma: DesignWare AXI DMA Controller, 8 channels
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: new USB bus registered, assigned bus number 1
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: hcc params 0x0240fe6d hci version 0x110 quirks 0x0000808000000810
+Jul 03 09:17:01 pi5nvme kernel: mmc0: SDHCI controller on 1000fff000.mmc [1000fff000.mmc] using ADMA 64-bit
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: irq 137, io mem 0x1f00200000
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: new USB bus registered, assigned bus number 2
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: Host supports USB 3.0 SuperSpeed
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: SerialNumber: xhci-hcd.0
+Jul 03 09:17:01 pi5nvme kernel: hub 1-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 1-0:1.0: 2 ports detected
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: SerialNumber: xhci-hcd.0
+Jul 03 09:17:01 pi5nvme kernel: hub 2-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 2-0:1.0: 1 port detected
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: new USB bus registered, assigned bus number 3
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: hcc params 0x0240fe6d hci version 0x110 quirks 0x0000808000000810
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: irq 142, io mem 0x1f00300000
+Jul 03 09:17:01 pi5nvme kernel: mmc1: SDHCI controller on 1001100000.mmc [1001100000.mmc] using ADMA 64-bit
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: new USB bus registered, assigned bus number 4
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: Host supports USB 3.0 SuperSpeed
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: mmc1: new ultra high speed DDR50 SDIO card at address 0001
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: SerialNumber: xhci-hcd.1
+Jul 03 09:17:01 pi5nvme kernel: hub 3-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 3-0:1.0: 2 ports detected
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: SerialNumber: xhci-hcd.1
+Jul 03 09:17:01 pi5nvme kernel: hub 4-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 4-0:1.0: 1 port detected
+Jul 03 09:17:01 pi5nvme kernel: of_cfs_init
+Jul 03 09:17:01 pi5nvme kernel: of_cfs_init: OK
+Jul 03 09:17:01 pi5nvme kernel: clk: Disabling unused clocks
+Jul 03 09:17:01 pi5nvme kernel: PM: genpd: Disabling unused power domains
+Jul 03 09:17:01 pi5nvme kernel: Freeing unused kernel memory: 5696K
+Jul 03 09:17:01 pi5nvme kernel: Run /init as init process
+Jul 03 09:17:01 pi5nvme kernel:   with arguments:
+Jul 03 09:17:01 pi5nvme kernel:     /init
+Jul 03 09:17:01 pi5nvme kernel:   with environment:
+Jul 03 09:17:01 pi5nvme kernel:     HOME=/
+Jul 03 09:17:01 pi5nvme kernel:     TERM=linux
+Jul 03 09:17:01 pi5nvme kernel: input: pwr_button as /devices/platform/pwr_button/input/input0
+Jul 03 09:17:01 pi5nvme kernel: brcmstb-i2c 107d508200.i2c:  @97500hz registered in interrupt mode
+Jul 03 09:17:01 pi5nvme kernel: brcmstb-i2c 107d508280.i2c:  @97500hz registered in interrupt mode
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: new full-speed USB device number 2 using xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: New USB device found, idVendor=1a64, idProduct=0000, bcdDevice= 3.00
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: Product: MasterBus USB Link
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: Manufacturer: Mastervolt International B.V.
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: SerialNumber: S110H0212
+Jul 03 09:17:01 pi5nvme kernel: hid-generic 0003:1A64:0000.0001: hiddev96,hidraw0: USB HID v1.01 Device [Mastervolt International B.V. MasterBus USB Link] on usb-xhci-hcd.1-2/input0
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx8   gen() 12521 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx4   gen() 10552 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx2   gen()  8170 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx1   gen()  7398 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x8  gen()  5236 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x4  gen()  4924 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x2  gen()  3861 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x1  gen()  3682 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: using algorithm neonx8 gen() 12521 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: .... xor() 8157 MB/s, rmw enabled
+Jul 03 09:17:01 pi5nvme kernel: raid6: using neon recovery algorithm
+Jul 03 09:17:01 pi5nvme kernel: xor: measuring software checksum speed
+Jul 03 09:17:01 pi5nvme kernel:    8regs           : 15738 MB/sec
+Jul 03 09:17:01 pi5nvme kernel:    32regs          : 15706 MB/sec
+Jul 03 09:17:01 pi5nvme kernel:    arm64_neon      : 21711 MB/sec
+Jul 03 09:17:01 pi5nvme kernel: xor: using function: arm64_neon (21711 MB/sec)
+Jul 03 09:17:01 pi5nvme kernel: Btrfs loaded, zoned=no, fsverity=no
+Jul 03 09:17:01 pi5nvme kernel: EXT4-fs (nvme0n1p2): mounted filesystem ce208fd3-38a8-424a-87a2-cd44114eb820 ro with ordered data mode. Quota mode: none.
+Jul 03 09:17:01 pi5nvme systemd[1]: System time before build time, advancing clock.
+Jul 03 09:17:01 pi5nvme kernel: NET: Registered PF_INET6 protocol family
+Jul 03 09:17:01 pi5nvme kernel: Segment Routing with IPv6
+Jul 03 09:17:01 pi5nvme kernel: In-situ OAM (IOAM) with IPv6
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd 252.39-1~deb12u2 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
+Jul 03 09:17:01 pi5nvme systemd[1]: Detected architecture arm64.
+Jul 03 09:17:01 pi5nvme systemd[1]: Hostname set to <pi5nvme>.
+Jul 03 09:17:01 pi5nvme systemd[1]: Queued start job for default target multi-user.target.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-postgresql.slice - Slice /system/postgresql.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice user.slice - User and Session Slice.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+Jul 03 09:17:01 pi5nvme systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+Jul 03 09:17:01 pi5nvme systemd[1]: Expecting device dev-disk-by\x2dpartuuid-552b6058\x2d01.device - /dev/disk/by-partuuid/552b6058-01...
+Jul 03 09:17:01 pi5nvme systemd[1]: Expecting device dev-ttyAMA10.device - /dev/ttyAMA10...
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target paths.target - Path Units.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target slices.target - Slice Units.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target swap.target - Swaps.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target time-set.target - System Time Set.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-fsckd.socket - fsck to fsckd communication Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-initctl.socket - initctl Compatibility Named Pipe.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald.socket - Journal Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: dev-hugepages.mount - Huge Pages File System was skipped because of an unmet condition check (ConditionPathExists=/sys/kernel/mm/hugepages).
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: auth-rpcgss-module.service - Kernel Module supporting RPCSEC_GSS was skipped because of an unmet condition check (ConditionPathExists=/etc/krb5.keytab).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting fake-hwclock.service - Restore / save the current clock...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting keyboard-setup.service - Set the console keyboard layout...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@configfs.service - Load Kernel Module configfs...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@dm_mod.service - Load Kernel Module dm_mod...
+Jul 03 09:17:01 pi5nvme kernel: device-mapper: ioctl: 4.48.0-ioctl (2023-03-01) initialised: dm-devel@lists.linux.dev
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@drm.service - Load Kernel Module drm...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@fuse.service - Load Kernel Module fuse...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@loop.service - Load Kernel Module loop...
+Jul 03 09:17:01 pi5nvme kernel: fuse: init (API version 7.41)
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathExists=!/run/initramfs/fsck-root).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-journald.service - Journal Service...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+Jul 03 09:17:01 pi5nvme systemd-journald[313]: Journal started
+Jul 03 09:17:01 pi5nvme systemd-journald[313]: Runtime Journal (/run/log/journal/57507218e3dd48ba81e7e162ed895ac9) is 8.0M, max 81.0M, 73.0M free.
+Jul 03 09:17:01 pi5nvme fake-hwclock[294]: Fri  3 Jul 08:17:01 UTC 2026
+Jul 03 09:17:01 pi5nvme kernel: EXT4-fs (nvme0n1p2): re-mounted ce208fd3-38a8-424a-87a2-cd44114eb820 r/w.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-journald.service - Journal Service.
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished fake-hwclock.service - Restore / save the current clock.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished keyboard-setup.service - Set the console keyboard layout.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished kmod-static-nodes.service - Create List of Static Device Nodes.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@configfs.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@configfs.service - Load Kernel Module configfs.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@dm_mod.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@dm_mod.service - Load Kernel Module dm_mod.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@drm.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@drm.service - Load Kernel Module drm.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@efi_pstore.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@efi_pstore.service - Load Kernel Module efi_pstore.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@fuse.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@fuse.service - Load Kernel Module fuse.
+Jul 03 09:17:01 pi5nvme systemd[1]: modprobe@loop.service: Deactivated successfully.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished modprobe@loop.service - Load Kernel Module loop.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
+Jul 03 09:17:01 pi5nvme systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-fs-fuse-connections.mount - FUSE Control File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-config.mount - Kernel Configuration File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-firstboot.service - First Boot Wizard was skipped because of an unmet condition check (ConditionFirstBoot=yes).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-journal-flush.service - Flush Journal to Persistent Storage...
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-pstore.service - Platform Persistent Storage Archival was skipped because of an unmet condition check (ConditionDirectoryNotEmpty=/sys/fs/pstore).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-random-seed.service - Load/Save Random Seed...
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-repart.service - Repartition Root Disk was skipped because no trigger condition checks were met.
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-sysusers.service - Create System Users...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted sys-fs-fuse-connections.mount - FUSE Control File System.
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted sys-kernel-config.mount - Kernel Configuration File System.
+Jul 03 09:17:01 pi5nvme systemd-journald[313]: Time spent on flushing to /var/log/journal/57507218e3dd48ba81e7e162ed895ac9 is 4.164ms for 539 entries.
+
+== boot -2 kernel faults ==
+Jul 03 09:17:01 pi5nvme kernel: hwmon hwmon1: temp2_input not attached to any thermal zone
+Jul 03 09:17:01 pi5nvme kernel: hwmon hwmon1: temp3_input not attached to any thermal zone
+Jul 03 09:17:01 pi5nvme kernel: nvme nvme0: 4/0/0 default/read/poll queues
+Jul 03 09:17:01 pi5nvme kernel:  nvme0n1: p1 p2
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie: host bridge /axi/pcie@1000120000 ranges:
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:   No bus range found for /axi/pcie@1000120000, using [bus 00-ff]
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:      MEM 0x1f00000000..0x1ffffffffb -> 0x0000000000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:      MEM 0x1c00000000..0x1effffffff -> 0x0400000000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:   IB MEM 0x1f00000000..0x1f003fffff -> 0x0000000000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:   IB MEM 0x0000000000..0x0fffffffff -> 0x1000000000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie:   IB MEM 0x1000130000..0x1000130fff -> 0xfffffff000
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie: PCI host bridge to bus 0002:00
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: root bus resource [bus 00-ff]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: root bus resource [mem 0x1f00000000-0x1ffffffffb] (bus address [0x00000000-0xfffffffb])
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: root bus resource [mem 0x1c00000000-0x1effffffff pref] (bus address [0x400000000-0x6ffffffff])
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: [14e4:2712] type 01 class 0x060400 PCIe Root Port
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: PCI bridge to [bus 00]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0:   bridge window [mem 0x1f80000000-0x1fbfffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: PME# supported from D0 D3hot
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: bridge configuration invalid ([bus 00-00]), reconfiguring
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie: clkreq-mode set to default
+Jul 03 09:17:01 pi5nvme kernel: brcm-pcie 1000120000.pcie: link up, 5.0 GT/s PCIe x4 (!SSC)
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: [1de4:0001] type 00 class 0x020000 PCIe Endpoint
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 0 [mem 0xffffc000-0xffffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 1 [mem 0xffc00000-0xffffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 2 [mem 0xffff0000-0xffffffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: supports D1
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: PME# supported from D0 D1 D3hot D3cold
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:01: busn_res: [bus 01-ff] end is updated to 01
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: bridge window [mem 0x1f00000000-0x1f005fffff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 1 [mem 0x1f00000000-0x1f003fffff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 2 [mem 0x1f00400000-0x1f0040ffff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: BAR 0 [mem 0x1f00410000-0x1f00413fff]: assigned
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: PCI bridge to [bus 01]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0:   bridge window [mem 0x1f00000000-0x1f005fffff]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: resource 4 [mem 0x1f00000000-0x1ffffffffb]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:00: resource 5 [mem 0x1c00000000-0x1effffffff pref]
+Jul 03 09:17:01 pi5nvme kernel: pci_bus 0002:01: resource 1 [mem 0x1f00000000-0x1f005fffff]
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:00:00.0: Max Payload Size set to  256/ 512 (was  128), Max Read Rq  512
+Jul 03 09:17:01 pi5nvme kernel: pci 0002:01:00.0: Max Payload Size set to  256/ 256 (was  128), Max Read Rq  512
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0002:00:00.0: enabling device (0000 -> 0002)
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0002:00:00.0: PME: Signaling with IRQ 44
+Jul 03 09:17:01 pi5nvme kernel: pcieport 0002:00:00.0: AER: enabled with IRQ 44
+Jul 03 09:17:01 pi5nvme kernel: rp1 0002:01:00.0: bar0 len 0x4000, start 0x1f00410000, end 0x1f00413fff, flags, 0x40200
+Jul 03 09:17:01 pi5nvme kernel: rp1 0002:01:00.0: bar1 len 0x400000, start 0x1f00000000, end 0x1f003fffff, flags, 0x40200
+Jul 03 09:17:01 pi5nvme kernel: rp1 0002:01:00.0: enabling device (0000 -> 0002)
+Jul 03 09:17:01 pi5nvme kernel: rp1 0002:01:00.0: chip_id 0x20001927
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005100.iommu: IOVA aperture 0xa00000000..0xb00000000 including DMA offset 0x0
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005100.iommu: bcm2712_iommu_init: DEBUG_INFO = 0x20804774
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005200.iommu: IOVA aperture 0xa00000000..0xa80000000 including DMA offset 0x0
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005200.iommu: bcm2712_iommu_init: DEBUG_INFO = 0x20804774
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005280.iommu: IOVA aperture 0x1a00000000..0x1a80000000 including DMA offset 0x1000000000
+Jul 03 09:17:01 pi5nvme kernel: bcm2712-iommu 1000005280.iommu: bcm2712_iommu_init: DEBUG_INFO = 0x20804774
+Jul 03 09:17:01 pi5nvme kernel: genirq: irq_chip rp1_irq_chip did not update eff. affinity mask of irq 106
+Jul 03 09:17:01 pi5nvme kernel: sdhci-brcmstb 1000fff000.mmc: Got CD GPIO
+Jul 03 09:17:01 pi5nvme kernel: mmc1: CQHCI version 5.10
+Jul 03 09:17:01 pi5nvme kernel: mmc0: CQHCI version 5.10
+Jul 03 09:17:01 pi5nvme kernel: macb 1f00100000.ethernet eth0: Cadence GEM rev 0x00070109 at 0x1f00100000 irq 112 (2c:cf:67:91:0a:69)
+Jul 03 09:17:01 pi5nvme kernel: dw_axi_dmac_platform 1f00188000.dma: DesignWare AXI DMA Controller, 8 channels
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: new USB bus registered, assigned bus number 1
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: hcc params 0x0240fe6d hci version 0x110 quirks 0x0000808000000810
+Jul 03 09:17:01 pi5nvme kernel: mmc0: SDHCI controller on 1000fff000.mmc [1000fff000.mmc] using ADMA 64-bit
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: irq 137, io mem 0x1f00200000
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: new USB bus registered, assigned bus number 2
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.0: Host supports USB 3.0 SuperSpeed
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb1: SerialNumber: xhci-hcd.0
+Jul 03 09:17:01 pi5nvme kernel: hub 1-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 1-0:1.0: 2 ports detected
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb2: SerialNumber: xhci-hcd.0
+Jul 03 09:17:01 pi5nvme kernel: hub 2-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 2-0:1.0: 1 port detected
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: new USB bus registered, assigned bus number 3
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: hcc params 0x0240fe6d hci version 0x110 quirks 0x0000808000000810
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: irq 142, io mem 0x1f00300000
+Jul 03 09:17:01 pi5nvme kernel: mmc1: SDHCI controller on 1001100000.mmc [1001100000.mmc] using ADMA 64-bit
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: new USB bus registered, assigned bus number 4
+Jul 03 09:17:01 pi5nvme kernel: xhci-hcd xhci-hcd.1: Host supports USB 3.0 SuperSpeed
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: New USB device found, idVendor=1d6b, idProduct=0002, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: mmc1: new ultra high speed DDR50 SDIO card at address 0001
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb3: SerialNumber: xhci-hcd.1
+Jul 03 09:17:01 pi5nvme kernel: hub 3-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 3-0:1.0: 2 ports detected
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: New USB device found, idVendor=1d6b, idProduct=0003, bcdDevice= 6.12
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: Product: xHCI Host Controller
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: Manufacturer: Linux 6.12.93+rpt-rpi-2712 xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb usb4: SerialNumber: xhci-hcd.1
+Jul 03 09:17:01 pi5nvme kernel: hub 4-0:1.0: USB hub found
+Jul 03 09:17:01 pi5nvme kernel: hub 4-0:1.0: 1 port detected
+Jul 03 09:17:01 pi5nvme kernel: of_cfs_init
+Jul 03 09:17:01 pi5nvme kernel: of_cfs_init: OK
+Jul 03 09:17:01 pi5nvme kernel: clk: Disabling unused clocks
+Jul 03 09:17:01 pi5nvme kernel: PM: genpd: Disabling unused power domains
+Jul 03 09:17:01 pi5nvme kernel: Freeing unused kernel memory: 5696K
+Jul 03 09:17:01 pi5nvme kernel: Run /init as init process
+Jul 03 09:17:01 pi5nvme kernel:   with arguments:
+Jul 03 09:17:01 pi5nvme kernel:     /init
+Jul 03 09:17:01 pi5nvme kernel:   with environment:
+Jul 03 09:17:01 pi5nvme kernel:     HOME=/
+Jul 03 09:17:01 pi5nvme kernel:     TERM=linux
+Jul 03 09:17:01 pi5nvme kernel: input: pwr_button as /devices/platform/pwr_button/input/input0
+Jul 03 09:17:01 pi5nvme kernel: brcmstb-i2c 107d508200.i2c:  @97500hz registered in interrupt mode
+Jul 03 09:17:01 pi5nvme kernel: brcmstb-i2c 107d508280.i2c:  @97500hz registered in interrupt mode
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: new full-speed USB device number 2 using xhci-hcd
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: New USB device found, idVendor=1a64, idProduct=0000, bcdDevice= 3.00
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: Product: MasterBus USB Link
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: Manufacturer: Mastervolt International B.V.
+Jul 03 09:17:01 pi5nvme kernel: usb 3-2: SerialNumber: S110H0212
+Jul 03 09:17:01 pi5nvme kernel: hid-generic 0003:1A64:0000.0001: hiddev96,hidraw0: USB HID v1.01 Device [Mastervolt International B.V. MasterBus USB Link] on usb-xhci-hcd.1-2/input0
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx8   gen() 12521 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx4   gen() 10552 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx2   gen()  8170 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: neonx1   gen()  7398 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x8  gen()  5236 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x4  gen()  4924 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x2  gen()  3861 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: int64x1  gen()  3682 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: using algorithm neonx8 gen() 12521 MB/s
+Jul 03 09:17:01 pi5nvme kernel: raid6: .... xor() 8157 MB/s, rmw enabled
+Jul 03 09:17:01 pi5nvme kernel: raid6: using neon recovery algorithm
+Jul 03 09:17:01 pi5nvme kernel: xor: measuring software checksum speed
+Jul 03 09:17:01 pi5nvme kernel:    8regs           : 15738 MB/sec
+Jul 03 09:17:01 pi5nvme kernel:    32regs          : 15706 MB/sec
+Jul 03 09:17:01 pi5nvme kernel:    arm64_neon      : 21711 MB/sec
+Jul 03 09:17:01 pi5nvme kernel: xor: using function: arm64_neon (21711 MB/sec)
+Jul 03 09:17:01 pi5nvme kernel: Btrfs loaded, zoned=no, fsverity=no
+Jul 03 09:17:01 pi5nvme kernel: EXT4-fs (nvme0n1p2): mounted filesystem ce208fd3-38a8-424a-87a2-cd44114eb820 ro with ordered data mode. Quota mode: none.
+Jul 03 09:17:01 pi5nvme systemd[1]: System time before build time, advancing clock.
+Jul 03 09:17:01 pi5nvme kernel: NET: Registered PF_INET6 protocol family
+Jul 03 09:17:01 pi5nvme kernel: Segment Routing with IPv6
+Jul 03 09:17:01 pi5nvme kernel: In-situ OAM (IOAM) with IPv6
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd 252.39-1~deb12u2 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
+Jul 03 09:17:01 pi5nvme systemd[1]: Detected architecture arm64.
+Jul 03 09:17:01 pi5nvme systemd[1]: Hostname set to <pi5nvme>.
+Jul 03 09:17:01 pi5nvme systemd[1]: Queued start job for default target multi-user.target.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-postgresql.slice - Slice /system/postgresql.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-serial\x2dgetty.slice - Slice /system/serial-getty.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
+Jul 03 09:17:01 pi5nvme systemd[1]: Created slice user.slice - User and Session Slice.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+Jul 03 09:17:01 pi5nvme systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+Jul 03 09:17:01 pi5nvme systemd[1]: Expecting device dev-disk-by\x2dpartuuid-552b6058\x2d01.device - /dev/disk/by-partuuid/552b6058-01...
+Jul 03 09:17:01 pi5nvme systemd[1]: Expecting device dev-ttyAMA10.device - /dev/ttyAMA10...
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target paths.target - Path Units.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target slices.target - Slice Units.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target swap.target - Swaps.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target time-set.target - System Time Set.
+Jul 03 09:17:01 pi5nvme systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-fsckd.socket - fsck to fsckd communication Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-initctl.socket - initctl Compatibility Named Pipe.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-journald.socket - Journal Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+Jul 03 09:17:01 pi5nvme systemd[1]: dev-hugepages.mount - Huge Pages File System was skipped because of an unmet condition check (ConditionPathExists=/sys/kernel/mm/hugepages).
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+Jul 03 09:17:01 pi5nvme systemd[1]: auth-rpcgss-module.service - Kernel Module supporting RPCSEC_GSS was skipped because of an unmet condition check (ConditionPathExists=/etc/krb5.keytab).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting fake-hwclock.service - Restore / save the current clock...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting keyboard-setup.service - Set the console keyboard layout...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting kmod-static-nodes.service - Create List of Static Device Nodes...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@configfs.service - Load Kernel Module configfs...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@dm_mod.service - Load Kernel Module dm_mod...
+Jul 03 09:17:01 pi5nvme kernel: device-mapper: ioctl: 4.48.0-ioctl (2023-03-01) initialised: dm-devel@lists.linux.dev
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@drm.service - Load Kernel Module drm...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@fuse.service - Load Kernel Module fuse...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting modprobe@loop.service - Load Kernel Module loop...
+Jul 03 09:17:01 pi5nvme kernel: fuse: init (API version 7.41)
+Jul 03 09:17:01 pi5nvme systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathExists=!/run/initramfs/fsck-root).
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-journald.service - Journal Service...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+Jul 03 09:17:01 pi5nvme systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+Jul 03 09:17:01 pi5nvme systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+Jul 03 09:17:01 pi5nvme kernel: EXT4-fs (nvme0n1p2): re-mounted ce208fd3-38a8-424a-87a2-cd44114eb820 r/w.
+Jul 03 09:17:01 pi5nvme systemd[1]: Started systemd-journald.service - Journal Service.

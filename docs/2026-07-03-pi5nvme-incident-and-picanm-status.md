@@ -63,6 +63,32 @@ The repo has been hardened so raw import/backfill is no longer an automatic live
 
 Before any importer/backfill is run on `pi5nvme`, still require explicit approval and an import window. Prefer offline/backfill-window processing, not during live validation.
 
+## Current status after pi5nvme reboot/recovery
+
+Checked again at about `2026-07-03T17:25+01:00` after `pi5nvme` was rebooted.
+
+`pi5nvme` current state:
+
+- reachable by SSH again;
+- uptime about 4 minutes at check time;
+- temperature about `52.7'C`;
+- `vcgencmd get_throttled` returned `0x0`;
+- memory healthy: about `3.2GiB` available, no swap used;
+- disk healthy: `/` about `36%` used with about `145G` free;
+- failed units: none;
+- active: `postgresql`, `signalk-pi5nvme`, `boat-n2k-raw-receiver`, `masterbus-signalk`;
+- inactive/disabled: `boat-raw-n2k-import.service`, `boat-raw-n2k-import.timer`;
+- raw receiver listening on `0.0.0.0:20200` and fanout on `127.0.0.1:20201`;
+- Signal K raw source present: `picanm-raw-candump-fanout` with 22 N2K sources and 37 PGNs observed;
+- old transitional Signal K source still present: `can0-nmea2000` with 16 N2K sources and 27 PGNs observed;
+- MasterBus service recovered after reboot and is streaming 94 mapped fields from 8 devices.
+
+Observed reboot history includes reboots at about `16:52`, `16:57`, and `17:18`. Journald reported an unclean previous shutdown and replaced a corrupted journal file. The 12:05 importer run is visible in retained logs and imported one compressed raw file with about `771532` decoded rows in about 76 seconds, consuming about 46 seconds CPU. Kernel logs retained after the reboot did not show a clear OOM/thermal/undervoltage smoking gun, so the precise failure mechanism remains unproven. The safest conclusion remains: raw import/backfill is a high-impact workload and must stay gated/resource-limited.
+
+A forwarding gap after reboot was traced to name resolution: on `picanm`, `pi5nvme` resolved to IPv6 addresses, while `boat-n2k-raw-receiver` listens on IPv4 `0.0.0.0:20200`. Direct IPv4 to `192.168.1.135:20200` worked. The deployed and committed `picanm` forwarder now uses `DEST_HOST=192.168.1.135`.
+
+`picanm` remains stable and preserving raw N2K source material.
+
 ## picanm status after pi5nvme outage
 
 Checked at `2026-07-03T12:23:34+01:00`.
@@ -90,4 +116,12 @@ Checked at `2026-07-03T12:23:34+01:00`.
 
 `n2k-raw-forwarder` is retrying `pi5nvme:20200`, as expected while `pi5nvme` is offline. Local raw logging is independent of forwarding and continues.
 
-After the outage, the deployed `picanm` forwarder retry interval was reduced from 5 seconds to 30 seconds by setting `RETRY_SEC=30` in `n2k-raw-forwarder.service`. This reduces log spam and connection churn while `pi5nvme` is down. The raw logger, CAN service, and picanm Signal K were not restarted for this change.
+After the outage, the deployed `picanm` forwarder retry interval was reduced from 5 seconds to 30 seconds by setting `RETRY_SEC=30` in `n2k-raw-forwarder.service`. This reduces log spam and connection churn while `pi5nvme` is down.
+
+After `pi5nvme` rebooted, `picanm` still failed to reconnect by hostname because `pi5nvme` resolved to IPv6 addresses and the receiver is IPv4-only. The deployed `n2k-raw-forwarder.service` now uses `DEST_HOST=192.168.1.135`, and the TCP stream is established again:
+
+```text
+picanm 192.168.1.235:xxxxx -> pi5nvme 192.168.1.135:20200 ESTABLISHED
+```
+
+The raw logger, CAN service, and picanm Signal K were not restarted for this change.

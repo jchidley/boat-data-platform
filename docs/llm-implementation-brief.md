@@ -81,13 +81,13 @@ Before any `pi5nvme` work, read the overload/thermal incident notes in `docs/202
 - Exact Signal K/canboat raw input method is proven: Signal K `providers/simple` with `type: "NMEA2000"`, `subOptions.type: "n2k-ip-gateway-canboatjs"`, `format: "candump3"`, connected to a read-only local fanout on `127.0.0.1:20201`.
 - `pi5nvme` raw receiver now archives the picanm stream from TCP `20200` and fans the same candump lines to Signal K on localhost `20201`.
 - pi5 Signal K has both feeds enabled for overlap: old `picanm:3000` Signal K and new raw candump/canboat feed.
-- MasterBus is active again on `pi5nvme`: `masterbus-signalk` listens on TCP `3009`, Signal K sees the `masterbus` source, and the bridge streams 94 mapped fields from 8 devices.
+- MasterBus is active again on `pi5nvme`: `masterbus-signalk` listens on TCP `3009`, Signal K has live vessel paths with `$source: "masterbus"`, and the bridge streams 94 mapped fields from 8 devices. Note: `/signalk/v1/api/sources` may show sparse/empty `masterbus` metadata even while vessel paths are live.
 
 ## Do next
 
-1. Compare old and new feeds in parallel: PGNs, Signal K paths, timestamps, and key values.
-2. Plan an approved, resource-limited decoded N2K import window; do not use importer/backfill as a casual live validation step.
-3. Confirm MasterBus paths remain present while the raw N2K feed is active.
+1. Compare old and new feeds in parallel: PGNs, Signal K paths, timestamps, source metadata, and key values.
+2. Confirm MasterBus vessel paths remain present while the raw N2K feed is active; check `/signalk/v1/api/vessels/self`, not only `/signalk/v1/api/sources`.
+3. Plan decoded N2K import/backfill only as a separate approved, resource-limited maintenance window; do not use importer/backfill as a casual live validation step.
 4. Disable `picanm` Signal K only after the go/no-go checklist passes.
 
 ## Do not do yet
@@ -108,7 +108,7 @@ All must pass:
 - `pi5nvme` receives and archives live raw frames.
 - Missed forwarder periods recover from mirrored spool files.
 - pi5 Signal K receives N2K data without `picanm:3000`.
-- TimescaleDB Signal K and decoded N2K row counts increase.
+- TimescaleDB Signal K row counts increase during live validation; decoded N2K row counts increase only during an approved/resource-limited import window.
 - Key values match during overlap: position, COG/SOG, heading, wind, depth, STW, rudder, AIS.
 - MasterBus paths remain present on pi5 Signal K.
 - CAN errors/drops do not increase.

@@ -75,7 +75,7 @@ Currently:
 - owns the PiCAN-M / `can0` NMEA 2000 interface
 - runs `can0-nmea2000.service`
 - runs `n2k-raw-logger.service` and writes raw candump logs under `/var/log/n2k/`
-- runs `n2k-raw-forwarder.service` and is connected to `pi5nvme.local:20200`
+- runs `n2k-raw-forwarder.service` and is connected to `pi5nvme.local:20200`; `.local` mDNS is required because bare `pi5nvme` resolves IPv6-first on the Starlink LAN while the receiver is currently IPv4-only
 - runs a minimal Signal K server on port `3000`
 - is memory constrained but working
 
@@ -104,8 +104,8 @@ Currently:
 picanm can0
   → edge timestamped candump-format records
   → local compressed spool in /var/log/n2k/
-  → live raw stream to pi5nvme
-  → pi5nvme raw archive / TimescaleDB import
+  → live raw stream to pi5nvme.local:20200
+  → pi5nvme raw archive / TimescaleDB import during approved/resource-limited import windows
 ```
 
 This is the source-of-truth path. It must keep working even if Signal K or Grafana is down.
@@ -333,7 +333,7 @@ Implemented transport:
 ```text
 picanm candump -L can0
   → n2k-raw-forwarder.service
-  → TCP pi5nvme:20200
+  → TCP pi5nvme.local:20200
   → boat-n2k-raw-receiver.service
       ├─ archive writer: /srv/boat/raw-n2k/live/can0-YYYYMMDDTHH0000Z.candump.log.tmp
       └─ read-only local fanout: 127.0.0.1:20201
@@ -363,11 +363,11 @@ old: picanm Signal K → pi5nvme Signal K
 new: picanm raw stream → pi5nvme Signal K
 ```
 
-Then compare path counts, key values, source metadata, and decoded PGNs. Disable the old feed only after the raw-stream path is proven equivalent or better.
+Then compare path counts, key values, source metadata, and decoded PGNs. Use `/signalk/v1/api/vessels/self` for value/path checks; `/signalk/v1/api/sources` can have incomplete metadata for non-N2K sources such as `masterbus`. Disable the old feed only after the raw-stream path is proven equivalent or better.
 
 ## Phase 3 — database ingestion model
 
-Keep raw candump files as the byte-for-byte source of truth, but ingest enough structured summaries into Timescale/Postgres that humans, scripts, and LLM agents can inspect the boat without reading huge log files.
+Keep raw candump files as the byte-for-byte source of truth, but ingest enough structured summaries into Timescale/Postgres that humans, scripts, and LLM agents can inspect the boat without reading huge log files. After the 2026-07-03 `pi5nvme` incident, raw import/backfill must be treated as a maintenance-window workload with explicit approval and resource limits, not as a casual live validation step.
 
 Use two classes of tables:
 
@@ -633,7 +633,7 @@ Add minimal health checks on `pi5nvme` for:
 - picanm memory
 - Signal K path freshness
 - Postgres collector freshness
-- raw importer backlog
+- raw importer backlog/status without starting importer/backfill
 
 Grafana should show freshness first. Defer alerting frameworks and fancy dashboards until a real need appears.
 
@@ -659,9 +659,9 @@ This preserves current functionality while keeping the raw source-of-truth intac
 
 ## Immediate next implementation tasks
 
-1. Run old and new paths in parallel and compare PGNs, Signal K paths, timestamps, and key values.
-2. Confirm completed raw receiver segments continue to import into decoded N2K Timescale rows.
-3. Keep MasterBus path validation in the overlap check.
+1. Run old and new paths in parallel and compare PGNs, Signal K paths, timestamps, source metadata, and key values.
+2. Keep MasterBus path validation in the overlap check using vessel paths; current live vessel data shows 15 `$source: "masterbus"` electrical paths even though source metadata may be sparse.
+3. Plan decoded raw N2K import/backfill as a separate approved, resource-limited maintenance window; do not run importer/backfill for routine live validation.
 4. Disable `picanm` Signal K only after validation.
 
 ## Review notes

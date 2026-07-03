@@ -57,7 +57,7 @@ Steady-state target:
 Current transition state:
 
 - `picanm` runs raw logger/forwarder services from `infra/picanm/`.
-- `picanm` forwards live candump-format frames to `pi5nvme:20200`.
+- `picanm` forwards live candump-format frames to `pi5nvme.local:20200`; `.local` mDNS is used because bare `pi5nvme` resolves IPv6-first on the Starlink LAN while the receiver is currently IPv4-only.
 - `picanm` still runs a minimal Signal K server on port `3000`.
 - The migration plan is to make pi5 Signal K consume the raw stream, compare it with the old `picanm:3000` feed, then disable Signal K on `picanm` after validation.
 
@@ -70,7 +70,7 @@ Current transition state:
 - Run MasterBus/Mastervolt USB tooling and publish it into Signal K.
 - Preserve MasterBus discovery/config snapshots when devices or mappings change.
 - Store normalized Signal K values in TimescaleDB.
-- Store decoded raw N2K PGN history in TimescaleDB.
+- Store decoded raw N2K PGN history in TimescaleDB, but only during approved/resource-limited import windows; decoded backfill is disabled by default after the 2026-07-03 pi5 incident.
 - Run Grafana and Signal K applications/plugins.
 - Run inventory, replay, decoder comparison, and analysis tooling.
 
@@ -122,7 +122,7 @@ Build health/freshness dashboards before presentation dashboards:
 - picanm disk, memory, and clock offset
 - Signal K path freshness
 - Timescale collector freshness
-- raw importer backlog
+- raw importer backlog/status, without running importer/backfill during live validation
 
 Boat/instrument dashboards:
 
@@ -145,7 +145,7 @@ Boat/instrument dashboards:
 - Fat Signal K server installed on `pi5nvme:3001`.
 - Fat Signal K currently consumes `picanm:3000` as a remote Signal K provider.
 - Initial Signal K webapps installed on `pi5nvme`: KIP, Freeboard-SK, Instrumentpanel, App Dock.
-- MasterBus USB tooling installed on `pi5nvme` and feeding Signal K.
+- MasterBus USB tooling installed on `pi5nvme`; `masterbus-signalk` is active and feeding Signal K vessel paths.
 - Signal K WebSocket collector installed and writing to TimescaleDB.
 - Raw N2K log decoder/importer installed and guarded; decoded PGN backfill is disabled by default and must run only in an approved, resource-limited import window.
 - N2K inventory tooling added.
@@ -157,12 +157,14 @@ Boat/instrument dashboards:
 - Determined and deployed the Signal K/canboat raw input method: `providers/simple` → `type: NMEA2000` → `subOptions.type: n2k-ip-gateway-canboatjs` with `format: candump3` connected to `127.0.0.1:20201`.
 - Replaced the Pi 5 raw receiver implementation with a Node receiver/fanout: picanm publishes to `pi5nvme.local:20200`; pi5 archives valid candump lines and broadcasts them read-only to local subscribers on `127.0.0.1:20201`.
 - Enabled the new `picanm-raw-candump-fanout` Signal K provider while keeping the old `picanm-signalk-ws` provider enabled for overlap.
-- Verified Signal K sources include both the old N2K feed (`can0-nmea2000`) and the new raw feed (`picanm-raw-candump-fanout`).
+- Verified Signal K sources include both the old N2K feed (`can0-nmea2000`) and the new raw feed (`picanm-raw-candump-fanout`). Latest low-impact check: `picanm-raw-candump-fanout` had 22 N2K sources / 38 PGNs; `can0-nmea2000` had 16 N2K sources / 27 PGNs.
 - Verified Timescale Signal K rows increased during the overlap check.
+- Verified MasterBus vessel paths are present in Signal K with `$source: "masterbus"` (15 electrical battery/charger/inverter paths in the latest low-impact check). Note: `/signalk/v1/api/sources` may show an empty `masterbus` metadata object even while vessel paths are live.
+- Recovered from the 2026-07-03 `pi5nvme` incident: importer service/timer are inactive/disabled, repo safeguards are deployed, and picanm raw forwarding is reconnected via `pi5nvme.local`.
 
 ## Near-term next steps
 
-1. Compare old and new feeds in parallel: path/PGN coverage, timestamps, and key values.
-2. Confirm completed raw segments from the new receiver continue to import into decoded N2K Timescale rows.
-3. Keep MasterBus validation in the overlap check.
+1. Compare old and new feeds in parallel: path/PGN coverage, timestamps, source metadata, and key values.
+2. Keep MasterBus path validation in the overlap check using `/signalk/v1/api/vessels/self`, not only `/signalk/v1/api/sources`.
+3. Plan decoded N2K import/backfill separately as an approved, resource-limited maintenance window; do not use importer/backfill as a casual live validation step.
 4. Disable Signal K on `picanm` only after the go/no-go checklist passes.

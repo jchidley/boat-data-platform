@@ -76,9 +76,10 @@ Checked again at about `2026-07-03T17:25+01:00` after `pi5nvme` was rebooted.
 - active: `postgresql`, `signalk-pi5nvme`, `boat-n2k-raw-receiver`, `masterbus-signalk`;
 - inactive/disabled: `boat-raw-n2k-import.service`, `boat-raw-n2k-import.timer`;
 - raw receiver listening on `0.0.0.0:20200` and fanout on `127.0.0.1:20201`;
-- Signal K raw source present: `picanm-raw-candump-fanout` with 22 N2K sources and 37 PGNs observed;
+- Signal K raw source present: `picanm-raw-candump-fanout`; latest low-impact check observed 22 N2K sources and 38 PGNs;
 - old transitional Signal K source still present: `can0-nmea2000` with 16 N2K sources and 27 PGNs observed;
-- MasterBus service recovered after reboot and is streaming 94 mapped fields from 8 devices.
+- MasterBus service recovered after reboot and is streaming 94 mapped fields from 8 devices;
+- Signal K vessel data contains 15 live electrical battery/charger/inverter paths with `$source: "masterbus"`; `/signalk/v1/api/sources` may show sparse/empty `masterbus` metadata despite live vessel paths.
 
 Observed reboot history includes reboots at about `16:52`, `16:57`, and `17:18`. Journald reported an unclean previous shutdown and replaced a corrupted journal file. The 12:05 importer run is visible in retained logs and imported one compressed raw file with about `771532` decoded rows in about 76 seconds, consuming about 46 seconds CPU. Kernel logs retained after the reboot did not show a clear OOM/thermal/undervoltage smoking gun, so the precise failure mechanism remains unproven. The safest conclusion remains: raw import/backfill is a high-impact workload and must stay gated/resource-limited.
 

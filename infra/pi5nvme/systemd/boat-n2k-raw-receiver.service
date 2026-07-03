@@ -1,0 +1,17 @@
+[Unit]
+Description=Receive live raw NMEA 2000 candump stream from picanm
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=jack
+Group=jack
+Environment=LISTEN_PORT=20200
+Environment=DEST_DIR=/srv/boat/raw-n2k/live
+ExecStart=/usr/local/bin/boat-n2k-raw-receiver
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

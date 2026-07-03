@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 import readline from 'node:readline'
+import crypto from 'node:crypto'
 import { makePool } from './db.mjs'
 
 const rawDir = process.env.RAW_N2K_DIR || '/srv/boat/raw-n2k'
@@ -17,11 +18,30 @@ async function alreadyDone(file, st) {
   return r.rows[0]?.processed_at
 }
 
-async function markSeen(file, st, processed = false) {
-  await pool.query(`insert into raw_n2k_log_files(path,size_bytes,mtime,processed_at)
-    values($1,$2,$3,$4)
-    on conflict(path) do update set size_bytes=excluded.size_bytes, mtime=excluded.mtime, processed_at=coalesce(excluded.processed_at, raw_n2k_log_files.processed_at)`,
-    [file, st.size, st.mtime, processed ? new Date() : null])
+async function sha256File(file) {
+  const h = crypto.createHash('sha256')
+  await new Promise((resolve, reject) => {
+    const s = fs.createReadStream(file)
+    s.on('data', chunk => h.update(chunk))
+    s.on('error', reject)
+    s.on('end', resolve)
+  })
+  return h.digest('hex')
+}
+
+async function markSeen(file, st, processed = false, meta = {}) {
+  await pool.query(`insert into raw_n2k_log_files(path,size_bytes,mtime,processed_at,sha256,first_edge_time,last_edge_time,frame_count,updated_at)
+    values($1,$2,$3,$4,$5,$6,$7,$8,now())
+    on conflict(path) do update set
+      size_bytes=excluded.size_bytes,
+      mtime=excluded.mtime,
+      processed_at=coalesce(excluded.processed_at, raw_n2k_log_files.processed_at),
+      sha256=coalesce(excluded.sha256, raw_n2k_log_files.sha256),
+      first_edge_time=coalesce(excluded.first_edge_time, raw_n2k_log_files.first_edge_time),
+      last_edge_time=coalesce(excluded.last_edge_time, raw_n2k_log_files.last_edge_time),
+      frame_count=coalesce(excluded.frame_count, raw_n2k_log_files.frame_count),
+      updated_at=now()`,
+    [file, st.size, st.mtime, processed ? new Date() : null, meta.sha256 ?? null, meta.firstEdgeTime ?? null, meta.lastEdgeTime ?? null, meta.frameCount ?? null])
 }
 
 async function insertRows(rows) {
@@ -35,7 +55,8 @@ async function insertRows(rows) {
 async function importFile(file) {
   const st = fs.statSync(file)
   if (await alreadyDone(file, st)) return { file, skipped: true }
-  await markSeen(file, st, false)
+  const sha256 = await sha256File(file)
+  await markSeen(file, st, false, { sha256 })
   const temp = path.join(tmpDir, `boat-n2k-${process.pid}-${path.basename(file, '.gz')}`)
   await new Promise((resolve, reject) => {
     const out = fs.createWriteStream(temp)
@@ -51,23 +72,36 @@ async function importFile(file) {
   const analyzerClosed = new Promise((res, rej) => an.on('close', code => code === 0 ? res() : rej(new Error(`analyzer exited ${code}`))))
   an.stderr.pipe(process.stderr)
   const rl = readline.createInterface({ input: an.stdout })
-  let idx=0, inserted=0, batch=[]
+  let idx=0, inserted=0, batch=[], firstEdgeTime=null, lastEdgeTime=null
   for await (const line of rl) {
     if (!line.trim().startsWith('{')) continue
     let msg
     try { msg = JSON.parse(line) } catch { continue }
-    batch.push({ log_path:file, message_index:idx++, time:msg.timestamp || null, pgn:msg.pgn, prio:msg.prio ?? null, src:msg.src ?? null, dst:msg.dst ?? null, description:msg.description ?? null, id:msg.id ?? null, fields:msg.fields ?? null, raw:msg })
+    const edgeTime = msg.timestamp || null
+    if (edgeTime && !firstEdgeTime) firstEdgeTime = edgeTime
+    if (edgeTime) lastEdgeTime = edgeTime
+    batch.push({ log_path:file, message_index:idx++, time:edgeTime, pgn:msg.pgn, prio:msg.prio ?? null, src:msg.src ?? null, dst:msg.dst ?? null, description:msg.description ?? null, id:msg.id ?? null, fields:msg.fields ?? null, raw:msg })
     if (batch.length >= 500) { await insertRows(batch); inserted += batch.length; batch=[] }
   }
   if (batch.length) { await insertRows(batch); inserted += batch.length }
   await analyzerClosed
   fs.rmSync(temp, { force: true })
-  await markSeen(file, st, true)
+  await markSeen(file, st, true, { sha256, firstEdgeTime, lastEdgeTime, frameCount: idx })
   return { file, inserted }
 }
 
+function findRawLogs(dir) {
+  const out = []
+  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, ent.name)
+    if (ent.isDirectory()) out.push(...findRawLogs(p))
+    else if (ent.isFile() && p.endsWith('.candump.log.gz')) out.push(p)
+  }
+  return out.sort()
+}
+
 try {
-  const files = fs.readdirSync(rawDir).filter(f=>f.endsWith('.candump.log.gz')).sort().map(f=>path.join(rawDir,f))
+  const files = findRawLogs(rawDir)
   let done=0
   for (const f of files) {
     if (limit && done >= limit) break

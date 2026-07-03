@@ -89,6 +89,7 @@ postgresql
 grafana-server
 signalk-pi5nvme
 masterbus-signalk
+boat-n2k-raw-receiver.service
 boat-raw-log-mirror.timer
 boat-signalk-collector.service
 boat-raw-n2k-import.timer
@@ -145,9 +146,10 @@ Expected core tables:
 boatdata.signal_k_measurements
 boatdata.n2k_decoded_messages
 boatdata.raw_n2k_log_files
+boatdata.masterbus_snapshots
 ```
 
-Expected/desired rebuildable inventory tables or views:
+Expected rebuildable inventory tables or views:
 
 ```text
 boatdata.masterbus_snapshots

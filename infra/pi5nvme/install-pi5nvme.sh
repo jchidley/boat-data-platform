@@ -7,7 +7,7 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 apt-get update
-apt-get install -y ca-certificates curl gnupg lsb-release rsync postgresql postgresql-contrib
+apt-get install -y ca-certificates curl gnupg lsb-release rsync postgresql postgresql-contrib nodejs npm socat gzip chrony
 
 install -d -m 0755 /etc/apt/keyrings
 if [ ! -f /etc/apt/keyrings/timescale.gpg ]; then
@@ -27,11 +27,19 @@ LIST
 apt-get update
 apt-get install -y timescaledb-2-postgresql-15 grafana
 
-install -d -m 0755 /srv/boat/raw-n2k /srv/boat/processed /etc/boat-data-platform
+install -d -m 0755 /srv/boat/raw-n2k/live /srv/boat/masterbus /srv/boat/processed /etc/boat-data-platform
 chown -R jack:jack /srv/boat
 install -m 0755 infra/pi5nvme/boat-raw-log-mirror.sh /usr/local/bin/boat-raw-log-mirror
+install -m 0755 infra/pi5nvme/scripts/boat-n2k-stream-segment-writer.sh /usr/local/bin/boat-n2k-stream-segment-writer
+install -m 0755 infra/pi5nvme/scripts/boat-n2k-raw-receiver.sh /usr/local/bin/boat-n2k-raw-receiver
+install -m 0755 infra/pi5nvme/scripts/check-pi5-boat-health.sh /usr/local/bin/check-pi5-boat-health
+install -m 0755 infra/pi5nvme/scripts/capture-masterbus-snapshot.sh /usr/local/bin/capture-masterbus-snapshot
 install -m 0644 infra/pi5nvme/systemd/boat-raw-log-mirror.service /etc/systemd/system/boat-raw-log-mirror.service
 install -m 0644 infra/pi5nvme/systemd/boat-raw-log-mirror.timer /etc/systemd/system/boat-raw-log-mirror.timer
+install -m 0644 infra/pi5nvme/systemd/boat-n2k-raw-receiver.service /etc/systemd/system/boat-n2k-raw-receiver.service
+install -m 0644 infra/pi5nvme/systemd/boat-raw-n2k-import.service /etc/systemd/system/boat-raw-n2k-import.service
+install -m 0644 infra/pi5nvme/systemd/boat-raw-n2k-import.timer /etc/systemd/system/boat-raw-n2k-import.timer
+install -m 0644 infra/pi5nvme/systemd/boat-signalk-collector.service /etc/systemd/system/boat-signalk-collector.service
 
 systemctl enable --now postgresql
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='boatdata'" | grep -q 1 || sudo -u postgres createdb boatdata
@@ -53,7 +61,9 @@ ALTER DATABASE boatdata OWNER TO postgres;
 ALTER SYSTEM SET shared_preload_libraries = 'timescaledb';
 SQL
 systemctl restart postgresql
-sudo -u postgres psql -d boatdata -f infra/pi5nvme/sql/001_init_timescale.sql
+for sql in infra/pi5nvme/sql/*.sql; do
+  sudo -u postgres psql -d boatdata -f "$sql"
+done
 
 install -d -m 0755 /etc/grafana/provisioning/datasources
 cat >/etc/grafana/provisioning/datasources/boatdata-postgres.yaml <<YAML
@@ -76,8 +86,13 @@ YAML
 chown root:grafana /etc/grafana/provisioning/datasources/boatdata-postgres.yaml
 chmod 0640 /etc/grafana/provisioning/datasources/boatdata-postgres.yaml
 
+if [ -f package.json ]; then
+  sudo -u jack npm install
+fi
+
 systemctl daemon-reload
-systemctl enable --now boat-raw-log-mirror.timer grafana-server
+systemctl enable --now chrony.service || true
+systemctl enable --now boat-raw-log-mirror.timer boat-raw-n2k-import.timer boat-n2k-raw-receiver.service grafana-server
 
 if ! grep -q '^GRAFANA_ADMIN_PASSWORD=' /etc/boat-data-platform/grafana.env 2>/dev/null; then
   umask 077

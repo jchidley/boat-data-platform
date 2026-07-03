@@ -1,0 +1,15 @@
+[Unit]
+Description=Raw NMEA 2000 candump logger
+Wants=can0-nmea2000.service time-sync.target
+After=can0-nmea2000.service time-sync.target
+
+[Service]
+Type=simple
+Environment=IFACE=can0
+Environment=LOG_DIR=/var/log/n2k
+ExecStart=/usr/local/bin/n2k-raw-log-writer
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

@@ -32,7 +32,7 @@ optional sidecar files
 
 ```text
 picanm:
-  can0 + raw logs + minimal Signal K on :3000
+  can0 + raw logs + raw forwarder + minimal Signal K on :3000
 
 pi5nvme:
   fat Signal K on :3001
@@ -63,16 +63,15 @@ pi5nvme:
 
 ## Do next
 
-1. Implement committed `picanm` raw logger/forwarder service files.
-2. Verify edge timestamps and clock sync.
-3. Implement MasterBus snapshot/export capture on `pi5nvme`.
-4. Implement `pi5nvme` raw stream receiver.
-5. Capture forwarded raw candump lines into files on `pi5nvme`.
-6. Prove canboatjs/analyzerjs decodes the received stream.
-7. Prove pi5 Signal K can consume the raw stream or document the bridge needed.
-8. Run old and new feeds in parallel.
-9. Compare PGNs, Signal K paths, timestamps, and key values.
-10. Disable `picanm` Signal K only after the go/no-go checklist passes.
+1. Deploy the `pi5nvme` raw stream receiver and health scripts from `infra/pi5nvme/`.
+2. Verify edge timestamps and clock sync on both hosts.
+3. Capture forwarded raw candump lines into files on `pi5nvme`.
+4. Capture a MasterBus snapshot/export on `pi5nvme`.
+5. Prove canboatjs/analyzerjs decodes the received stream.
+6. Prove pi5 Signal K can consume the raw stream or document the bridge needed.
+7. Run old and new feeds in parallel.
+8. Compare PGNs, Signal K paths, timestamps, and key values.
+9. Disable `picanm` Signal K only after the go/no-go checklist passes.
 
 ## Do not do yet
 

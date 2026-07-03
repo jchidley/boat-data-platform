@@ -74,6 +74,7 @@ Currently:
 
 - owns the PiCAN-M / `can0` NMEA 2000 interface
 - runs raw `candump` logging under `/var/log/n2k/`
+- runs `n2k-raw-forwarder.service`, which will connect when `pi5nvme` exposes the raw receiver
 - runs a minimal Signal K server on port `3000`
 - is memory constrained but working
 
@@ -292,7 +293,7 @@ If disk pressure forces deletion, delete derived data before raw/source material
 
 ## Phase 1 — make picanm edge services explicit
 
-Create/verify these `picanm` services:
+Create/verify these committed `picanm` services from `infra/picanm/`:
 
 ```text
 can0-nmea2000.service
@@ -642,14 +643,13 @@ This preserves current functionality while keeping the raw source-of-truth intac
 
 ## Immediate next implementation tasks
 
-1. Add committed `picanm` service files for raw logger/forwarder and clock sync notes.
-2. Add MasterBus snapshot/export capture on `pi5nvme`.
-3. Add a `pi5nvme` raw stream receiver service.
-4. Test raw stream into files on `pi5nvme` without touching Signal K.
-5. Prove exactly how pi5 Signal K/canboat will consume the raw stream.
-6. Configure pi5 Signal K/canboat input from that raw stream.
-7. Run old and new paths in parallel and compare.
-8. Disable `picanm` Signal K only after validation.
+1. Deploy updated `infra/pi5nvme/install-pi5nvme.sh` on `pi5nvme`.
+2. Verify raw stream capture into files on `pi5nvme` without touching Signal K.
+3. Capture a MasterBus snapshot/export on `pi5nvme`.
+4. Prove exactly how pi5 Signal K/canboat will consume the raw stream.
+5. Configure pi5 Signal K/canboat input from that raw stream.
+6. Run old and new paths in parallel and compare.
+7. Disable `picanm` Signal K only after validation.
 
 ## Review notes
 

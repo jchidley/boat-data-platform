@@ -28,7 +28,9 @@ install -m 0755 /home/jack/.cargo/bin/masterbus-tui /usr/local/bin/masterbus-tui
 install -m 0755 /home/jack/.cargo/bin/masterbus-signalk /usr/local/bin/masterbus-signalk
 install -m 0755 /home/jack/.cargo/bin/masterbus-set-field /usr/local/bin/masterbus-set-field
 
-install -d -m 0755 /etc/default/masterbus /etc/default/masterbus-signalk /var/lib/masterbus
+install -d -m 0755 /etc/default/masterbus /etc/default/masterbus-signalk /var/lib/masterbus /srv/boat/masterbus
+chown jack:jack /srv/boat/masterbus
+install -m 0755 infra/pi5nvme/scripts/capture-masterbus-snapshot.sh /usr/local/bin/capture-masterbus-snapshot
 install -m 0644 infra/pi5nvme/masterbus/config.ini /etc/default/masterbus/config.ini
 install -m 0644 infra/pi5nvme/masterbus/masterbus-signalk.env /etc/default/masterbus-signalk/config
 install -m 0644 /home/jack/src/masterbus/crates/masterbus-tools/etc/masterbus-signalk.service /etc/systemd/system/masterbus-signalk.service

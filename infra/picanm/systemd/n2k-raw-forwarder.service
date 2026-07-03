@@ -1,0 +1,16 @@
+[Unit]
+Description=Forward raw NMEA 2000 candump stream to pi5nvme
+Wants=can0-nmea2000.service network-online.target
+After=can0-nmea2000.service network-online.target
+
+[Service]
+Type=simple
+Environment=IFACE=can0
+Environment=DEST_HOST=pi5nvme
+Environment=DEST_PORT=20200
+ExecStart=/usr/local/bin/n2k-raw-forwarder
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

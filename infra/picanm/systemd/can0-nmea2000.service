@@ -1,0 +1,13 @@
+[Unit]
+Description=Configure SocketCAN can0 for NMEA 2000
+Wants=network-pre.target
+Before=network-pre.target n2k-raw-logger.service n2k-raw-forwarder.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh -c '/usr/sbin/ip link set can0 down 2>/dev/null || true; /usr/sbin/ip link set can0 type can bitrate 250000 restart-ms 100; /usr/sbin/ip link set can0 up'
+ExecStop=/usr/sbin/ip link set can0 down
+
+[Install]
+WantedBy=multi-user.target

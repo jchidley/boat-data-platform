@@ -56,8 +56,9 @@ Steady-state target:
 
 Current transition state:
 
+- `picanm` runs raw logger/forwarder services from `infra/picanm/`.
 - `picanm` still runs a minimal Signal K server on port `3000`.
-- The migration plan is to replace this as the primary upstream with raw CAN forwarding to `pi5nvme`, then disable Signal K on `picanm` after validation.
+- The migration plan is to validate raw CAN forwarding into `pi5nvme`, then disable Signal K on `picanm` after validation.
 
 ## pi5nvme responsibilities
 
@@ -147,15 +148,15 @@ Boat/instrument dashboards:
 - Signal K WebSocket collector installed and writing to TimescaleDB.
 - Raw N2K log decoder/importer installed and writing decoded PGNs to TimescaleDB.
 - N2K inventory tooling added.
+- Committed and deployed `picanm` raw edge services: `can0-nmea2000`, `n2k-raw-logger`, and `n2k-raw-forwarder`.
 
 ## Near-term next steps
 
-1. Add committed `picanm` raw logger/forwarder service definitions.
-2. Add clock-sync/timestamping checks for `picanm` and `pi5nvme`.
-3. Add MasterBus snapshot/export capture on `pi5nvme`.
-4. Add `pi5nvme` raw stream receiver service.
-5. Test raw stream capture into files on `pi5nvme`.
-6. Prove how pi5 Signal K/canboat will consume the raw stream.
-7. Feed pi5 Signal K from the raw stream instead of `picanm` Signal K.
-8. Run old and new feeds in parallel and compare path/PGN coverage.
-9. Disable Signal K on `picanm` after validation.
+1. Deploy updated `infra/pi5nvme/install-pi5nvme.sh` on `pi5nvme`.
+2. Verify clock sync and timestamp quality with `check-picanm-health` and `check-pi5-boat-health`.
+3. Test raw stream capture into files under `/srv/boat/raw-n2k/live/` on `pi5nvme`.
+4. Capture a MasterBus snapshot with `capture-masterbus-snapshot`.
+5. Prove how pi5 Signal K/canboat will consume the raw stream.
+6. Feed pi5 Signal K from the raw stream instead of `picanm` Signal K.
+7. Run old and new feeds in parallel and compare path/PGN coverage.
+8. Disable Signal K on `picanm` after validation.

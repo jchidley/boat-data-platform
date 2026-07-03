@@ -6,6 +6,9 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+REPO_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
+
 apt-get update
 apt-get install -y ca-certificates curl gnupg lsb-release rsync postgresql postgresql-contrib nodejs socat gzip chrony
 
@@ -29,17 +32,17 @@ apt-get install -y timescaledb-2-postgresql-15 grafana
 
 install -d -m 0755 /srv/boat/raw-n2k/live /srv/boat/masterbus /srv/boat/processed /etc/boat-data-platform
 chown -R jack:jack /srv/boat
-install -m 0755 infra/pi5nvme/boat-raw-log-mirror.sh /usr/local/bin/boat-raw-log-mirror
-install -m 0755 infra/pi5nvme/scripts/boat-n2k-stream-segment-writer.sh /usr/local/bin/boat-n2k-stream-segment-writer
-install -m 0755 infra/pi5nvme/scripts/boat-n2k-raw-receiver.sh /usr/local/bin/boat-n2k-raw-receiver
-install -m 0755 infra/pi5nvme/scripts/check-pi5-boat-health.sh /usr/local/bin/check-pi5-boat-health
-install -m 0755 infra/pi5nvme/scripts/capture-masterbus-snapshot.sh /usr/local/bin/capture-masterbus-snapshot
-install -m 0644 infra/pi5nvme/systemd/boat-raw-log-mirror.service /etc/systemd/system/boat-raw-log-mirror.service
-install -m 0644 infra/pi5nvme/systemd/boat-raw-log-mirror.timer /etc/systemd/system/boat-raw-log-mirror.timer
-install -m 0644 infra/pi5nvme/systemd/boat-n2k-raw-receiver.service /etc/systemd/system/boat-n2k-raw-receiver.service
-install -m 0644 infra/pi5nvme/systemd/boat-raw-n2k-import.service /etc/systemd/system/boat-raw-n2k-import.service
-install -m 0644 infra/pi5nvme/systemd/boat-raw-n2k-import.timer /etc/systemd/system/boat-raw-n2k-import.timer
-install -m 0644 infra/pi5nvme/systemd/boat-signalk-collector.service /etc/systemd/system/boat-signalk-collector.service
+install -m 0755 "$SCRIPT_DIR/boat-raw-log-mirror.sh" /usr/local/bin/boat-raw-log-mirror
+install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-stream-segment-writer.sh" /usr/local/bin/boat-n2k-stream-segment-writer
+install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-raw-receiver.sh" /usr/local/bin/boat-n2k-raw-receiver
+install -m 0755 "$SCRIPT_DIR/scripts/check-pi5-boat-health.sh" /usr/local/bin/check-pi5-boat-health
+install -m 0755 "$SCRIPT_DIR/scripts/capture-masterbus-snapshot.sh" /usr/local/bin/capture-masterbus-snapshot
+install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-log-mirror.service" /etc/systemd/system/boat-raw-log-mirror.service
+install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-log-mirror.timer" /etc/systemd/system/boat-raw-log-mirror.timer
+install -m 0644 "$SCRIPT_DIR/systemd/boat-n2k-raw-receiver.service" /etc/systemd/system/boat-n2k-raw-receiver.service
+install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-n2k-import.service" /etc/systemd/system/boat-raw-n2k-import.service
+install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-n2k-import.timer" /etc/systemd/system/boat-raw-n2k-import.timer
+install -m 0644 "$SCRIPT_DIR/systemd/boat-signalk-collector.service" /etc/systemd/system/boat-signalk-collector.service
 
 systemctl enable --now postgresql
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='boatdata'" | grep -q 1 || sudo -u postgres createdb boatdata
@@ -61,8 +64,8 @@ ALTER DATABASE boatdata OWNER TO postgres;
 ALTER SYSTEM SET shared_preload_libraries = 'timescaledb';
 SQL
 systemctl restart postgresql
-for sql in infra/pi5nvme/sql/*.sql; do
-  sudo -u postgres psql -d boatdata -f "$sql"
+for sql in "$SCRIPT_DIR"/sql/*.sql; do
+  sudo -u postgres psql -d boatdata < "$sql"
 done
 
 install -d -m 0755 /etc/grafana/provisioning/datasources
@@ -86,8 +89,8 @@ YAML
 chown root:grafana /etc/grafana/provisioning/datasources/boatdata-postgres.yaml
 chmod 0640 /etc/grafana/provisioning/datasources/boatdata-postgres.yaml
 
-if [ -f package.json ]; then
-  sudo -u jack npm install
+if [ -f "$REPO_ROOT/package.json" ]; then
+  sudo -u jack bash -lc "cd '$REPO_ROOT' && npm install"
 fi
 
 systemctl daemon-reload

@@ -10,7 +10,8 @@ Define the current storage model for compact, rebuildable historical data withou
 |---|---|
 | Complete NMEA 2000 frames | Compressed edge-timestamped candump files |
 | Selected decoded N2K values | PGN-shaped typed PostgreSQL tables |
-| Selected MasterBus values | Typed MasterBus PostgreSQL tables sourced from the best replayable MasterBus log available |
+| Complete replayable MasterBus decoded events | Append-only native field-event logs captured before Signal K mapping |
+| Selected MasterBus values | Typed MasterBus PostgreSQL tables sourced directly from native field-event logs |
 | Engine transitions and runtime | Typed PostgreSQL events derived from typed MasterBus history |
 | Health and import evidence | Bounded metadata tables |
 
@@ -82,17 +83,29 @@ Typed MasterBus and engine-event history must come from the source replay path, 
 
 ## MasterBus history
 
-Mapped Signal K JSONL preserves only fields mapped at capture time. Keep it as an interim replay source while investigating native decoded MasterBus field-event logging.
+The historical source must be native decoded Mastervolt/MasterBus field events captured from the existing decoder before Signal K mapping. Mapped Signal K JSONL preserves only configured paths and is an interim comparison/fallback source, not the end-state PostgreSQL feed.
+
+The native event log must be append-only, rotated and replayable. Each event must preserve enough information to reconstruct selected typed facts:
+
+- source timestamp;
+- stable device identity;
+- native field/register identity;
+- decoded value and unit;
+- decoder and schema version;
+- source file and replay position.
 
 Preserve together:
 
+- native field-event logs;
 - discovery snapshots;
 - configuration/schema caches;
-- mapping versions;
-- rotated replay logs;
+- decoder/schema versions;
+- current mapped JSONL during migration;
 - import checksums and status.
 
-Do not add new hardware or undertake broad protocol reverse engineering unless the existing library cannot provide the required field events.
+PostgreSQL consumes selected native events through typed staging and idempotent merge. It must not be the only sink because database downtime must not lose source evidence. Signal K continues as the independent live-state consumer and is not mirrored into PostgreSQL.
+
+Do not add new hardware or undertake broad protocol reverse engineering unless the existing library cannot expose the required decoded events. Remain receive-only and do not add MasterBus writes or control.
 
 ## Disk and resource safety
 
@@ -126,6 +139,6 @@ The storage design is complete when:
 - each retained historical fact has one documented owner;
 - only the live Signal K and typed PostgreSQL processing paths remain;
 - durable engine events and runtime are derived from typed MasterBus history;
-- MasterBus history can be replayed from preserved source logs, subject to documented mapping limits;
+- MasterBus history can be rebuilt from preserved native decoded field-event logs without depending on Signal K mappings;
 - disk pressure stops rebuildable writers before source acquisition is endangered;
 - PostgreSQL can be rebuilt from preserved source material and committed schema/tools.

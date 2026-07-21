@@ -93,7 +93,7 @@ A disposable staging clone then imported the 05:00 sample twice, retaining 6,007
 
 The decoder acceptance gate is therefore complete for the initial seven-PGN set. JavaScript remains available as the oracle/fallback; additional typed PGNs still require the same bounded parity test before inclusion.
 
-## MasterBus path validated
+## Interim mapped-JSONL MasterBus converter validation
 
 ```text
 MasterBus Signal K replay sample
@@ -120,7 +120,7 @@ Synthetic validation confirmed:
 - sparse update merging;
 - alternator, battery, inverter/charger and solar rows.
 
-A bounded real MasterBus replay-log validation completed on 2026-07-21. A 65-second capture contained 638 battery deltas from `battery-2` and `house-batt`; conversion emitted 638 typed staging rows with no skips, and merge coalesced them into 221 timestamp/device samples. Voltage, current, temperature, state-of-charge and time-remaining values were present. No alternator, inverter/charger or solar updates occurred during this stationary sample, so each still requires representative real-data validation.
+A bounded real mapped Signal K JSONL validation completed on 2026-07-21. A 65-second capture contained 638 battery deltas from `battery-2` and `house-batt`; conversion emitted 638 typed staging rows with no skips, and merge coalesced them into 221 timestamp/device samples. Voltage, current, temperature, state-of-charge and time-remaining values were present. This validates typed conversion and merge behavior, not the end-state source path. Native decoded Mastervolt/MasterBus field-event capture before Signal K mapping must still be implemented and validated for battery, alternator, inverter/charger and solar data.
 
 This validation found and fixed an inventory bug: merge previously replaced the source JSONL `line_count` with the number of coalesced typed rows. Source line count now remains immutable import provenance.
 
@@ -129,7 +129,7 @@ This validation found and fixed an inventory bug: merge previously replaced the 
 - Validation samples are deliberately small.
 - No broad historical import has been approved.
 - The 2026-07-21 bounded real-data comparison selected typed-only direct provenance: 20 MB versus 55 MB for envelope-plus-typed, a 63.1% reduction across 118,149 decoded envelopes and 109,768 typed rows.
-- MasterBus replay currently contains mapped fields, not every native field.
+- The validated MasterBus sample is mapped Signal K JSONL, not the required native pre-mapping field-event source.
 - Each newly supported PGN needs a bounded representative sample and test fixture.
 
 ## Reproduce safely

@@ -89,7 +89,7 @@ Do not persist engine history by mirroring the Signal K output.
 Instead:
 
 ```text
-MasterBus replay/native events
+native decoded MasterBus field-event log captured before Signal K mapping
   -> typed alternator history
   -> typed engine start/stop events
   -> runtime derived from event intervals
@@ -104,5 +104,5 @@ A live `propulsion.*.runTime` value may be published into Signal K if a live app
 - All four physical engine combinations produce the expected state.
 - Debounce suppresses short threshold crossings.
 - Plugin restart does not emit false transitions.
-- Typed MasterBus history can independently reproduce the same transitions.
+- Typed history loaded from native pre-Signal-K MasterBus events can independently reproduce the same transitions.
 - Tests pass and standard health checks remain healthy.

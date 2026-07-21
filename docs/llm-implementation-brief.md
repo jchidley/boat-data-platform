@@ -73,7 +73,7 @@ Current safeguards:
 - input size and process runtime are bounded by default;
 - broad historical work runs offline/staging, not on live `pi5nvme`.
 
-MasterBus typed schemas/converters exist for alternator, battery, inverter/charger and solar samples, but replay into those tables still needs bounded real-data validation.
+MasterBus typed schemas/converters exist for alternator, battery, inverter/charger and solar samples. The mapped Signal K JSONL battery test is comparison evidence only. The required historical source is now an append-only stream of native decoded Mastervolt/MasterBus field events captured before Signal K mapping; native capture and bounded real replay still need implementation and validation.
 
 ## Source material
 
@@ -102,11 +102,11 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 Complete the new typed historical path in this order:
 
-1. Select and run the first explicitly bounded seven-PGN staging import. The direct Rust decoder gate is complete for PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`: multiple-file count/value parity, malformed/incomplete packets, first-frame timestamps, Rust-only decodes, idempotence and delete/rebuild are verified. Keep live Signal K/canboatjs unchanged and retain it as the oracle/fallback; parity-gate any additional PGN before inclusion.
-2. Validate real alternator, inverter/charger and solar MasterBus replay when representative states are available; battery replay is validated.
-3. Implement typed engine transition/runtime history from MasterBus alternator evidence.
-4. Point health/Grafana queries at typed tables.
-5. Build the first historical Grafana dashboards.
+1. Inspect the deployed Mastervolt/MasterBus decoder and implement versioned append-only native decoded field-event capture before Signal K mapping. Preserve timestamps, device and field identity, value/unit, decoder/schema version and replay position under `/srv/boat/masterbus/`. Leave the working live Signal K path unchanged and remain receive-only.
+2. Convert selected native events directly into typed PostgreSQL alternator, battery, inverter/charger and solar tables; validate representative real states, provenance, idempotence, failure cleanup and delete/rebuild. Mapped Signal K JSONL remains comparison/fallback input only until native replay is proven.
+3. Select and run the first explicitly bounded seven-PGN staging import. The direct Rust decoder gate is complete for PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`; parity-gate any additional PGN before inclusion.
+4. Implement typed engine transition/runtime history from native MasterBus alternator evidence and verify all four physical engine combinations.
+5. Point health/Grafana queries at typed tables and build the first historical dashboards.
 6. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Do not do

@@ -74,12 +74,15 @@ for sql in "$SCRIPT_DIR"/sql/*.sql; do
   sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d boatdata -f "$sql"
 done
 
-install -d -m 0755 /etc/grafana/provisioning/datasources
+install -d -m 0755 /etc/grafana/provisioning/datasources /etc/grafana/provisioning/dashboards /etc/grafana/dashboards/boat-data-platform
+install -m 0644 "$SCRIPT_DIR/grafana/provisioning/dashboards/boatdata.yaml" /etc/grafana/provisioning/dashboards/boatdata.yaml
+install -m 0644 "$SCRIPT_DIR/grafana/dashboards/boat-history.json" /etc/grafana/dashboards/boat-data-platform/boat-history.json
 cat >/etc/grafana/provisioning/datasources/boatdata-postgres.yaml <<YAML
 apiVersion: 1
 
 datasources:
   - name: Boat TimescaleDB
+    uid: boat-timescaledb
     type: postgres
     access: proxy
     url: localhost:5432

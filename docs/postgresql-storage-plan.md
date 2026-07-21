@@ -142,3 +142,11 @@ The storage design is complete when:
 - MasterBus history can be rebuilt from preserved native decoded field-event logs without depending on Signal K mappings;
 - disk pressure stops rebuildable writers before source acquisition is endangered;
 - PostgreSQL can be rebuilt from preserved source material and committed schema/tools.
+
+## 2026-07-21 bounded batch evidence and engine layer
+
+The settled native-file gate used the rotated `masterbus-native-20260721T070000Z.jsonl` file, never the active `080000Z` file. Its source checksum, line count, timestamps, converter counts, merged typed counts and resource limits are recorded in the implementation brief and validation document. Duplicate import remained idempotent, staging was empty after merge, explicit delete removed typed rows and inventory, and the rebuilt normalized typed exports matched byte-for-byte.
+
+`011_masterbus_engine_history_v1.sql` adds the historical owner for engine transitions and runtime. It consumes `masterbus_alternator_samples_v1`, not Signal K. A running interval is closed only by typed stop evidence or a bounded data gap; missing data is not interpreted as an engine stop, and an unresolved interval remains open and is excluded from completed-runtime totals. Source file and line provenance is retained for observed transitions.
+
+Grafana queries are bounded by dashboard time macros and row limits and use typed MasterBus tables/views. They are repository-controlled only; live provisioning is still approval/prerequisite-gated.

@@ -204,3 +204,11 @@ These observations depend on operating the engines and are not blockers for code
 - only the live Signal K and typed PostgreSQL processing paths remain;
 - PostgreSQL can be rebuilt from preserved source logs;
 - disk/resource guards protect live acquisition.
+
+## 2026-07-21 implementation status
+
+The settled-file native MasterBus staging gate is complete. A rotated hourly file was imported twice, deleted from disposable staging with its inventory, and rebuilt; counts and normalized typed content were identical. The live `boatdata` schema was checked read-only and remains empty. No approval-gated live import was performed.
+
+The first bounded Rust N2K staging batch is also complete using settled mirrored `picanm` data and only PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`, with research mode `none`. The exact sample, decoder revision/schema, resource limits, counts, null rates, provenance and delete/rebuild evidence are recorded in `2026-07-05-copy-merge-validation.md`. The local staging clone required the already-documented `004a_reset_n2k_typed_provenance.sql`; because it is plain PostgreSQL rather than TimescaleDB, only extension/hypertable statements were omitted in a temporary staging invocation. Production SQL is unchanged.
+
+Migration `011_masterbus_engine_history_v1.sql` implements deterministic typed-native transition/runtime rebuilds. It is not yet applied to live PostgreSQL. The repository-controlled bounded Grafana dashboard is prepared but not deployed while the live typed tables are empty. Logbook integration remains deliberately deferred until all four physical engine combinations and typed runtime semantics are trustworthy.

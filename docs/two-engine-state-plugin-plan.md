@@ -106,3 +106,11 @@ A live `propulsion.*.runTime` value may be published into Signal K if a live app
 - Plugin restart does not emit false transitions.
 - Typed history loaded from native pre-Signal-K MasterBus events can independently reproduce the same transitions.
 - Tests pass and standard health checks remain healthy.
+
+## Historical implementation status — 2026-07-21
+
+Migration `infra/pi5nvme/sql/011_masterbus_engine_history_v1.sql` now owns durable historical transitions and runtime. The rebuild function reads only `masterbus_alternator_samples_v1` for `alpha-port` and `alpha-stbd`; it never reads the live Signal K output. It uses the deployed strict `13.25 V` threshold, 10-second start debounce and 30-second stop debounce. Samples are ordered deterministically by timestamp and raw provenance. Same-key duplicate timestamps are already coalesced by the typed primary key. A gap over 120 seconds closes a running interval as `data_gap` at the last known evidence and resets state to unknown; it never infers a stop from missing data. Unresolved running intervals remain open and are excluded from completed-runtime totals. Consumers use indexed transition/runtime tables and bounded views.
+
+On the settled native staging file, 1,025 port and 1,912 starboard alternator samples produced one open starboard `started` event at `2026-07-21T07:26:44.298Z` and no port start event. This agrees with the available physical starboard-only observation (`alpha-stbd` approximately 13.7–13.8 V and derived state `started`, port sense 0 V). It is typed native evidence and not mirrored Signal K history.
+
+A disposable SQL regression sequence covered threshold equality, start/stop debounce, threshold chatter, a long heartbeat gap and an open/closed runtime boundary; it produced the expected start/stop/start/data-gap sequence with raw-line provenance. The migration is implemented and tested in disposable staging only. Both-off, port-only and both-running physical commissioning remain required, and runtime must not yet be presented as trusted operational/logbook history.

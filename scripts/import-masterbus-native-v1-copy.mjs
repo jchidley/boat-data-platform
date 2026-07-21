@@ -16,7 +16,11 @@ Options:
   --sample-lines N      Import only the first N events (required unless --allow-full-file)
   --allow-full-file     Explicitly permit a complete settled event file
   --max-input-bytes N   Reject larger input (default 104857600)
+  --max-lines N         Reject more prepared events (default 100000)
   --max-runtime-sec N   Timeout converter/psql processes (default 300)
+  --max-memory-mb N     Refuse if this process exceeds RSS limit (default 512)
+  --max-workspace-bytes N  Refuse workspace growth above limit (default 1073741824)
+  --min-free-disk-bytes N  Require free space before/after work (default 1073741824)
   --work-dir DIR        Work directory (default temporary)
   --keep-work           Keep generated work files
   --dry-run             Convert only; do not touch PostgreSQL
@@ -31,7 +35,11 @@ const rawFile = arg('--raw-file')
 const sampleLines = arg('--sample-lines') ? Number(arg('--sample-lines')) : null
 const allowFullFile = has('--allow-full-file')
 const maxInputBytes = Number(arg('--max-input-bytes') ?? 104857600)
+const maxLines = Number(arg('--max-lines') ?? 100000)
 const maxRuntimeSec = Number(arg('--max-runtime-sec') ?? 300)
+const maxMemoryMb = Number(arg('--max-memory-mb') ?? 512)
+const maxWorkspaceBytes = Number(arg('--max-workspace-bytes') ?? 1073741824)
+const minFreeDiskBytes = Number(arg('--min-free-disk-bytes') ?? 1073741824)
 const dryRun = has('--dry-run')
 const keepWork = has('--keep-work')
 const workDir = arg('--work-dir') || fs.mkdtempSync(path.join(os.tmpdir(), 'masterbus-native-copy-'))
@@ -39,8 +47,30 @@ const psqlCmd = process.env.PSQL || 'psql'
 if (!rawFile || !fs.existsSync(rawFile)) { console.error(usage); process.exit(2) }
 if (sampleLines !== null && (!Number.isInteger(sampleLines) || sampleLines <= 0)) throw new Error('--sample-lines must be positive')
 if (sampleLines === null && !allowFullFile) throw new Error('refusing complete file without --allow-full-file')
-if (!Number.isInteger(maxInputBytes) || maxInputBytes < 0 || !Number.isInteger(maxRuntimeSec) || maxRuntimeSec <= 0) throw new Error('invalid resource limit')
+if (![maxInputBytes, maxLines, maxRuntimeSec, maxMemoryMb, maxWorkspaceBytes, minFreeDiskBytes].every(Number.isInteger)
+  || maxInputBytes < 0 || maxLines <= 0 || maxRuntimeSec <= 0 || maxMemoryMb <= 0 || maxWorkspaceBytes <= 0 || minFreeDiskBytes < 0) throw new Error('invalid resource limit')
 if (maxInputBytes && fs.statSync(rawFile).size > maxInputBytes) throw new Error('input exceeds --max-input-bytes')
+
+function workspaceBytes(dir) {
+  let total = 0
+  if (!fs.existsSync(dir)) return total
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const target = path.join(dir, entry.name)
+    if (entry.isDirectory()) total += workspaceBytes(target)
+    else if (entry.isFile()) total += fs.statSync(target).size
+  }
+  return total
+}
+function freeDiskBytes(dir) {
+  const stat = fs.statfsSync(dir)
+  return Number(stat.bavail) * Number(stat.bsize)
+}
+function enforceLimits(stage) {
+  const rss = process.memoryUsage().rss
+  if (rss > maxMemoryMb * 1024 * 1024) throw new Error(`${stage}: RSS exceeds --max-memory-mb`)
+  if (workspaceBytes(workDir) > maxWorkspaceBytes) throw new Error(`${stage}: workspace exceeds --max-workspace-bytes`)
+  if (freeDiskBytes(workDir) < minFreeDiskBytes) throw new Error(`${stage}: free disk below --min-free-disk-bytes`)
+}
 
 function run(cmd, cmdArgs, options = {}) {
   return new Promise((resolve, reject) => {
@@ -62,12 +92,23 @@ async function prepare(src, dest) {
   const output = fs.createWriteStream(dest)
   const rl = readline.createInterface({ input: stream })
   let count = 0
+  let firstEventTime = null
+  let lastEventTime = null
   for await (const line of rl) {
-    output.write(`${line}\n`); count++
+    count++
+    if (count > maxLines) throw new Error('prepared input exceeds --max-lines')
+    try {
+      const event = JSON.parse(line)
+      if (event.observedAt) {
+        firstEventTime ??= event.observedAt
+        lastEventTime = event.observedAt
+      }
+    } catch { /* converter records malformed lines as skips */ }
+    output.write(`${line}\n`)
     if (sampleLines !== null && count >= sampleLines) { rl.close(); stream.destroy(); break }
   }
   await new Promise((resolve, reject) => output.end(error => error ? reject(error) : resolve()))
-  return count
+  return { count, firstEventTime, lastEventTime }
 }
 function hash(file) { return new Promise((resolve, reject) => { const h = crypto.createHash('sha256'); fs.createReadStream(file).on('data', d => h.update(d)).on('error', reject).on('end', () => resolve(h.digest('hex'))) }) }
 function copy(table, file) { return `\\copy ${table} FROM '${file.replace(/'/g, "''")}' WITH (FORMAT text, DELIMITER E'\\t', NULL '\\N')` }
@@ -75,32 +116,40 @@ function psqlArgs(file) { return ['-X', '-v', 'ON_ERROR_STOP=1', '-d', process.e
 
 async function main() {
   fs.mkdirSync(workDir, { recursive: true })
+  enforceLimits('start')
+  const startedAt = Date.now()
   const prepared = path.join(workDir, 'input.jsonl')
   const typedDir = path.join(workDir, 'typed')
-  const lineCount = await prepare(rawFile, prepared)
+  const preparedInfo = await prepare(rawFile, prepared)
+  const lineCount = preparedInfo.count
   if (!lineCount) throw new Error('prepared input is empty')
+  enforceLimits('after-prepare')
   const converter = path.join(scriptDir, 'masterbus-native-jsonl-to-copy.mjs')
   async function convert(id) {
     fs.rmSync(typedDir, { recursive: true, force: true }); fs.mkdirSync(typedDir, { recursive: true })
     const input = fs.openSync(prepared, 'r')
-    return run(process.execPath, [converter, '--log-file-id', String(id), '--typed-dir', typedDir], { stdio: [input, 'pipe', 'pipe'] })
+    return run(process.execPath, [`--max-old-space-size=${maxMemoryMb}`, converter, '--log-file-id', String(id), '--typed-dir', typedDir], { stdio: [input, 'pipe', 'pipe'] })
   }
   let result = await convert(1)
   let stats = JSON.parse(result.stderr.trim())
-  if (dryRun) { console.log(JSON.stringify({ dryRun: true, rawFile, lineCount, workDir, stats }, null, 2)); return }
+  enforceLimits('after-convert')
+  const typedRowCounts = Object.fromEntries(fs.readdirSync(typedDir).filter(name => name.endsWith('.tsv')).map(name => [name, fs.readFileSync(path.join(typedDir, name), 'utf8').split('\n').filter(Boolean).length]))
+  const sourceSha256 = await hash(rawFile)
+  const preparedSha256 = await hash(prepared)
+  const evidence = { sourceSha256, sourceSizeBytes: fs.statSync(rawFile).size, preparedSha256, preparedSizeBytes: fs.statSync(prepared).size, firstEventTime: preparedInfo.firstEventTime, lastEventTime: preparedInfo.lastEventTime, lineCount, stats, typedRowCounts, resourceLimits: { maxInputBytes, maxLines, maxRuntimeSec, maxMemoryMb, maxWorkspaceBytes, minFreeDiskBytes }, workspaceBytes: workspaceBytes(workDir), freeDiskBytes: freeDiskBytes(workDir), elapsedMs: Date.now() - startedAt, maxRssKb: process.resourceUsage().maxRSS }
+  if (dryRun) { console.log(JSON.stringify({ dryRun: true, rawFile, workDir, ...evidence }, null, 2)); return }
 
   const { makePool } = await import('./db.mjs')
   const pool = makePool('ingest')
   let id
   try {
-    const stat = fs.statSync(prepared)
-    const digest = await hash(prepared)
+    const stat = fs.statSync(rawFile)
     const inventoryPath = sampleLines ? `${rawFile}#first-${sampleLines}` : rawFile
     const q = await pool.query(`INSERT INTO masterbus_log_files_v1(path,size_bytes,mtime,sha256,line_count,import_status,updated_at)
       VALUES($1,$2,to_timestamp($3),$4,$5,'staged',now()) ON CONFLICT(path) DO UPDATE SET
       size_bytes=EXCLUDED.size_bytes,mtime=EXCLUDED.mtime,sha256=EXCLUDED.sha256,line_count=EXCLUDED.line_count,
       import_status='staged',updated_at=now() RETURNING masterbus_log_file_id`,
-    [inventoryPath, stat.size, stat.mtimeMs / 1000, digest, lineCount])
+    [inventoryPath, stat.size, stat.mtimeMs / 1000, sourceSha256, lineCount])
     id = q.rows[0].masterbus_log_file_id
   } finally { await pool.end() }
 
@@ -115,7 +164,8 @@ async function main() {
   const sqlFile = path.join(workDir, 'copy-and-merge.sql')
   fs.writeFileSync(sqlFile, ['\\set ON_ERROR_STOP on', 'BEGIN;', ...tables.map(([table]) => `DELETE FROM ${table} WHERE raw_log_file_id=${id};`), ...existing.map(([table, file]) => copy(table, path.join(typedDir, file))), `SELECT masterbus_merge_staged_log_v1(${id});`, 'COMMIT;', ''].join('\n'))
   await run(psqlCmd, psqlArgs(sqlFile))
+  enforceLimits('after-merge')
   if (!keepWork) fs.rmSync(workDir, { recursive: true, force: true })
-  console.log(JSON.stringify({ imported: true, rawFile, masterbusLogFileId: id, lineCount, stats, copiedTypedTables: existing.map(([table]) => table) }, null, 2))
+  console.log(JSON.stringify({ imported: true, rawFile, masterbusLogFileId: id, ...evidence, copiedTypedTables: existing.map(([table]) => table), elapsedMs: Date.now() - startedAt, maxRssKb: process.resourceUsage().maxRSS }, null, 2))
 }
 main().catch(error => { console.error(error.stack || error.message); if (!keepWork) fs.rmSync(workDir, { recursive: true, force: true }); process.exit(1) })

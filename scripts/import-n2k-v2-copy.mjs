@@ -19,7 +19,11 @@ Options:
   --sample-lines N      Copy only the first N candump lines (required unless --allow-full-file)
   --allow-full-file     Explicitly permit a complete file import
   --max-input-bytes N   Reject larger source files (default: 104857600; 0 disables)
+  --max-lines N         Reject larger prepared samples (default: 100000)
   --max-runtime-sec N   Timeout for each analyzer/psql process (default: 300)
+  --max-memory-mb N     RSS planning limit (default: 512)
+  --max-workspace-bytes N  Reject work files above limit (default: 1073741824)
+  --min-free-disk-bytes N  Require free space before/after work (default: 1073741824)
   --research-mode MODE  none (default), untyped, or selected
   --research-pgn LIST   Comma-separated PGNs required with selected research mode
   --decoder MODE        js (default) or rust; rust emits typed TSV directly
@@ -43,7 +47,11 @@ const rawFile = arg('--raw-file')
 const sampleLines = arg('--sample-lines') ? Number(arg('--sample-lines')) : null
 const allowFullFile = has('--allow-full-file')
 const maxInputBytes = Number(arg('--max-input-bytes') ?? process.env.N2K_IMPORT_MAX_INPUT_BYTES ?? 104857600)
+const maxLines = Number(arg('--max-lines') ?? 100000)
 const maxRuntimeSec = Number(arg('--max-runtime-sec') ?? process.env.N2K_IMPORT_MAX_RUNTIME_SEC ?? 300)
+const maxMemoryMb = Number(arg('--max-memory-mb') ?? 512)
+const maxWorkspaceBytes = Number(arg('--max-workspace-bytes') ?? 1073741824)
+const minFreeDiskBytes = Number(arg('--min-free-disk-bytes') ?? 1073741824)
 const researchMode = arg('--research-mode') || 'none'
 const researchPgn = arg('--research-pgn')
 const decoder = arg('--decoder') || 'js'
@@ -63,8 +71,9 @@ if (sampleLines === null && !allowFullFile) {
   console.error('refusing a complete import without --allow-full-file; use --sample-lines for validation')
   process.exit(2)
 }
-if (!Number.isInteger(maxInputBytes) || maxInputBytes < 0 || !Number.isInteger(maxRuntimeSec) || maxRuntimeSec <= 0) {
-  console.error('--max-input-bytes must be a non-negative integer and --max-runtime-sec a positive integer')
+if (![maxInputBytes, maxLines, maxRuntimeSec, maxMemoryMb, maxWorkspaceBytes, minFreeDiskBytes].every(Number.isInteger)
+  || maxInputBytes < 0 || maxLines <= 0 || maxRuntimeSec <= 0 || maxMemoryMb <= 0 || maxWorkspaceBytes <= 0 || minFreeDiskBytes < 0) {
+  console.error('--max-input-bytes must be non-negative and resource limits must be positive (except min free disk)')
   process.exit(2)
 }
 if (!['none', 'untyped', 'selected'].includes(researchMode) || (researchMode === 'selected' && !researchPgn)) {
@@ -83,7 +92,8 @@ if (!fs.existsSync(rawFile)) {
   console.error(`raw file not found: ${rawFile}`)
   process.exit(2)
 }
-const sourceSize = fs.statSync(rawFile).size
+const rawStat = fs.statSync(rawFile)
+const sourceSize = rawStat.size
 if (maxInputBytes > 0 && sourceSize > maxInputBytes) {
   console.error(`source file is ${sourceSize} bytes, above --max-input-bytes ${maxInputBytes}`)
   process.exit(2)
@@ -121,6 +131,25 @@ const typedTables = [
 ]
 const stageTables = ['n2k_frames_stage_v2', 'n2k_research_fields_stage_v2', ...typedTables.map(t => t[0])]
 
+function workspaceBytes(dir) {
+  let total = 0
+  if (!fs.existsSync(dir)) return total
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const target = path.join(dir, entry.name)
+    total += entry.isDirectory() ? workspaceBytes(target) : (entry.isFile() ? fs.statSync(target).size : 0)
+  }
+  return total
+}
+function freeDiskBytes(dir) {
+  const stat = fs.statfsSync(dir)
+  return Number(stat.bavail) * Number(stat.bsize)
+}
+function enforceLimits(stage) {
+  if (process.memoryUsage().rss > maxMemoryMb * 1024 * 1024) throw new Error(`${stage}: RSS exceeds --max-memory-mb`)
+  if (workspaceBytes(workDir) > maxWorkspaceBytes) throw new Error(`${stage}: workspace exceeds --max-workspace-bytes`)
+  if (freeDiskBytes(workDir) < minFreeDiskBytes) throw new Error(`${stage}: free disk below --min-free-disk-bytes`)
+}
+
 function run(cmd, cmdArgs, opts = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(cmd, cmdArgs, { stdio: opts.stdio || ['ignore', 'pipe', 'pipe'], env: opts.env || process.env })
@@ -137,26 +166,18 @@ function run(cmd, cmdArgs, opts = {}) {
   })
 }
 
-async function copyPossiblyGz(src, dest, maxLines = null) {
+async function copyPossiblyGz(src, dest, sampleLimit = null) {
   fs.mkdirSync(path.dirname(dest), { recursive: true })
   const input = fs.createReadStream(src)
   const stream = src.endsWith('.gz') ? input.pipe(zlib.createGunzip()) : input
   const output = fs.createWriteStream(dest, { encoding: 'utf8' })
-  if (maxLines === null) {
-    await new Promise((resolve, reject) => {
-      stream.pipe(output)
-      stream.on('error', reject)
-      output.on('error', reject)
-      output.on('finish', resolve)
-    })
-    return
-  }
   const rl = readline.createInterface({ input: stream })
   let lines = 0
   for await (const line of rl) {
-    output.write(line + '\n')
     lines++
-    if (lines >= maxLines) {
+    if (lines > maxLines) throw new Error('prepared input exceeds --max-lines')
+    output.write(line + '\n')
+    if (sampleLimit !== null && lines >= sampleLimit) {
       rl.close()
       stream.destroy?.()
       break
@@ -188,6 +209,8 @@ function analyzerInvocation() {
 
 async function main() {
   fs.mkdirSync(workDir, { recursive: true })
+  const startedAt = Date.now()
+  enforceLimits('start')
   const preparedRaw = path.join(workDir, 'input.candump.log')
   const analyzerJsonl = path.join(workDir, 'analyzer.jsonl')
   const framesTsv = path.join(workDir, 'frames.tsv')
@@ -198,6 +221,7 @@ async function main() {
   await copyPossiblyGz(rawFile, preparedRaw, sampleLines)
   const preparedStat = fs.statSync(preparedRaw)
   if (preparedStat.size === 0) throw new Error('prepared raw sample is empty')
+  enforceLimits('after-prepare')
 
   const converter = path.join(scriptDir, 'analyzer-jsonl-to-n2k-copy.mjs')
   const converterArgs = id => [converter, '--log-file-id', String(id), '--frames-tsv', framesTsv, '--fields-tsv', fieldsTsv, '--typed-dir', typedDir, '--research-mode', researchMode, ...(researchPgn ? ['--research-pgn', researchPgn] : [])]
@@ -225,15 +249,16 @@ async function main() {
   }
 
   const conv = await convert(1)
+  enforceLimits('after-convert')
   let convertStats = {}
   try { convertStats = JSON.parse(conv) } catch { convertStats = { raw: conv } }
 
   if (dryRun) {
-    console.log(JSON.stringify({ dryRun: true, rawFile, preparedRaw, workDir, convertStats }, null, 2))
+    console.log(JSON.stringify({ dryRun: true, rawFile, preparedRaw, workDir, convertStats, resourceLimits: { maxInputBytes, maxLines, maxRuntimeSec, maxMemoryMb, maxWorkspaceBytes, minFreeDiskBytes }, workspaceBytes: workspaceBytes(workDir), freeDiskBytes: freeDiskBytes(workDir), elapsedMs: Date.now() - startedAt, maxRssKb: process.resourceUsage().maxRSS }, null, 2))
     return
   }
 
-  const sha256 = await sha256File(preparedRaw)
+  const sourceSha256 = await sha256File(rawFile)
   const { makePool } = await import('./db.mjs')
   const pool = makePool('ingest')
   let rawFileId
@@ -249,7 +274,7 @@ async function main() {
         error_summary = NULL,
         updated_at = now()
       RETURNING raw_file_id
-    `, [sampleLines ? `${rawFile}#first-${sampleLines}` : rawFile, preparedStat.size, preparedStat.mtimeMs / 1000, sha256])
+    `, [sampleLines ? `${rawFile}#first-${sampleLines}` : rawFile, sourceSize, rawStat.mtimeMs / 1000, sourceSha256])
     rawFileId = inv.rows[0].raw_file_id
   } finally {
     await pool.end()
@@ -281,6 +306,7 @@ async function main() {
   fs.writeFileSync(copySqlPath, sql)
   const psql = await run(psqlCmd, [...psqlDsnArgs(), '-X', '-v', 'ON_ERROR_STOP=1', '-f', copySqlPath])
 
+  enforceLimits('after-merge')
   if (!keepWork) fs.rmSync(workDir, { recursive: true, force: true })
 
   console.log(JSON.stringify({
@@ -288,7 +314,15 @@ async function main() {
     rawFile,
     rawFileId,
     sampleLines,
+    sourceSha256,
+    sourceSizeBytes: sourceSize,
+    preparedSizeBytes: preparedStat.size,
     convertStats,
+    resourceLimits: { maxInputBytes, maxLines, maxRuntimeSec, maxMemoryMb, maxWorkspaceBytes, minFreeDiskBytes },
+    workspaceBytes: workspaceBytes(workDir),
+    freeDiskBytes: freeDiskBytes(workDir),
+    elapsedMs: Date.now() - startedAt,
+    maxRssKb: process.resourceUsage().maxRSS,
     copiedTypedTables: existingTyped.map(([table]) => table),
     psqlStdout: psql.stdout.trim()
   }, null, 2))

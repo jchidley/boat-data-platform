@@ -1,0 +1,48 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "type": "timeseries", "title": "Alternator sense voltage",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
+      "targets": [{"rawSql": "SELECT time AS \"time\", alternator_key AS metric, sense_voltage_v AS value FROM masterbus_alternator_samples_v1 WHERE $__timeFilter(time) ORDER BY time LIMIT 10000", "format": "time_series", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "volt"}, "overrides": []}
+    },
+    {
+      "type": "timeseries", "title": "Battery voltage and current",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
+      "targets": [{"rawSql": "SELECT time AS \"time\", battery_key || ' voltage' AS metric, voltage_v AS value FROM masterbus_battery_samples_v1 WHERE $__timeFilter(time) UNION ALL SELECT time, battery_key || ' current', current_a FROM masterbus_battery_samples_v1 WHERE $__timeFilter(time) ORDER BY 1 LIMIT 10000", "format": "time_series", "refId": "A"}],
+      "fieldConfig": {"defaults": {}, "overrides": []}
+    },
+    {
+      "type": "stat", "title": "Completed runtime",
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 8},
+      "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
+      "targets": [{"rawSql": "SELECT engine_key, round((completed_runtime_seconds / 3600.0)::numeric, 2) AS runtime_hours FROM v_masterbus_engine_runtime_summary_v1", "format": "table", "refId": "A"}],
+      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "auto"}
+    },
+    {
+      "type": "table", "title": "Engine transitions and provenance",
+      "gridPos": {"h": 6, "w": 16, "x": 8, "y": 8},
+      "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
+      "targets": [{"rawSql": "SELECT event_time, engine_key, event_type, state, evidence_time, raw_log_file_id, raw_line_number, threshold_v FROM masterbus_engine_transitions_v1 WHERE $__timeFilter(event_time) ORDER BY event_time DESC LIMIT 200", "format": "table", "refId": "A"}],
+      "options": {"showHeader": true}
+    },
+    {
+      "type": "table", "title": "Latest acquisition provenance",
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 14},
+      "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
+      "targets": [{"rawSql": "SELECT device_class, device_key, max(time) AS last_seen, max(source) AS source, max(raw_log_file_id) AS raw_log_file_id FROM v_masterbus_recent_electrical_v1 GROUP BY device_class, device_key ORDER BY last_seen DESC LIMIT 100", "format": "table", "refId": "A"}],
+      "options": {"showHeader": true}
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "time": {"from": "now-6h", "to": "now"},
+  "title": "Boat typed history",
+  "uid": "boat-typed-history",
+  "version": 1
+}

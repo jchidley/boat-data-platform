@@ -128,3 +128,32 @@ Complete the new typed historical path in this order:
 - Device inventory: [`2026-07-03-boat-discovery-and-decoder-inventory.md`](2026-07-03-boat-discovery-and-decoder-inventory.md)
 - Engine-state design: [`two-engine-state-plugin-plan.md`](two-engine-state-plugin-plan.md)
 - Resource safety: [`2026-07-03-pi5nvme-incident-and-picanm-status.md`](2026-07-03-pi5nvme-incident-and-picanm-status.md)
+
+## 2026-07-21 implementation and staging evidence
+
+The repository now contains migration `011_masterbus_engine_history_v1.sql`, which deterministically rebuilds durable engine transitions and runtime intervals from typed native alternator samples only. It uses the deployed 13.25 V strict threshold, 10-second start debounce and 30-second stop debounce, suppresses duplicate samples through the typed primary key, treats gaps over 120 seconds as unknown/data-gap boundaries, leaves sparse open intervals open, and retains raw log/line provenance. It does not read Signal K engine-state output. Indexed consumer views cover engine runtime summaries, recent electrical history and provenance.
+
+A first useful repository-controlled Grafana dashboard/provisioning set is present under `infra/pi5nvme/grafana/`, but it has not been deployed to the live host because the live typed tables remain empty and no live import approval exists.
+
+### Completed disposable staging gates
+
+- Settled native source: `/srv/boat/masterbus/native-events/masterbus-native-20260721T070000Z.jsonl`, copied only after the writer rotated to `masterbus-native-20260721T080000Z.jsonl`; SHA-256 `846e2088af460a974e6be8e340ea84e29e3dcb75767dde11858a2952361b0347`, 2,893,597 bytes, 11,418 events, `2026-07-21T07:26:31.291Z`–`07:59:59.643Z`.
+- Native converter counts: 3,545 alternator, 3,338 battery, 1,938 inverter/charger and 2,597 solar event rows; zero skips. Merged typed counts after same-timestamp sparse coalescing: 2,937, 2,124, 1,482 and 2,376 respectively.
+- Native runs: first import, duplicate import and delete/rebuild import. The duplicate reused one inventory row and identical typed counts. Derived rows and inventory were explicitly deleted to zero; staging rows were zero after each merge; normalized typed TSV exports matched exactly after rebuild. Limits were 5,000,000 input bytes, 20,000 lines, 120 seconds, 256 MiB RSS/JS heap planning, 200,000,000 workspace bytes and 1,000,000,000 free disk bytes. Observed elapsed times were 656/646/669 ms, peak RSS 67,736–68,408 KiB, workspace 4,076,872 bytes and free disk about 883 GB.
+- Native-derived engine evidence: 2,937 alternator samples (port 1,025; starboard 1,912) produced one open starboard `started` transition at `2026-07-21T07:26:44.298Z`; port produced no start transition. This agrees with the available starboard-only physical evidence, but is not full physical commissioning.
+
+### First bounded live MasterBus batch — prepared, not executed
+
+- Settled source: `/srv/boat/masterbus/native-events/masterbus-native-20260721T070000Z.jsonl`; SHA-256 `846e2088af460a974e6be8e340ea84e29e3dcb75767dde11858a2952361b0347`; 2,893,597 bytes; 11,418 events; `2026-07-21T07:26:31.291Z`–`07:59:59.643Z`. The active `080000Z` file is excluded.
+- Expected typed tables/rows from staging: `masterbus_alternator_samples_v1` 2,937; `masterbus_battery_samples_v1` 2,124; `masterbus_inverter_charger_samples_v1` 1,482; `masterbus_solar_samples_v1` 2,376. Expected skips: 0. One `masterbus_log_files_v1` inventory row.
+- Scope: one PostgreSQL transaction containing inventory upsert, COPY to four disposable stages and `masterbus_merge_staged_log_v1`; stage tables must be empty on success. Runtime limit 120 seconds per converter/psql process; input limit 5 MB; line limit 20,000; memory planning limit 256 MiB; workspace limit 200 MB; minimum free disk 1 GB. Verify live filesystem use remains below the 75/85/90% guard thresholds before approval.
+- Rollback: before approval, snapshot the empty-schema state; on failure let the transaction roll back; after an approved rollback, delete only rows with the batch inventory id and then its inventory row in a bounded transaction, followed by the same indexed count/provenance checks. Do not delete source logs.
+- Post-import verification: status `imported`, checksum/size/line/timestamps exact, four expected counts, zero stage rows, zero skips, raw-native source labels, and no change to live Signal K/MasterBus/raw acquisition health. This batch has not been executed; explicit approval is still required.
+
+### Remaining gates
+
+- No native or N2K batch has been imported into live `pi5nvme` PostgreSQL. The first native live batch remains approval-gated.
+- The engine migration and Grafana provisioning are repository/staging implementation only; live deployment awaits the approved typed batch and review.
+- Both-off, port-only and both-running remain deferred physical observations. Do not describe runtime as trusted operational/logbook history until those observations are recorded.
+
+Read-only live verification on `pi5nvme` confirmed direct `raw_file_id/message_index` schema columns and zero rows in `masterbus_log_files_v1`, `masterbus_alternator_samples_v1`, and N2K raw inventory. The bounded health run at `2026-07-21T08:21:02Z` passed 27/27 checks with picanm, raw receiver, Signal K and MasterBus active; Signal K freshness was 96/104 raw-feed paths and 43/43 MasterBus paths. No live writer or schema mutation was performed.

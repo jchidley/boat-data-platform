@@ -16,6 +16,9 @@ test('N2K v2 wrapper exposes safe COPY/import workflow in help', () => {
   assert.match(result.stdout, /--decoder MODE/)
   assert.match(result.stdout, /--rust-importer CMD/)
   assert.match(result.stdout, /--max-runtime-sec N/)
+  assert.match(result.stdout, /--max-lines N/)
+  assert.match(result.stdout, /--max-workspace-bytes N/)
+  assert.match(result.stdout, /--min-free-disk-bytes N/)
   assert.match(result.stdout, /safe v2 relational\/COPY path/)
 })
 
@@ -28,6 +31,8 @@ test('N2K v2 wrapper orchestrates analyzer, converter, COPY and merge', () => {
   assert.match(source, /researchMode = arg\('--research-mode'\) \|\| 'none'/)
   assert.match(source, /refusing a complete import without --allow-full-file/)
   assert.match(source, /N2K_IMPORT_MAX_INPUT_BYTES/)
+  assert.match(source, /sourceSha256/)
+  assert.match(source, /enforceLimits\('after-merge'\)/)
   assert.match(source, /n2k_rudder_127245_stage_v2/)
   assert.match(source, /n2k_environment_130310_stage_v2/)
   assert.match(source, /n2k_temperature_ext_130316_stage_v2/)

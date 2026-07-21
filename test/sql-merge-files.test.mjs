@@ -7,6 +7,7 @@ const n2kSql = fs.readFileSync('infra/pi5nvme/sql/007_n2k_v2_merge.sql', 'utf8')
 const masterbusSql = fs.readFileSync('infra/pi5nvme/sql/008_masterbus_v1_merge.sql', 'utf8')
 const inventoryViewsSql = fs.readFileSync('infra/pi5nvme/sql/009_inventory_views.sql', 'utf8')
 const cleanupSql = fs.readFileSync('infra/pi5nvme/sql/010_end_state_cleanup.sql', 'utf8')
+const engineSql = fs.readFileSync('infra/pi5nvme/sql/011_masterbus_engine_history_v1.sql', 'utf8')
 
 test('active SQL defines summary-backed N2K views and end-state cleanup', () => {
   assert.match(inventoryViewsSql, /FROM n2k_file_pgn_summary_v2/)
@@ -69,6 +70,23 @@ test('N2K v2 merge SQL covers direct-provenance typed PGNs, summaries, and statu
   assert.match(n2kSql, /ON CONFLICT \(time, raw_file_id, message_index\)/)
   assert.match(n2kSql, /FROM n2k_frames_stage_v2/)
   assert.doesNotMatch(n2kSql, /n2k_frames_v2|frame_id/)
+})
+
+test('engine history SQL is native-source, deterministic, indexed, and gap-aware', () => {
+  assert.match(engineSql, /masterbus_engine_transitions_v1/)
+  assert.match(engineSql, /masterbus_engine_runtime_intervals_v1/)
+  assert.match(engineSql, /rebuild_masterbus_engine_history_v1/)
+  assert.match(engineSql, /alpha-port/)
+  assert.match(engineSql, /alpha-stbd/)
+  assert.match(engineSql, /p_threshold_v double precision DEFAULT 13\.25/)
+  assert.match(engineSql, /p_start_debounce_seconds double precision DEFAULT 10/)
+  assert.match(engineSql, /p_stop_debounce_seconds double precision DEFAULT 30/)
+  assert.match(engineSql, /data_gap/)
+  assert.match(engineSql, /TRUNCATE public\.masterbus_engine_runtime_intervals_v1/)
+  assert.match(engineSql, /ORDER BY time, raw_log_file_id NULLS LAST, raw_line_number NULLS LAST/)
+  assert.match(engineSql, /CREATE INDEX IF NOT EXISTS masterbus_engine_transitions_v1_time_idx/)
+  assert.match(engineSql, /v_masterbus_engine_runtime_summary_v1/)
+  assert.doesNotMatch(engineSql, /propulsion\.port\.state|signalk-two-engine-state/)
 })
 
 test('MasterBus v1 merge SQL covers typed tables and import status', () => {

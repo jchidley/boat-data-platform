@@ -237,3 +237,11 @@ docs/2026-07-03-boat-discovery-and-decoder-inventory.md
 ```
 
 if paths, services, devices, decoders, or known gaps changed.
+
+## 2026-07-21 rebuild evidence
+
+The native MasterBus rebuild procedure is now validated on a settled hourly file: convert, merge, duplicate merge, delete typed rows and inventory, then re-import. The normalized typed exports were identical after rebuild and disposable staging tables were empty after merge. Use `011_masterbus_engine_history_v1.sql` after native typed replay to deterministically rebuild engine transitions/runtime; it uses native alternator evidence and preserves data-gap/open-interval semantics.
+
+The Rust N2K rebuild procedure is validated for the initial seven parity-gated PGNs on a settled mirrored sample. The staging clone was first reset from the stale frame-linked experiment with `004a_reset_n2k_typed_provenance.sql`, then the sample was imported twice, cleared with `TRUNCATE n2k_raw_files_v2 CASCADE`, and rebuilt to identical counts and normalized row hashes. The local clone lacked TimescaleDB, so extension/hypertable statements were omitted only from a temporary staging SQL invocation; the committed production migrations remain authoritative.
+
+Do not use the active hourly MasterBus file, live Signal K output, or live `pi5nvme` for rebuild validation. Live typed import, migration deployment and dashboard provisioning remain explicit approval/prerequisite gates.

@@ -43,4 +43,8 @@ test('native MasterBus importer requires bounded input and exposes dry-run batch
   assert.match(help.stdout, /--sample-lines/)
   assert.match(help.stdout, /--allow-full-file/)
   assert.match(help.stdout, /--dry-run/)
+  assert.match(help.stdout, /--max-lines/)
+  assert.match(help.stdout, /--max-memory-mb/)
+  assert.match(help.stdout, /--max-workspace-bytes/)
+  assert.match(help.stdout, /--min-free-disk-bytes/)
 })

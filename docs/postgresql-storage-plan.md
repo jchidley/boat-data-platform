@@ -128,6 +128,19 @@ Historical conversion remains offline/staging work. Any approved import must set
 - minimum free disk;
 - transaction scope.
 
+### Deployed-schema and import parity gate
+
+Do not discover repository/live drift during COPY. Before every live schema change or typed batch:
+
+- compare deployed function definitions, grants, columns and constraints with committed SQL;
+- verify required staging `SELECT`/`INSERT`/`UPDATE`/`DELETE` and merge-function privileges using the actual ingest role;
+- snapshot the bounded pre-change schema/data scope;
+- prove the source is settled and record checksum, bytes, physical source-event lines and event-time range;
+- run a no-write conversion under the approved limits;
+- require expected converter counts and zero unexpected skips before COPY.
+
+After import, require exact immutable inventory provenance, expected merged typed counts, correct source labels, zero residual staging rows, idempotent retry where specified, successful dependent-history rebuild and unchanged disk/acquisition health. Source-event line count is source provenance and must never be replaced by a typed, distinct or coalesced row count.
+
 ## Acceptance criteria
 
 The storage design is complete when:

@@ -36,16 +36,16 @@ Use [`docs/signalk-llm-source-map.md`](docs/signalk-llm-source-map.md) for the c
 
 ## Active near-term order
 
-1. The PostgreSQL end-state cleanup and disk guard were deployed on 2026-07-21. Do not run an import on `pi5nvme`; perform historical conversion on staging.
-2. Keep the deployed MasterBus input paths used by the live Signal K engine-state plugin:
+1. The PostgreSQL cleanup, disk guard, first bounded native MasterBus batch and engine-history migration were deployed on 2026-07-21. Broad conversion remains staging-only; every additional live typed batch requires explicit approval and the deployed-schema parity gate in `docs/plan.md`.
+2. Deploy and validate the repository-controlled Grafana history dashboard against the first live MasterBus batch.
+3. Keep the deployed MasterBus input paths used by the live Signal K engine-state plugin:
    - `electrical.alternators.alpha-port.senseVoltage`
    - `electrical.alternators.alpha-stbd.senseVoltage`
-3. Use schema-safe alphanumeric instance ids for any new Signal K mappings. Do not expand the current hyphenated boat-specific names.
-4. Verify the deployed `signalk-two-engine-state` plugin against all four physical engine combinations. Runtime history is derived from typed MasterBus intervals, not a separate hour-meter plugin.
-5. On staging, measure envelope-plus-typed storage against typed-only rows with raw-file provenance and select the final model.
-6. Validate MasterBus replay into typed tables, then derive engine transitions/runtime.
-7. Build Grafana and logbook history from PostgreSQL typed views. Use the static PGN capability and source-attribution inventories before assuming a device source.
-8. Run historical conversion/import only offline or on staging under `docs/2026-07-04-backfill-strategy.md` limits.
+4. Complete port-only and both-running physical commissioning. Starboard-only and both-off are verified. Runtime history is derived from typed MasterBus intervals, not a separate hour-meter plugin, and is not yet trusted for logbook use.
+5. Evaluate logbook integration only after physical commissioning and typed runtime semantics are trustworthy.
+6. Decide whether additional settled MasterBus imports warrant a schedule based on demonstrated consumer value; keep each batch approval-gated until reviewed.
+7. Define a named navigation-history consumer before any live N2K import. Start with only the seven parity-gated Rust PGNs and use the static PGN capability/source-attribution inventories before expanding scope.
+8. Use schema-safe alphanumeric instance ids for new Signal K mappings. Do not expand the current hyphenated boat-specific names.
 
 ## Operational notes
 

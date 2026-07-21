@@ -187,11 +187,27 @@ Live-only apps continue to use Signal K.
 
 ## Immediate work order
 
-1. Prove settled-native-file import/delete/rebuild, then approve the first bounded native batch into the deployed empty PostgreSQL schema.
-2. Select and run the first explicitly bounded seven-PGN Rust staging import.
-3. Implement durable engine transitions/runtime from typed native MasterBus alternator history.
-4. Build Grafana health and first useful typed-history dashboards.
-5. Evaluate logbook integration after engine state/runtime is trustworthy.
+The settled-native rebuild gate, first bounded live native batch, seven-PGN Rust staging gate and durable engine-history deployment are complete.
+
+1. Deploy and validate the repository-controlled Grafana history dashboard against the first live MasterBus batch.
+2. Complete port-only and both-running physical commissioning when safe; keep runtime out of operational/logbook claims until the typed transitions agree with all four physical combinations.
+3. Evaluate logbook integration after engine state/runtime is trustworthy.
+4. Decide whether to schedule additional MasterBus settled-file imports based on demonstrated dashboard/history value. Keep each additional batch explicitly approved until that operating model is reviewed.
+5. Approve a first live seven-PGN N2K import only for a named navigation-history consumer. Port or retain additional PGNs only through the existing consumer-driven parity gate.
+
+### Live schema and import gate
+
+Before every live schema deployment or typed batch:
+
+1. Compare deployed function definitions, role grants, table columns and constraints with committed SQL; correct drift before COPY.
+2. Confirm the source file is settled, a later active segment exists, and checksum, byte count, source-event line count and first/last timestamps match staging evidence.
+3. Record explicit resource and transaction limits, confirm disk/service health and take a bounded pre-change snapshot.
+4. Run the converter with no database writes and require expected converter counts and zero unexpected skips.
+5. Import one approved batch transactionally, then verify immutable inventory provenance, expected merged counts, native/raw provenance labels and zero staging rows.
+6. Repeat the same batch once when required by the acceptance plan and require unchanged typed counts and inventory provenance.
+7. Rebuild dependent derived history, verify bounded consumers, and recheck disk, Signal K, MasterBus and raw acquisition health.
+
+Source line count means physical source events, not distinct typed/coalesced source lines. Merge functions must never replace it with a derived count.
 
 ## Deferred physical commissioning
 

@@ -139,6 +139,20 @@ Done operationally; continue validating:
 
 Current typed coverage includes navigation, heading, steering, speed, depth, distance, GNSS quality, route/waypoint, common AIS, wind and environmental PGNs. Add rarer PGNs only when needed.
 
+#### Historical decoder migration
+
+Keep the existing Signal K/canboatjs live path unchanged. Before the first significant limited historical import, evaluate a pinned `canboat-rs` release as the offline PostgreSQL decoder.
+
+The migration gate is:
+
+1. add a tested adapter from edge candump text to CANboat PLAIN/FAST while preserving source-line provenance;
+2. run canboatjs and `canboat-rs` over the same bounded real files;
+3. compare typed counts, values, SI units, fast-packet timestamps, incomplete-packet handling and PGNs decoded by only one implementation;
+4. import both outputs into disposable staging databases and prove idempotent delete/rebuild;
+5. adopt Rust only when timestamp and message-position differences are understood.
+
+The initial Rust path may continue emitting analyzer-compatible JSON into the existing typed converter. Embedding `canboat-core` and emitting COPY rows directly is a later optimisation, not a prerequisite. Pin the binary version, checksum and embedded CANboat schema version; retain canboatjs as a fallback through the first validated limited import.
+
 ### 3. Finish the typed MasterBus path
 
 1. Preserve current snapshots and mapped replay logs.
@@ -170,10 +184,11 @@ Live-only apps continue to use Signal K.
 
 ## Immediate work order
 
-1. Validate real alternator, inverter/charger and solar MasterBus replay; battery replay is validated.
-2. Implement durable engine transitions/runtime from typed MasterBus history.
-3. Build Grafana health and first useful typed-history dashboards.
-4. Evaluate logbook integration after engine state/runtime is trustworthy.
+1. Complete the bounded canboatjs versus `canboat-rs` historical-decoder migration gate before a significant limited N2K import.
+2. Validate real alternator, inverter/charger and solar MasterBus replay; battery replay is validated.
+3. Implement durable engine transitions/runtime from typed MasterBus history.
+4. Build Grafana health and first useful typed-history dashboards.
+5. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Done means
 

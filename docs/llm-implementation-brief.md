@@ -102,11 +102,12 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 Complete the new typed historical path in this order:
 
-1. Validate real alternator, inverter/charger and solar MasterBus replay when representative states are available; battery replay is validated.
-2. Implement typed engine transition/runtime history from MasterBus alternator evidence.
-3. Point health/Grafana queries at typed tables.
-4. Build the first historical Grafana dashboards.
-5. Evaluate logbook integration after engine state/runtime is trustworthy.
+1. Before a significant limited N2K import, evaluate a pinned `canboat-rs` release offline against canboatjs on identical bounded real files. Add a candump-to-PLAIN adapter, preserve source-line provenance, compare typed values/counts and resolve fast-packet timestamp/message-position differences. Keep live Signal K/canboatjs unchanged.
+2. Validate real alternator, inverter/charger and solar MasterBus replay when representative states are available; battery replay is validated.
+3. Implement typed engine transition/runtime history from MasterBus alternator evidence.
+4. Point health/Grafana queries at typed tables.
+5. Build the first historical Grafana dashboards.
+6. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Do not do
 

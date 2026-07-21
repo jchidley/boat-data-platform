@@ -37,6 +37,12 @@ PostgreSQL
 
 Normal operation does not replay PostgreSQL history into Signal K.
 
+## Historical decoder policy
+
+Signal K continues using its deployed canboatjs decoder for live state. The offline PostgreSQL path may migrate to a pinned `canboat-rs` release after bounded dual-decoder validation. Rust must consume an adapter that preserves the original candump source-line position; decoder output sequence numbers are not raw provenance.
+
+Acceptance requires equivalent supported typed row counts, understood numeric differences, SI units, explicit fast-packet timestamp semantics, bounded malformed/incomplete-packet behavior, and a successful staging delete/rebuild. Record the binary checksum and embedded CANboat schema version. Initially retain analyzer-compatible JSON between Rust and the existing typed converter; direct `canboat-core`-to-COPY integration is optional future optimisation.
+
 ## N2K storage
 
 Raw candump files are complete and replayable. PostgreSQL stores only selected values that are useful for queries, dashboards, analysis or durable events.

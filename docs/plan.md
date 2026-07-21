@@ -170,11 +170,10 @@ Live-only apps continue to use Signal K.
 
 ## Immediate work order
 
-1. Implement direct `raw_file_id`/message-position provenance in typed N2K tables and remove persistent frame envelopes.
-2. Validate real alternator, inverter/charger and solar MasterBus replay; battery replay is validated.
-3. Implement durable engine transitions/runtime from typed MasterBus history.
-4. Build Grafana health and first useful typed-history dashboards.
-5. Evaluate logbook integration after engine state/runtime is trustworthy.
+1. Validate real alternator, inverter/charger and solar MasterBus replay; battery replay is validated.
+2. Implement durable engine transitions/runtime from typed MasterBus history.
+3. Build Grafana health and first useful typed-history dashboards.
+4. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Done means
 

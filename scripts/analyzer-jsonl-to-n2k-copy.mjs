@@ -11,7 +11,7 @@ Options:
   --research-mode MODE     none (default), untyped, or selected
   --research-pgn LIST      Comma-separated PGNs required with selected mode
 
-Converts canboat/analyzerjs JSONL to relational TSV files suitable for PostgreSQL COPY. Normal imports write the frame envelope and supported typed PGNs. Research fields are opt-in and must never be enabled as an unbounded full-history duplicate.
+Converts canboat/analyzerjs JSONL to relational TSV files suitable for PostgreSQL COPY. Normal imports write a disposable staging envelope for summaries plus supported typed PGNs carrying direct raw-file/message provenance. Research fields are opt-in and must never be enabled as an unbounded full-history duplicate.
 `
 
 const args = process.argv.slice(2)

@@ -118,7 +118,7 @@ Do not run a complete-file import on live `pi5nvme`. Follow [`2026-07-04-backfil
 Before expanding historical volume:
 
 1. tests pass;
-2. the importer/schema implements the selected typed-only direct-provenance model;
+2. the implemented typed-only model continues to preserve direct provenance and idempotence;
 3. representative real alternator, inverter/charger and solar logs pass typed merge validation;
 4. duplicate import remains idempotent;
 5. row counts and representative values match source decoder output;

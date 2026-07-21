@@ -22,9 +22,10 @@ test('MasterBus replay logger service writes JSONL as unprivileged jack user', (
   assert.match(service, /NoNewPrivileges=true/)
 })
 
-test('pi5 installer enforces the two-path service layout', () => {
+test('pi5 installer enforces the two-path service layout and fails fast on SQL errors', () => {
   assert.match(install, /disable --now boat-signalk-collector\.service/)
   assert.match(install, /rm -f \/etc\/systemd\/system\/boat-signalk-collector\.service/)
+  assert.match(install, /psql -X -v ON_ERROR_STOP=1 -d boatdata -f/)
 })
 
 test('derived storage guard enforces the 85 percent threshold without touching raw acquisition', () => {

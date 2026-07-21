@@ -12,3 +12,4 @@ DROP TABLE IF EXISTS public.masterbus_snapshots CASCADE;
 DROP TABLE IF EXISTS public.data_quality_observations CASCADE;
 DROP TABLE IF EXISTS public.boat_data_summaries CASCADE;
 DROP TABLE IF EXISTS public.n2k_device_pgn_summary_v2 CASCADE;
+DROP TABLE IF EXISTS public.n2k_frames_v2 CASCADE;

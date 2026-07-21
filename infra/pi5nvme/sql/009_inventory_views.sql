@@ -1,30 +1,30 @@
--- Create inventory views against the typed N2K model after 005_* creates the
--- frame and definition tables.
+-- Inventory views use compact per-file summaries. Complete decoded frame
+-- envelopes remain in authoritative candump files, not PostgreSQL.
 
 CREATE OR REPLACE VIEW v_pgn_catalog_seen AS
 SELECT
-  f.pgn,
+  s.pgn,
   max(d.description) AS description,
-  count(*) AS frames,
-  min(f.time) AS first_seen,
-  max(f.time) AS last_seen,
-  count(DISTINCT f.source_address) AS source_count,
-  array_agg(DISTINCT f.source_address ORDER BY f.source_address)
-    FILTER (WHERE f.source_address IS NOT NULL) AS sources
-FROM n2k_frames_v2 f
+  sum(s.frame_count) AS frames,
+  min(s.first_time) AS first_seen,
+  max(s.last_time) AS last_seen,
+  count(DISTINCT s.source_address) FILTER (WHERE s.source_address IS NOT NULL) AS source_count,
+  array_agg(DISTINCT s.source_address ORDER BY s.source_address)
+    FILTER (WHERE s.source_address IS NOT NULL) AS sources
+FROM n2k_file_pgn_summary_v2 s
 LEFT JOIN n2k_pgn_definitions_v2 d USING (pgn)
-GROUP BY f.pgn;
+GROUP BY s.pgn;
 
 CREATE OR REPLACE VIEW v_known_devices AS
 SELECT
-  source_address,
-  count(*) AS frames,
-  min(time) AS first_seen,
-  max(time) AS last_seen,
-  array_agg(DISTINCT pgn ORDER BY pgn) AS pgns
-FROM n2k_frames_v2
-WHERE source_address IS NOT NULL
-GROUP BY source_address;
+  s.source_address,
+  sum(s.frame_count) AS frames,
+  min(s.first_time) AS first_seen,
+  max(s.last_time) AS last_seen,
+  array_agg(DISTINCT p.pgn ORDER BY p.pgn) AS pgns
+FROM n2k_file_source_summary_v2 s
+CROSS JOIN LATERAL unnest(s.pgns) AS p(pgn)
+GROUP BY s.source_address;
 
 CREATE OR REPLACE VIEW v_unknown_or_proprietary_pgns AS
 SELECT *

@@ -8,8 +8,10 @@ const masterbusSql = fs.readFileSync('infra/pi5nvme/sql/008_masterbus_v1_merge.s
 const inventoryViewsSql = fs.readFileSync('infra/pi5nvme/sql/009_inventory_views.sql', 'utf8')
 const cleanupSql = fs.readFileSync('infra/pi5nvme/sql/010_end_state_cleanup.sql', 'utf8')
 
-test('active SQL defines typed N2K views and end-state cleanup', () => {
-  assert.match(inventoryViewsSql, /FROM n2k_frames_v2/)
+test('active SQL defines summary-backed N2K views and end-state cleanup', () => {
+  assert.match(inventoryViewsSql, /FROM n2k_file_pgn_summary_v2/)
+  assert.match(inventoryViewsSql, /FROM n2k_file_source_summary_v2/)
+  assert.doesNotMatch(inventoryViewsSql, /n2k_frames_v2/)
   for (const object of [
     'signal_k_measurements',
     'raw_n2k_log_files',
@@ -20,14 +22,17 @@ test('active SQL defines typed N2K views and end-state cleanup', () => {
   ]) assert.match(cleanupSql, new RegExp(`DROP TABLE IF EXISTS public\\.${object}`))
 })
 
-test('N2K v2 schema grants wrapper staging privileges to ingest role', () => {
+test('N2K v2 schema uses direct typed provenance and grants staging privileges', () => {
+  assert.match(n2kSchemaSql, /raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2\(raw_file_id\)/)
+  assert.match(n2kSchemaSql, /message_index integer NOT NULL/)
+  assert.doesNotMatch(n2kSchemaSql, /CREATE TABLE IF NOT EXISTS n2k_frames_v2/)
+  assert.doesNotMatch(n2kSchemaSql, /frame_id/)
   assert.match(n2kSchemaSql, /GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO boat_ingest;/)
 })
 
-test('N2K v2 merge SQL covers frames, typed PGNs, summaries, and status', () => {
+test('N2K v2 merge SQL covers direct-provenance typed PGNs, summaries, and status', () => {
   assert.match(n2kSql, /CREATE OR REPLACE FUNCTION n2k_merge_staged_file_v2\(p_raw_file_id bigint\)/)
   for (const table of [
-    'n2k_frames_v2',
     'n2k_position_rapid_129025_v2',
     'n2k_cog_sog_129026_v2',
     'n2k_gnss_position_129029_v2',
@@ -61,7 +66,9 @@ test('N2K v2 merge SQL covers frames, typed PGNs, summaries, and status', () => 
     'n2k_file_source_summary_v2'
   ]) assert.match(n2kSql, new RegExp(`INSERT INTO ${table}`))
   assert.match(n2kSql, /import_status = 'imported'/)
-  assert.match(n2kSql, /ON CONFLICT \(raw_file_id, message_index\)/)
+  assert.match(n2kSql, /ON CONFLICT \(time, raw_file_id, message_index\)/)
+  assert.match(n2kSql, /FROM n2k_frames_stage_v2/)
+  assert.doesNotMatch(n2kSql, /n2k_frames_v2|frame_id/)
 })
 
 test('MasterBus v1 merge SQL covers typed tables and import status', () => {

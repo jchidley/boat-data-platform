@@ -64,7 +64,7 @@ The final model is typed-only provenance: each typed row carries `raw_file_id` a
 
 A bounded 2026-07-21 staging measurement used 200,000 real CAN frames, producing 118,149 decoded envelopes and 109,768 typed rows. On plain PostgreSQL 17 with representative indexes, envelope-plus-typed used 55 MB and typed-only used 20 MB. Typed-only reduced measured storage by 63.1%. TimescaleDB chunk overhead and compression may change absolute sizes, but do not justify duplicating every decoded message already preserved in raw files.
 
-`n2k_frames_v2` may remain only as disposable COPY/merge staging until the importer writes direct typed provenance. It is not an end-state historical table.
+The importer writes direct typed provenance. `n2k_frames_stage_v2` is disposable and exists only long enough to build file/source/PGN summaries; no persistent frame-envelope table exists.
 
 ## Signal K history collector removal
 

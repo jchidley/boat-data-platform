@@ -63,6 +63,8 @@ raw candump
 
 Supported typed PGNs include navigation, heading, rudder, rate of turn, attitude, magnetic variation, switch bank, speed, depth, distance log, route/waypoints, GNSS quality, common AIS, wind and environmental data.
 
+The typed tables now carry `raw_file_id` and `message_index` directly. File/source/PGN summaries are built from disposable envelope staging; no persistent frame-envelope table remains. This schema was validated twice on a 200,000-frame real sample and deployed empty to `pi5nvme` on 2026-07-21 without an import or backfill.
+
 Current safeguards:
 
 - research output defaults to `none`;
@@ -100,12 +102,11 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 Complete the new typed historical path in this order:
 
-1. Change the N2K schema/importer to write `raw_file_id` and `message_index` directly into typed tables and remove persistent frame-envelope retention.
-2. Validate real alternator, inverter/charger and solar MasterBus replay when representative states are available; battery replay is validated.
-3. Implement typed engine transition/runtime history from MasterBus alternator evidence.
-4. Point health/Grafana queries at typed tables.
-5. Build the first historical Grafana dashboards.
-6. Evaluate logbook integration after engine state/runtime is trustworthy.
+1. Validate real alternator, inverter/charger and solar MasterBus replay when representative states are available; battery replay is validated.
+2. Implement typed engine transition/runtime history from MasterBus alternator evidence.
+3. Point health/Grafana queries at typed tables.
+4. Build the first historical Grafana dashboards.
+5. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Do not do
 

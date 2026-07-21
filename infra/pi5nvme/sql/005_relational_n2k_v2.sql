@@ -58,27 +58,6 @@ CREATE TABLE IF NOT EXISTS n2k_devices_v2 (
   UNIQUE NULLS NOT DISTINCT (manufacturer, model, serial, unique_number, device_instance, system_instance)
 );
 
-CREATE TABLE IF NOT EXISTS n2k_frames_v2 (
-  frame_id bigserial PRIMARY KEY,
-  time timestamptz NOT NULL,
-  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
-  message_index integer NOT NULL,
-  pgn integer NOT NULL,
-  source_address smallint,
-  destination_address smallint,
-  priority smallint,
-  can_id integer,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (raw_file_id, message_index)
-);
-
--- n2k_frames_v2 is a normal relational table so frame_id is a simple stable
--- join key. Typed PGN tables carry the time-series load.
-CREATE INDEX IF NOT EXISTS n2k_frames_v2_time_idx ON n2k_frames_v2 (time DESC);
-CREATE INDEX IF NOT EXISTS n2k_frames_v2_pgn_time_idx ON n2k_frames_v2 (pgn, time DESC);
-CREATE INDEX IF NOT EXISTS n2k_frames_v2_source_time_idx ON n2k_frames_v2 (source_address, time DESC) WHERE source_address IS NOT NULL;
-CREATE INDEX IF NOT EXISTS n2k_frames_v2_raw_file_idx ON n2k_frames_v2 (raw_file_id, message_index);
-
 CREATE TABLE IF NOT EXISTS n2k_source_observations_v2 (
   observed_at timestamptz NOT NULL,
   source_address smallint NOT NULL,
@@ -91,22 +70,21 @@ CREATE TABLE IF NOT EXISTS n2k_source_observations_v2 (
   unique_number bigint,
   device_name bigint,
   raw_file_id bigint REFERENCES n2k_raw_files_v2(raw_file_id),
-  frame_id bigint REFERENCES n2k_frames_v2(frame_id),
   PRIMARY KEY (observed_at, source_address)
 );
 SELECT create_hypertable('n2k_source_observations_v2', 'observed_at', if_not_exists => TRUE);
 
--- Typed PGN tables. Each table follows the PGN/message shape. frame_id is the
--- provenance join point; time/source/device are denormalised for efficient SQL.
+-- Typed PGN tables carry direct raw-file and message-position provenance.
 
 CREATE TABLE IF NOT EXISTS n2k_position_rapid_129025_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
   latitude_deg double precision NOT NULL,
   longitude_deg double precision NOT NULL,
-  PRIMARY KEY (time, frame_id),
+  PRIMARY KEY (time, raw_file_id, message_index),
   CONSTRAINT n2k_position_rapid_129025_lat_check CHECK (latitude_deg BETWEEN -90 AND 90),
   CONSTRAINT n2k_position_rapid_129025_lon_check CHECK (longitude_deg BETWEEN -180 AND 180)
 );
@@ -114,7 +92,8 @@ SELECT create_hypertable('n2k_position_rapid_129025_v2', 'time', if_not_exists =
 CREATE INDEX IF NOT EXISTS n2k_position_rapid_129025_source_time_idx ON n2k_position_rapid_129025_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_cog_sog_129026_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -122,7 +101,7 @@ CREATE TABLE IF NOT EXISTS n2k_cog_sog_129026_v2 (
   reference text,
   cog_rad double precision,
   sog_ms double precision,
-  PRIMARY KEY (time, frame_id),
+  PRIMARY KEY (time, raw_file_id, message_index),
   CONSTRAINT n2k_cog_sog_129026_cog_check CHECK (cog_rad IS NULL OR (cog_rad >= 0 AND cog_rad < 6.283185307179586)),
   CONSTRAINT n2k_cog_sog_129026_sog_check CHECK (sog_ms IS NULL OR sog_ms >= 0)
 );
@@ -130,7 +109,8 @@ SELECT create_hypertable('n2k_cog_sog_129026_v2', 'time', if_not_exists => TRUE)
 CREATE INDEX IF NOT EXISTS n2k_cog_sog_129026_source_time_idx ON n2k_cog_sog_129026_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_gnss_position_129029_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -148,7 +128,7 @@ CREATE TABLE IF NOT EXISTS n2k_gnss_position_129029_v2 (
   pdop double precision,
   geoidal_separation_m double precision,
   reference_stations smallint,
-  PRIMARY KEY (time, frame_id),
+  PRIMARY KEY (time, raw_file_id, message_index),
   CONSTRAINT n2k_gnss_position_129029_lat_check CHECK (latitude_deg IS NULL OR latitude_deg BETWEEN -90 AND 90),
   CONSTRAINT n2k_gnss_position_129029_lon_check CHECK (longitude_deg IS NULL OR longitude_deg BETWEEN -180 AND 180)
 );
@@ -156,7 +136,8 @@ SELECT create_hypertable('n2k_gnss_position_129029_v2', 'time', if_not_exists =>
 CREATE INDEX IF NOT EXISTS n2k_gnss_position_129029_source_time_idx ON n2k_gnss_position_129029_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_heading_127250_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -165,14 +146,15 @@ CREATE TABLE IF NOT EXISTS n2k_heading_127250_v2 (
   deviation_rad double precision,
   variation_rad double precision,
   reference text,
-  PRIMARY KEY (time, frame_id),
+  PRIMARY KEY (time, raw_file_id, message_index),
   CONSTRAINT n2k_heading_127250_heading_check CHECK (heading_rad IS NULL OR (heading_rad >= 0 AND heading_rad < 6.283185307179586))
 );
 SELECT create_hypertable('n2k_heading_127250_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_heading_127250_source_time_idx ON n2k_heading_127250_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_rudder_127245_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -180,13 +162,14 @@ CREATE TABLE IF NOT EXISTS n2k_rudder_127245_v2 (
   direction_order text,
   angle_order_rad double precision,
   position_rad double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_rudder_127245_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_rudder_127245_source_time_idx ON n2k_rudder_127245_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_heading_track_control_127237_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -207,25 +190,27 @@ CREATE TABLE IF NOT EXISTS n2k_heading_track_control_127237_v2 (
   rate_of_turn_order_rad_s double precision,
   off_track_limit_m double precision,
   vessel_heading_rad double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_heading_track_control_127237_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_heading_track_control_127237_source_time_idx ON n2k_heading_track_control_127237_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_rate_of_turn_127251_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
   sid smallint,
   rate_rad_s double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_rate_of_turn_127251_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_rate_of_turn_127251_source_time_idx ON n2k_rate_of_turn_127251_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_switch_bank_status_127501_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -258,13 +243,14 @@ CREATE TABLE IF NOT EXISTS n2k_switch_bank_status_127501_v2 (
   indicator26 text,
   indicator27 text,
   indicator28 text,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_switch_bank_status_127501_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_switch_bank_status_127501_source_time_idx ON n2k_switch_bank_status_127501_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_attitude_127257_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -272,39 +258,42 @@ CREATE TABLE IF NOT EXISTS n2k_attitude_127257_v2 (
   yaw_rad double precision,
   pitch_rad double precision,
   roll_rad double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_attitude_127257_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_attitude_127257_source_time_idx ON n2k_attitude_127257_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_magnetic_variation_127258_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
   sid smallint,
   source text,
   variation_rad double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_magnetic_variation_127258_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_magnetic_variation_127258_source_time_idx ON n2k_magnetic_variation_127258_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_water_speed_128259_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
   speed_water_referenced_ms double precision,
   speed_ground_referenced_ms double precision,
   speed_water_type text,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_water_speed_128259_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_water_speed_128259_source_time_idx ON n2k_water_speed_128259_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_water_depth_128267_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -312,14 +301,15 @@ CREATE TABLE IF NOT EXISTS n2k_water_depth_128267_v2 (
   depth_below_transducer_m double precision,
   offset_m double precision,
   range_m double precision,
-  PRIMARY KEY (time, frame_id),
+  PRIMARY KEY (time, raw_file_id, message_index),
   CONSTRAINT n2k_water_depth_128267_depth_check CHECK (depth_below_transducer_m IS NULL OR depth_below_transducer_m >= 0)
 );
 SELECT create_hypertable('n2k_water_depth_128267_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_water_depth_128267_source_time_idx ON n2k_water_depth_128267_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_distance_log_128275_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -327,13 +317,14 @@ CREATE TABLE IF NOT EXISTS n2k_distance_log_128275_v2 (
   seconds_since_midnight double precision,
   log_m double precision,
   trip_log_m double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_distance_log_128275_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_distance_log_128275_source_time_idx ON n2k_distance_log_128275_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_navigation_data_129284_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -352,13 +343,14 @@ CREATE TABLE IF NOT EXISTS n2k_navigation_data_129284_v2 (
   destination_latitude_deg double precision,
   destination_longitude_deg double precision,
   waypoint_closing_velocity_ms double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_navigation_data_129284_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_navigation_data_129284_source_time_idx ON n2k_navigation_data_129284_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_route_waypoint_129285_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -374,13 +366,14 @@ CREATE TABLE IF NOT EXISTS n2k_route_waypoint_129285_v2 (
   waypoint_name text,
   waypoint_latitude_deg double precision,
   waypoint_longitude_deg double precision,
-  PRIMARY KEY (time, frame_id, waypoint_index)
+  PRIMARY KEY (time, raw_file_id, message_index, waypoint_index)
 );
 SELECT create_hypertable('n2k_route_waypoint_129285_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_route_waypoint_129285_source_time_idx ON n2k_route_waypoint_129285_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_ais_class_a_position_129038_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -401,13 +394,14 @@ CREATE TABLE IF NOT EXISTS n2k_ais_class_a_position_129038_v2 (
   nav_status text,
   special_maneuver_indicator text,
   sequence_id smallint,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_ais_class_a_position_129038_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_ais_class_a_position_129038_user_time_idx ON n2k_ais_class_a_position_129038_v2 (user_id, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_ais_class_b_position_129039_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -431,13 +425,14 @@ CREATE TABLE IF NOT EXISTS n2k_ais_class_b_position_129039_v2 (
   can_handle_msg_22 text,
   ais_mode text,
   ais_communication_state text,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_ais_class_b_position_129039_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_ais_class_b_position_129039_user_time_idx ON n2k_ais_class_b_position_129039_v2 (user_id, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_ais_class_a_static_129794_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -460,13 +455,14 @@ CREATE TABLE IF NOT EXISTS n2k_ais_class_a_static_129794_v2 (
   gnss_type text,
   dte text,
   ais_transceiver_information text,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_ais_class_a_static_129794_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_ais_class_a_static_129794_user_time_idx ON n2k_ais_class_a_static_129794_v2 (user_id, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_ais_class_b_static_a_129809_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -476,13 +472,14 @@ CREATE TABLE IF NOT EXISTS n2k_ais_class_b_static_a_129809_v2 (
   name text,
   ais_transceiver_information text,
   sequence_id smallint,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_ais_class_b_static_a_129809_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_ais_class_b_static_a_129809_user_time_idx ON n2k_ais_class_b_static_a_129809_v2 (user_id, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_ais_class_b_static_b_129810_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -500,13 +497,14 @@ CREATE TABLE IF NOT EXISTS n2k_ais_class_b_static_b_129810_v2 (
   gnss_type text,
   ais_transceiver_information text,
   sequence_id smallint,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_ais_class_b_static_b_129810_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_ais_class_b_static_b_129810_user_time_idx ON n2k_ais_class_b_static_b_129810_v2 (user_id, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_gnss_dops_129539_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -516,13 +514,14 @@ CREATE TABLE IF NOT EXISTS n2k_gnss_dops_129539_v2 (
   hdop double precision,
   vdop double precision,
   tdop double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_gnss_dops_129539_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_gnss_dops_129539_source_time_idx ON n2k_gnss_dops_129539_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_gnss_satellites_129540_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -536,13 +535,14 @@ CREATE TABLE IF NOT EXISTS n2k_gnss_satellites_129540_v2 (
   snr_db double precision,
   range_residual_m double precision,
   status text,
-  PRIMARY KEY (time, frame_id, satellite_index)
+  PRIMARY KEY (time, raw_file_id, message_index, satellite_index)
 );
 SELECT create_hypertable('n2k_gnss_satellites_129540_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_gnss_satellites_129540_source_time_idx ON n2k_gnss_satellites_129540_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_wind_130306_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -550,14 +550,15 @@ CREATE TABLE IF NOT EXISTS n2k_wind_130306_v2 (
   wind_speed_ms double precision,
   wind_angle_rad double precision,
   reference text,
-  PRIMARY KEY (time, frame_id),
+  PRIMARY KEY (time, raw_file_id, message_index),
   CONSTRAINT n2k_wind_130306_speed_check CHECK (wind_speed_ms IS NULL OR wind_speed_ms >= 0)
 );
 SELECT create_hypertable('n2k_wind_130306_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_wind_130306_source_time_idx ON n2k_wind_130306_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_environment_130310_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -565,13 +566,14 @@ CREATE TABLE IF NOT EXISTS n2k_environment_130310_v2 (
   water_temperature_k double precision,
   outside_ambient_air_temperature_k double precision,
   atmospheric_pressure_pa double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_environment_130310_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_environment_130310_source_time_idx ON n2k_environment_130310_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_environment_130311_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -581,13 +583,14 @@ CREATE TABLE IF NOT EXISTS n2k_environment_130311_v2 (
   temperature_k double precision,
   humidity_ratio double precision,
   atmospheric_pressure_pa double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_environment_130311_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_environment_130311_source_time_idx ON n2k_environment_130311_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_temperature_130312_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -596,13 +599,14 @@ CREATE TABLE IF NOT EXISTS n2k_temperature_130312_v2 (
   source text,
   actual_temperature_k double precision,
   set_temperature_k double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_temperature_130312_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_temperature_130312_source_time_idx ON n2k_temperature_130312_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_pressure_130314_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -610,13 +614,14 @@ CREATE TABLE IF NOT EXISTS n2k_pressure_130314_v2 (
   instance smallint,
   source text,
   pressure_pa double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_pressure_130314_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_pressure_130314_source_time_idx ON n2k_pressure_130314_v2 (source_address, time DESC);
 
 CREATE TABLE IF NOT EXISTS n2k_temperature_ext_130316_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   source_address smallint,
   device_id bigint REFERENCES n2k_devices_v2(device_id),
@@ -625,7 +630,7 @@ CREATE TABLE IF NOT EXISTS n2k_temperature_ext_130316_v2 (
   source text,
   temperature_k double precision,
   set_temperature_k double precision,
-  PRIMARY KEY (time, frame_id)
+  PRIMARY KEY (time, raw_file_id, message_index)
 );
 SELECT create_hypertable('n2k_temperature_ext_130316_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_temperature_ext_130316_source_time_idx ON n2k_temperature_ext_130316_v2 (source_address, time DESC);
@@ -633,7 +638,8 @@ CREATE INDEX IF NOT EXISTS n2k_temperature_ext_130316_source_time_idx ON n2k_tem
 -- Research fallback for unknown/proprietary PGNs. This is not the primary app
 -- query model and should not receive a GIN index during ingest.
 CREATE TABLE IF NOT EXISTS n2k_research_fields_v2 (
-  frame_id bigint NOT NULL REFERENCES n2k_frames_v2(frame_id) ON DELETE CASCADE,
+  raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
+  message_index integer NOT NULL,
   time timestamptz NOT NULL,
   pgn integer NOT NULL,
   source_address smallint,
@@ -641,7 +647,7 @@ CREATE TABLE IF NOT EXISTS n2k_research_fields_v2 (
   value_double double precision,
   value_text text,
   value_bool boolean,
-  PRIMARY KEY (time, frame_id, field_name),
+  PRIMARY KEY (time, raw_file_id, message_index, field_name),
   CONSTRAINT n2k_research_fields_v2_one_value_check CHECK (
     ((value_double IS NOT NULL)::integer +
      (value_text IS NOT NULL)::integer +
@@ -650,6 +656,33 @@ CREATE TABLE IF NOT EXISTS n2k_research_fields_v2 (
 );
 SELECT create_hypertable('n2k_research_fields_v2', 'time', if_not_exists => TRUE);
 CREATE INDEX IF NOT EXISTS n2k_research_fields_v2_pgn_time_idx ON n2k_research_fields_v2 (pgn, time DESC);
+
+-- Direct provenance lookups must not scan time-first hypertable keys.
+DO $$
+DECLARE
+  table_name text;
+BEGIN
+  FOREACH table_name IN ARRAY ARRAY[
+    'n2k_position_rapid_129025_v2', 'n2k_cog_sog_129026_v2',
+    'n2k_gnss_position_129029_v2', 'n2k_heading_127250_v2',
+    'n2k_rudder_127245_v2', 'n2k_heading_track_control_127237_v2',
+    'n2k_rate_of_turn_127251_v2', 'n2k_switch_bank_status_127501_v2',
+    'n2k_attitude_127257_v2', 'n2k_magnetic_variation_127258_v2',
+    'n2k_water_speed_128259_v2', 'n2k_water_depth_128267_v2',
+    'n2k_distance_log_128275_v2', 'n2k_navigation_data_129284_v2',
+    'n2k_route_waypoint_129285_v2', 'n2k_ais_class_a_position_129038_v2',
+    'n2k_ais_class_b_position_129039_v2', 'n2k_ais_class_a_static_129794_v2',
+    'n2k_ais_class_b_static_a_129809_v2', 'n2k_ais_class_b_static_b_129810_v2',
+    'n2k_gnss_dops_129539_v2', 'n2k_gnss_satellites_129540_v2',
+    'n2k_wind_130306_v2', 'n2k_environment_130310_v2',
+    'n2k_environment_130311_v2', 'n2k_temperature_130312_v2',
+    'n2k_pressure_130314_v2', 'n2k_temperature_ext_130316_v2',
+    'n2k_research_fields_v2'
+  ] LOOP
+    EXECUTE format('CREATE INDEX IF NOT EXISTS %I ON %I (raw_file_id, message_index)',
+      table_name || '_provenance_idx', table_name);
+  END LOOP;
+END $$;
 
 CREATE TABLE IF NOT EXISTS n2k_file_pgn_summary_v2 (
   raw_file_id bigint NOT NULL REFERENCES n2k_raw_files_v2(raw_file_id),
@@ -1144,7 +1177,7 @@ CREATE UNLOGGED TABLE IF NOT EXISTS n2k_research_fields_stage_v2 (
 --
 -- INSERT INTO n2k_file_pgn_summary_v2(raw_file_id, pgn, source_key, source_address, frame_count, first_time, last_time)
 -- SELECT raw_file_id, pgn, coalesce(source_address, -1), source_address, count(*), min(time), max(time)
--- FROM n2k_frames_v2
+-- FROM n2k_frames_stage_v2
 -- WHERE raw_file_id = $1
 -- GROUP BY raw_file_id, pgn, source_address
 -- ON CONFLICT (raw_file_id, pgn, source_key) DO UPDATE SET

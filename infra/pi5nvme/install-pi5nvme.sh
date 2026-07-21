@@ -68,7 +68,7 @@ ALTER SYSTEM SET shared_preload_libraries = 'timescaledb';
 SQL
 systemctl restart postgresql
 for sql in "$SCRIPT_DIR"/sql/*.sql; do
-  sudo -u postgres psql -d boatdata < "$sql"
+  sudo -u postgres psql -X -v ON_ERROR_STOP=1 -d boatdata -f "$sql"
 done
 
 install -d -m 0755 /etc/grafana/provisioning/datasources

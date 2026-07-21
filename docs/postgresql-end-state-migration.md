@@ -2,7 +2,7 @@
 
 ## Status
 
-Applied and verified on `pi5nvme` on 2026-07-21. The pre-migration snapshot is stored on the host at `/home/jack/boat-migration-backup-20260721T015537Z`. No import or backfill was run.
+Applied and verified on `pi5nvme` on 2026-07-21. The obsolete-object snapshot is stored at `/home/jack/boat-migration-backup-20260721T015537Z`. The later direct-provenance schema snapshot is stored at `/home/jack/boat-schema-backup-20260721T022037Z`. No import or backfill was run.
 
 ## Goal
 
@@ -63,7 +63,7 @@ health_observations and health views
 unlogged staging tables used by bounded COPY imports
 ```
 
-The bounded staging comparison selected typed-only direct provenance. `n2k_frames_v2` is not an end-state historical table; do not load broad history into it. Remove its persistent role when the importer writes `raw_file_id` and `message_index` directly to typed tables.
+The bounded staging comparison selected typed-only direct provenance. Migration `004a_reset_n2k_typed_provenance.sql` removes the experimental persistent frame table before `005_relational_n2k_v2.sql` creates typed tables carrying `raw_file_id` and `message_index` directly.
 
 `n2k_research_fields_v2` remains available only for explicit bounded research. Normal imports must produce zero research rows.
 

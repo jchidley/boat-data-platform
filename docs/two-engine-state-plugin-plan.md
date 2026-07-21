@@ -65,11 +65,11 @@ Current hyphenated input names are boat-specific deployed Signal K paths. New ma
 
 ## Deferred physical commissioning
 
-Physical combinations are a commissioning checklist, not a blocker for implementation handoff. Starboard-only was verified on 2026-07-21 at approximately 1500 RPM: starboard sense voltage was about 13.7 V, field current about 3.0 A, alternator voltage about 13.6–13.7 V and the output was `started`; port sense voltage was 0 V and its output was `stopped`. Complete the remaining observations when those engine states are safely available, before using derived runtime as trusted operational/logbook history.
+Physical combinations are a commissioning checklist, not a blocker for implementation handoff. Starboard-only was verified on 2026-07-21 at approximately 1500 RPM: starboard sense voltage was about 13.7 V, field current about 3.0 A, alternator voltage about 13.6–13.7 V and the output was `started`; port sense voltage was 0 V and its output was `stopped`. Both-off was verified later on 2026-07-21 during nighttime: over a 20-second/10-sample capture both sense-voltage and field-current inputs remained 0 and both outputs remained `stopped`. Evidence is under `observations/alternator-engine-state/20260721T114801Z-engines-off/`. Complete the remaining observations when those engine states are safely available, before using derived runtime as trusted operational/logbook history.
 
 | Port engine | Starboard engine | Expected outputs | Status |
 |---|---|---|---|
-| Off | Off | stopped / stopped | required |
+| Off | Off | stopped / stopped | verified 2026-07-21 |
 | On | Off | started / stopped | required |
 | Off | On | stopped / started | verified 2026-07-21 |
 | On | On | started / started | required |
@@ -113,4 +113,4 @@ Migration `infra/pi5nvme/sql/011_masterbus_engine_history_v1.sql` now owns durab
 
 On the settled native staging file, 1,025 port and 1,912 starboard alternator samples produced one open starboard `started` event at `2026-07-21T07:26:44.298Z` and no port start event. This agrees with the available physical starboard-only observation (`alpha-stbd` approximately 13.7–13.8 V and derived state `started`, port sense 0 V). It is typed native evidence and not mirrored Signal K history.
 
-The committed executable test `npm run test:engine-history:integration` now covers threshold equality, strictness, exact start/stop debounce boundaries, chatter, duplicate/sparse and null samples, exact/over-120-second gaps while stopped and running, file boundaries, closed/data-gap/open intervals, raw file/line provenance, port/starboard isolation, invalid parameters and deterministic delete/rebuild. The newly rerun disposable result is 7 transitions, 4 intervals, 2 summaries and 230 completed runtime seconds on PostgreSQL 17.10 without TimescaleDB. The migration is implemented and tested in disposable staging only; it remains undeployed live. Both-off, port-only and both-running physical commissioning remain required, and runtime must not yet be presented as trusted operational/logbook history.
+The committed executable test `npm run test:engine-history:integration` now covers threshold equality, strictness, exact start/stop debounce boundaries, chatter, duplicate/sparse and null samples, exact/over-120-second gaps while stopped and running, file boundaries, closed/data-gap/open intervals, raw file/line provenance, port/starboard isolation, invalid parameters and deterministic delete/rebuild. The newly rerun disposable result is 7 transitions, 4 intervals, 2 summaries and 230 completed runtime seconds on PostgreSQL 17.10 without TimescaleDB. The migration is implemented, tested in disposable staging and deployed live. Its empty-source rebuild produced no derived rows because no typed native batch has been imported. Port-only and both-running physical commissioning remain required, and runtime must not yet be presented as trusted operational/logbook history.

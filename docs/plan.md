@@ -160,7 +160,7 @@ Consumer-driven port order is: use the seven already gated PGNs for initial navi
 3. The bounded native converter/importer supports typed alternator, battery, inverter/charger and solar tables with file/line provenance. A real 257-event sample covered all four domains with zero skips and repeated disposable staging import was idempotent.
 4. Discovery-triggered systemd restart recovery and live native-log growth are verified. Hourly segmentation is implemented in the writer, and daily compression with 90-day retention is configuration-validated; monitor both operationally without blocking implementation. Prove settled-file delete/rebuild before approving a limited live PostgreSQL batch. The empty typed schema is deployed; no native batch has been loaded.
 5. Keep mapped Signal K JSONL only as retained comparison/fallback evidence; its separate logger is removed from normal deployment.
-6. Derive port/starboard engine transitions from typed native alternator evidence and runtime from durable transition intervals. The repository migration and disposable executable regression test are complete; live deployment remains approval-gated.
+6. Derive port/starboard engine transitions from typed native alternator evidence and runtime from durable transition intervals. The migration is tested and deployed live; its verified outputs remain empty until an approved typed native batch is imported.
 
 This path is receive-only. Do not write to MasterBus devices or add protocol control behavior.
 
@@ -195,7 +195,7 @@ Live-only apps continue to use Signal K.
 
 ## Deferred physical commissioning
 
-These observations depend on operating the engines and are not blockers for code handoff: both-off, port-only and both-running. Starboard-only is verified. Record the remaining combinations using [`two-engine-state-plugin-plan.md`](two-engine-state-plugin-plan.md) before declaring engine transitions/runtime trustworthy for operational logbook use.
+These observations depend on safely operating the engines and are not blockers for code handoff: port-only and both-running. Starboard-only and both-off are verified. Record the remaining combinations using [`two-engine-state-plugin-plan.md`](two-engine-state-plugin-plan.md) before declaring engine transitions/runtime trustworthy for operational logbook use.
 
 ## Done means
 
@@ -214,4 +214,4 @@ The settled-file native MasterBus staging gate is complete. A rotated hourly fil
 
 The first bounded Rust N2K staging batch is also complete using settled mirrored `picanm` data and only PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`, with research mode `none`. The exact sample, decoder revision/schema, resource limits, counts, null rates, provenance and delete/rebuild evidence are recorded in `2026-07-05-copy-merge-validation.md`. The local staging clone required the already-documented `004a_reset_n2k_typed_provenance.sql`; because it is plain PostgreSQL rather than TimescaleDB, only extension/hypertable statements were omitted in a temporary staging invocation. Production SQL is unchanged.
 
-Migration `011_masterbus_engine_history_v1.sql` implements deterministic typed-native transition/runtime rebuilds. Its committed integration test runs against a temporary PostgreSQL database without TimescaleDB and covers exact transitions, intervals, summaries, provenance, gaps, debounce, duplicate/coalesced samples, isolation and rebuild cleanup. It is not applied to live PostgreSQL. The repository-controlled bounded Grafana dashboard is prepared but not deployed while the live typed tables are empty. Logbook integration remains deliberately deferred until all four physical engine combinations and typed runtime semantics are trustworthy.
+Migration `011_masterbus_engine_history_v1.sql` implements deterministic typed-native transition/runtime rebuilds. Its committed integration test runs against a temporary PostgreSQL database without TimescaleDB and covers exact transitions, intervals, summaries, provenance, gaps, debounce, duplicate/coalesced samples, isolation and rebuild cleanup. It was deployed live on 2026-07-21 after schema backup `/home/jack/boat-engine-schema-backup-20260721T114643Z.sql`; an empty-source rebuild succeeded and produced zero transitions, intervals and summaries as expected. No typed batch was imported. The repository-controlled bounded Grafana dashboard is prepared but not deployed while the live typed tables are empty. Logbook integration remains deliberately deferred until the two remaining physical engine combinations and typed runtime semantics are trustworthy.

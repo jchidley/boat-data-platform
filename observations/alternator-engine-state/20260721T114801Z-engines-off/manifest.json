@@ -1,0 +1,10 @@
+{
+  "captured_at": "2026-07-21T11:48:21.379Z",
+  "label": "engines-off",
+  "baseUrl": "http://192.168.1.136:3001",
+  "durationSec": 20,
+  "intervalSec": 2,
+  "samples": 10,
+  "rows": 160,
+  "note": "User confirmed both physical engines were off and it was nighttime. Both alternator sense-voltage and field-current inputs remained 0 throughout the capture; both derived propulsion states remained stopped."
+}

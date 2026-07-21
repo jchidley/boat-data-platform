@@ -1,0 +1,15 @@
+path	source	count	min	avg	max	latest	latestTimestamp
+electrical.alternators.alpha-port.alternatorTemperature	masterbus	10	292.15	292.15000000000003	292.15	292.15	2026-07-21T11:48:17.822Z
+electrical.alternators.alpha-port.alternatorVoltage	masterbus	10	13.170940399169922	13.174514770507812	13.179876327514648	13.179876327514648	2026-07-21T11:48:17.822Z
+electrical.alternators.alpha-port.current	masterbus	10	-28.57957649230957	-27.824005699157716	-26.41360855102539	-27.888803482055664	2026-07-21T11:48:17.822Z
+electrical.alternators.alpha-port.fieldCurrent	masterbus	10	0	0	0	0	2026-07-21T11:48:17.622Z
+electrical.alternators.alpha-port.senseVoltage	masterbus	10	0	0	0	0	2026-07-21T11:48:17.772Z
+electrical.alternators.alpha-port.temperature	masterbus	10	301.65	301.65000000000003	301.65	301.65	2026-07-21T11:48:17.822Z
+electrical.alternators.alpha-port.voltage	masterbus	10	13.288799285888672	13.290029525756836	13.291259765625	13.288799285888672	2026-07-21T11:48:17.772Z
+electrical.alternators.alpha-stbd.alternatorTemperature	masterbus	10	312.15	312.25000000000006	313.15	312.15	2026-07-21T11:48:17.872Z
+electrical.alternators.alpha-stbd.alternatorVoltage	masterbus	10	13.188811302185059	13.190598487854004	13.197747230529785	13.188811302185059	2026-07-21T11:48:18.373Z
+electrical.alternators.alpha-stbd.current	masterbus	10	-29.11190414428711	-28.105600357055664	-27.239822387695312	-28.2559814453125	2026-07-21T11:48:17.822Z
+electrical.alternators.alpha-stbd.fieldCurrent	masterbus	10	0	0	0	0	2026-07-21T11:48:17.872Z
+electrical.alternators.alpha-stbd.senseVoltage	masterbus	10	0	0	0	0	2026-07-21T11:48:18.073Z
+electrical.alternators.alpha-stbd.temperature	masterbus	10	301.65	301.65000000000003	301.65	301.65	2026-07-21T11:48:17.822Z
+electrical.alternators.alpha-stbd.voltage	masterbus	10	13.288799285888672	13.290029525756836	13.291259765625	13.288799285888672	2026-07-21T11:48:18.373Z

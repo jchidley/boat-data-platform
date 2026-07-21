@@ -47,7 +47,7 @@ propulsion.port.state
 propulsion.starboard.state
 ```
 
-with a `13.25 V` threshold and debounce. Physical verification of all engine combinations remains required.
+with a `13.25 V` threshold and debounce. Starboard-only and both-off are physically verified; port-only and both-running remain required.
 
 ## New typed historical path
 
@@ -106,7 +106,7 @@ Complete the new typed historical path in this order:
 
 1. Prove settled-native-file import/delete/rebuild on staging, then approve a bounded native typed batch for live PostgreSQL. Native hourly segmentation is implemented and daily compression/90-day retention configuration is validated; continue monitoring these as operations, not implementation blockers. The live schema is empty and no batch has been loaded.
 2. Select and run the first explicitly bounded seven-PGN staging import. The direct Rust decoder gate is complete for PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`; parity-gate any additional PGN before inclusion.
-3. Verify the repository engine transition/runtime migration with the committed disposable PostgreSQL integration test. The migration remains undeployed live; starboard-only is physically verified, while both-off, port-only and both-running remain a commissioning checklist and must be completed before engine history is declared trustworthy for logbook use.
+3. The engine transition/runtime migration is deployed live and its empty-source rebuild is verified. Starboard-only and both-off are physically verified; port-only and both-running remain a commissioning checklist and must be completed before engine history is declared trustworthy for logbook use.
 4. Point health/Grafana queries at typed tables and build the first historical dashboards; repository dashboard files remain undeployed.
 5. Evaluate logbook integration after engine state/runtime is trustworthy.
 
@@ -139,7 +139,7 @@ A first useful repository-controlled Grafana dashboard/provisioning set is prese
 
 This is newly rerun evidence from the current repository, distinct from the inherited bounded native and N2K staging records below. `npm run test:engine-history:integration` passed against PostgreSQL 17.10 in a disposable database created through the local Unix socket and dropped with `DROP DATABASE ... WITH (FORCE)` in cleanup. TimescaleDB was not present and was not required. The test applied a minimum MasterBus inventory/device/alternator/battery schema plus `011_masterbus_engine_history_v1.sql`, then rebuilt deterministic fixtures covering threshold equality/strictness, both debounce boundaries, chatter, duplicate/sparse same-key samples, nulls, exact and over-limit gaps, source-file boundaries, closed/data-gap/open intervals, provenance, port/starboard isolation, invalid parameters and repeated delete/rebuild. It asserted 7 transition rows, 4 interval rows, 2 summary rows and 230 seconds of completed runtime; the open interval was excluded. The latest run took 255 ms measured inside the test, peaked at 60,468 KiB Node RSS and reported a disposable database size of 8,197,811 bytes. The temporary database was removed successfully.
 
-The migration now records source labels and raw line numbers on transition and runtime interval provenance, locks the typed alternator source during a bounded rebuild, adds time indexes used by recent-electrical consumers, and guards optional-role grants. This changes repository implementation only; the migration was not deployed to live PostgreSQL.
+The migration now records source labels and raw line numbers on transition and runtime interval provenance, locks the typed alternator source during a bounded rebuild, adds time indexes used by recent-electrical consumers, and guards optional-role grants. The migration was deployed to live PostgreSQL on 2026-07-21 after a schema-only backup, then rebuilt successfully against the still-empty typed alternator source. Its transition, interval and summary outputs remain empty as expected.
 
 A focused audit of the older canboatjs typed slices confirmed that PGNs `129540` and `129285` key nested children by source-list position (`satellite_index`/`waypoint_index`) within raw file, message and timestamp. Repeated PRNs or waypoint ids therefore remain distinct and ordered; empty lists now emit no invented child row. AIS `129039`, `129809` and `129810` have synthetic converter/schema/merge coverage but the cited bounded real sample contained zero rows, so they are not representative-real-data validated. Do not use or Rust-port these older slices without an identified consumer and the required representative/parity gate.
 
@@ -161,8 +161,8 @@ A focused audit of the older canboatjs typed slices confirmed that PGNs `129540`
 ### Remaining gates
 
 - No native or N2K batch has been imported into live `pi5nvme` PostgreSQL. The first native live batch remains approval-gated.
-- The engine migration and Grafana provisioning are repository/staging implementation only; live deployment awaits the approved typed batch and review.
-- Both-off, port-only and both-running remain deferred physical observations. Do not describe runtime as trusted operational/logbook history until those observations are recorded.
+- The engine migration is deployed live but has no typed input yet. Grafana provisioning remains repository-only and awaits the approved typed batch and review.
+- Port-only and both-running remain deferred physical observations. Both-off was verified at nighttime with both sense-voltage and field-current inputs at 0 and both derived states `stopped`. Do not describe runtime as trusted operational/logbook history until the remaining observations are recorded.
 
 Read-only live verification on `pi5nvme` confirmed direct `raw_file_id/message_index` schema columns and zero rows in `masterbus_log_files_v1`, `masterbus_alternator_samples_v1`, and N2K raw inventory. The bounded health run at `2026-07-21T08:21:02Z` passed 27/27 checks with picanm, raw receiver, Signal K and MasterBus active; Signal K freshness was 96/104 raw-feed paths and 43/43 MasterBus paths. No live writer or schema mutation was performed.
 

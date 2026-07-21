@@ -16,7 +16,7 @@ Use these docs as the current source of truth. Document roles are intentionally 
 5. [`2026-07-03-boat-discovery-and-decoder-inventory.md`](2026-07-03-boat-discovery-and-decoder-inventory.md) — devices, available data and decoder gaps.
 6. [`2026-07-03-pi5nvme-incident-and-picanm-status.md`](2026-07-03-pi5nvme-incident-and-picanm-status.md) — resource-safety limits for live-host work.
 
-Read other documents only when their specific subject is needed.
+Read other documents only when their specific subject is needed. For a tightly constrained task sequence suitable for a less capable agent, use [`limited-agent-next-task-runbook.md`](limited-agent-next-task-runbook.md); canonical plans still take precedence.
 
 ## Current rules
 

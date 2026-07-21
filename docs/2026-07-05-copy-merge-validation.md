@@ -78,7 +78,20 @@ malformed rows:                 0
 
 Rust and canboatjs produced identical row counts for each implemented typed PGN: `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`. Across the sample, corresponding numeric differences were below `3e-14`. Rust deliberately preserves the raw edge timestamp to microseconds and records the one-based source line, rather than canboatjs's decoded-record index and millisecond timestamp formatting.
 
-The bounded wrapper imported the Rust output twice into disposable PostgreSQL without duplicates; frame staging emptied and summary count remained 6,001. Rust is not yet the default because malformed/incomplete packet, Rust-only decode and additional-file comparisons still need broader fixtures.
+The bounded wrapper imported the Rust output twice into disposable PostgreSQL without duplicates; frame staging emptied and summary count remained 6,001.
+
+The remaining decoder gate was completed on 2026-07-21:
+
+- malformed candump timestamps, CAN ids, payload lengths, payload bytes and separators are rejected without panic;
+- an incomplete fast packet emits no message;
+- a complete real PGN 129029 fast packet uses the first frame's source line and microsecond edge timestamp;
+- three additional 10,000-line real samples from 03:00, 04:00 and 05:00 UTC produced identical per-PGN row counts for all seven direct typed shapes;
+- 43,253 corresponding typed fields were compared, with a maximum numeric difference of `2.842170943040401e-14` and no text differences;
+- Rust decoded 112, 109 and 111 more messages respectively. In each sample the entire difference was PGN 65280: the Rust schema emits the generic manufacturer-proprietary single-frame range record while canboatjs suppresses it. It produces no selected typed row and is harmless summary evidence, not a historical fact.
+
+A disposable staging clone then imported the 05:00 sample twice, retaining 6,007 summarized messages and 3,013 selected typed rows without duplication. `TRUNCATE n2k_raw_files_v2 CASCADE` cleared the clone's import runs, summaries and typed provenance rows; reimport reproduced exactly 6,007 summarized messages and 3,013 typed rows, with frame staging empty.
+
+The decoder acceptance gate is therefore complete for the initial seven-PGN set. JavaScript remains available as the oracle/fallback; additional typed PGNs still require the same bounded parity test before inclusion.
 
 ## MasterBus path validated
 

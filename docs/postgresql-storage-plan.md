@@ -43,7 +43,7 @@ Signal K continues using its deployed canboatjs decoder for live state. The offl
 
 Rust provenance is the one-based source candump line where the message begins; decoder output sequence numbers are never provenance. Current coverage is intentionally limited to seven typed PGNs and is selected with `--decoder rust` in the bounded wrapper. canboatjs remains the default comparison path until acceptance is complete.
 
-Acceptance requires equivalent supported typed row counts, values within field resolution, explicit first-frame fast-packet timestamps, bounded malformed/incomplete-packet behavior, explained Rust-only decodes and a successful staging delete/rebuild. Record the pinned revision and embedded CANboat schema version in conversion evidence.
+Acceptance requires equivalent supported typed row counts, values within field resolution, explicit first-frame fast-packet timestamps, bounded malformed/incomplete-packet behavior, explained Rust-only decodes and a successful staging delete/rebuild. This gate is complete for the initial seven-PGN set; conversion evidence is recorded in [`2026-07-05-copy-merge-validation.md`](2026-07-05-copy-merge-validation.md). Record the pinned revision and embedded CANboat schema version in every later conversion evidence set.
 
 ## N2K storage
 

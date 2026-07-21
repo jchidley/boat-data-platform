@@ -168,6 +168,36 @@ fn packet_type(db: &Database, pgn: u32) -> FramePacketType {
     }
 }
 
+fn reassemble_frame(
+    reassembler: &mut Reassembler,
+    first_frames: &mut HashMap<(u32, u8, u8), (usize, String, u32)>,
+    raw: CandumpFrame,
+    kind: FramePacketType,
+) -> Option<(Frame, usize, String, u32)> {
+    let fast_key = if kind == FramePacketType::Fast && !raw.frame.data.is_empty() {
+        Some((raw.frame.pgn, raw.frame.src, raw.frame.data[0] >> 5))
+    } else {
+        None
+    };
+    if let Some(key) = fast_key
+        && raw.frame.data[0] & 0x1f == 0
+    {
+        first_frames.insert(key, (raw.source_line, raw.timestamp.clone(), raw.can_id));
+    }
+    match reassembler.push(raw.frame, kind) {
+        Reassembled::PassThrough(frame) => {
+            Some((frame, raw.source_line, raw.timestamp, raw.can_id))
+        }
+        Reassembled::Complete(frame) => {
+            let provenance = fast_key
+                .and_then(|key| first_frames.remove(&key))
+                .unwrap_or((raw.source_line, raw.timestamp, raw.can_id));
+            Some((frame, provenance.0, provenance.1, provenance.2))
+        }
+        Reassembled::Partial | Reassembled::Error(_) => None,
+    }
+}
+
 fn tsv(value: Option<String>) -> String {
     match value {
         None => "\\N".into(),
@@ -375,30 +405,9 @@ fn main() -> Result<()> {
             continue;
         };
         let kind = packet_type(db, raw.frame.pgn);
-        let fast_key = if kind == FramePacketType::Fast && !raw.frame.data.is_empty() {
-            Some((raw.frame.pgn, raw.frame.src, raw.frame.data[0] >> 5))
-        } else {
-            None
-        };
-        if let Some(key) = fast_key
-            && raw.frame.data[0] & 0x1f == 0
-        {
-            first_lines.insert(key, (raw.source_line, raw.timestamp.clone(), raw.can_id));
-        }
-        let event = reassembler.push(raw.frame, kind);
-        let frame = match event {
-            Reassembled::PassThrough(f) => Some((f, raw.source_line, raw.timestamp, raw.can_id)),
-            Reassembled::Complete(f) => {
-                let provenance = fast_key.and_then(|k| first_lines.remove(&k)).unwrap_or((
-                    raw.source_line,
-                    raw.timestamp,
-                    raw.can_id,
-                ));
-                Some((f, provenance.0, provenance.1, provenance.2))
-            }
-            Reassembled::Partial | Reassembled::Error(_) => None,
-        };
-        let Some((frame, message_line, timestamp, can_id)) = frame else {
+        let Some((frame, message_line, timestamp, can_id)) =
+            reassemble_frame(&mut reassembler, &mut first_lines, raw, kind)
+        else {
             continue;
         };
         let Ok(pgn) = db.decode(&frame) else { continue };
@@ -442,5 +451,58 @@ mod tests {
         assert_eq!(f.frame.pgn, 127245);
         assert_eq!(f.frame.src, 13);
         assert_eq!(f.timestamp, "2026-07-21T00:59:50.772000Z");
+    }
+
+    #[test]
+    fn rejects_malformed_candump_fields_without_panicking() {
+        for line in [
+            "(not-a-time) can0 19F10D0D#00",
+            "(1784595590.0) can0 NOTHEX#00",
+            "(1784595590.0) can0 19F10D0D#0",
+            "(1784595590.0) can0 19F10D0D#GG",
+            "(1784595590.0) can0 missing-separator",
+        ] {
+            assert!(parse_candump(line, 1).is_err(), "accepted: {line}");
+        }
+        assert!(parse_candump("ordinary log noise", 1).unwrap().is_none());
+    }
+
+    #[test]
+    fn incomplete_fast_packet_emits_nothing() {
+        let db = Database::embedded(Units::Si);
+        let raw = parse_candump("(1782800983.059702) can0 0DF80516#402FC09A5060CFEF", 6)
+            .unwrap()
+            .unwrap();
+        let kind = packet_type(db, raw.frame.pgn);
+        assert_eq!(kind, FramePacketType::Fast);
+        let mut reassembler = Reassembler::new();
+        let mut first_frames = HashMap::new();
+        assert!(reassemble_frame(&mut reassembler, &mut first_frames, raw, kind).is_none());
+    }
+
+    #[test]
+    fn completed_fast_packet_uses_first_frame_line_and_timestamp() {
+        let lines = [
+            "(1782800983.059702) can0 0DF80516#402FC09A5060CFEF",
+            "(1782800983.060257) can0 0DF80516#410DA0D4DA901E06",
+            "(1782800983.060802) can0 0DF80516#42A303003D1996E8",
+            "(1782800983.061362) can0 0DF80516#4333BB1120DF5000",
+            "(1782800983.061929) can0 0DF80516#440000000014FC26",
+            "(1782800983.062480) can0 0DF80516#4530005B00180B00",
+            "(1782800983.063069) can0 0DF80516#460000FFFFFFFFFF",
+        ];
+        let db = Database::embedded(Units::Si);
+        let mut reassembler = Reassembler::new();
+        let mut first_frames = HashMap::new();
+        let mut completed = None;
+        for (offset, line) in lines.iter().enumerate() {
+            let raw = parse_candump(line, 6 + offset).unwrap().unwrap();
+            let kind = packet_type(db, raw.frame.pgn);
+            completed = reassemble_frame(&mut reassembler, &mut first_frames, raw, kind);
+        }
+        let (frame, source_line, timestamp, _) = completed.expect("packet should complete");
+        assert_eq!(frame.pgn, 129029);
+        assert_eq!(source_line, 6);
+        assert_eq!(timestamp, "2026-06-30T06:29:43.059702Z");
     }
 }

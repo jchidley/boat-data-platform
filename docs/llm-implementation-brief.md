@@ -102,7 +102,7 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 Complete the new typed historical path in this order:
 
-1. Complete the direct Rust historical-decoder gate. `tools/n2k-rust-importer/` now embeds pinned `canboat-core`, reads candump directly and emits seven typed PGN TSV shapes without analyzer JSON. Extend value/timestamp/malformed-packet parity testing and port only the additional PGNs needed for the first limited import. Keep live Signal K/canboatjs unchanged and retain it as the oracle/fallback.
+1. Select and run the first explicitly bounded seven-PGN staging import. The direct Rust decoder gate is complete for PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`: multiple-file count/value parity, malformed/incomplete packets, first-frame timestamps, Rust-only decodes, idempotence and delete/rebuild are verified. Keep live Signal K/canboatjs unchanged and retain it as the oracle/fallback; parity-gate any additional PGN before inclusion.
 2. Validate real alternator, inverter/charger and solar MasterBus replay when representative states are available; battery replay is validated.
 3. Implement typed engine transition/runtime history from MasterBus alternator evidence.
 4. Point health/Grafana queries at typed tables.

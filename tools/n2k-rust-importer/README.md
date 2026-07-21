@@ -36,4 +36,4 @@ node scripts/import-n2k-v2-copy.mjs \
   --dry-run --keep-work
 ```
 
-Do not use this for a broad import until the parity and timestamp gates in `docs/plan.md` are complete.
+The bounded parity, malformed/incomplete-packet, timestamp and staging delete/rebuild gates are complete for these seven PGNs. Use remains offline/staging-only and bounded; parity-gate every additional PGN before inclusion. Do not run a broad import or conversion on live `pi5nvme`.

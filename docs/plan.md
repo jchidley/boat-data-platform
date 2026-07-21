@@ -145,15 +145,9 @@ Keep the existing Signal K/canboatjs live path unchanged. The offline PostgreSQL
 
 Initial direct typed coverage is PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`. On a bounded 10,000-line real sample, Rust and canboatjs produced identical row counts for all seven typed PGNs; Rust decoded 6,001 total messages versus 5,891 from canboatjs. The Rust wrapper imported twice idempotently into disposable PostgreSQL staging, retained 6,001 summary messages and emptied staging.
 
-Before Rust becomes the default or runs a significant limited import:
+The migration gate is complete for the initial seven-PGN set. Three additional bounded real files matched per-PGN row counts and values within `2.85e-14`; malformed and incomplete packets and first-frame fast-packet timestamps have explicit tests. Rust-only decoded messages were generic PGN 65280 manufacturer-proprietary range records, which produce no selected typed rows. A disposable staging import was repeated idempotently, deleted with its dependent provenance, and rebuilt to identical counts.
 
-1. compare values within field resolution, SI units and first-frame fast-packet timestamps on several bounded real files;
-2. test malformed and incomplete packets explicitly;
-3. explain PGNs decoded by only one implementation;
-4. port and validate each additional typed PGN needed by the first historical consumers;
-5. prove delete/rebuild with the final selected PGN set.
-
-Pin the `canboat-rs` revision and embedded schema version in `Cargo.lock`; retain canboatjs as the comparison oracle and fallback through the first validated limited import.
+Pin the `canboat-rs` revision and embedded schema version in `Cargo.lock`; retain canboatjs as the comparison oracle and fallback through the first validated limited import. Port an additional typed PGN only when a first historical consumer needs it, and apply the same bounded parity gate before inclusion.
 
 ### 3. Finish the typed MasterBus path
 
@@ -186,7 +180,7 @@ Live-only apps continue to use Signal K.
 
 ## Immediate work order
 
-1. Complete the bounded canboatjs versus `canboat-rs` historical-decoder migration gate before a significant limited N2K import.
+1. Select and run the first explicitly bounded seven-PGN staging import; the canboatjs versus `canboat-rs` decoder gate for that set is complete.
 2. Validate real alternator, inverter/charger and solar MasterBus replay; battery replay is validated.
 3. Implement durable engine transitions/runtime from typed MasterBus history.
 4. Build Grafana health and first useful typed-history dashboards.

@@ -36,7 +36,8 @@ Current state:
 - Engine history has one open starboard interval and no port transition.
 - Both-off and starboard-only physical engine combinations are verified.
 - Port-only and both-running still require safe physical commissioning.
-- Grafana dashboard UID `boat-typed-history` is deployed with stable datasource UID `boat-timescaledb`.
+- Grafana dashboard UID `boat-typed-history` is deployed with stable datasource UID `boat-timescaledb`; Grafana 13 requires `database: boatdata` both at datasource top level and under `jsonData`.
+- Alternator, battery, transition and provenance panels show the first batch. Completed runtime correctly shows no data because its only starboard interval is open.
 - No live N2K typed batch has been imported.
 
 Do not assume this state remains true. Verify it at Checkpoint 0.
@@ -233,7 +234,11 @@ Expected safe fields include:
 uid: boat-timescaledb
 type: postgres
 database: boatdata
+jsonData:
+  database: boatdata
 ```
+
+Grafana 13 needs both database entries. A successful datasource health check alone does not prove dashboard queries have a default database.
 
 Do not print `secureJsonData` or the full datasource file.
 
@@ -345,6 +350,8 @@ Do not declare success merely because Grafana is active. The checksum, API healt
 - disk remains below 75%;
 - health helper passes;
 - no new Grafana provisioning/query errors appear;
+- alternator, battery, transition and provenance panels display data for the imported interval;
+- completed runtime may show no data while every interval is open; this is expected and must not be “fixed” by inventing a stop;
 - no PostgreSQL schema or typed data changed.
 
 After successful deployment, update:

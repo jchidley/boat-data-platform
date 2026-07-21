@@ -9,6 +9,7 @@ const nativePatch = fs.readFileSync('infra/pi5nvme/masterbus/masterbus-signalk-a
 const logrotate = fs.readFileSync('infra/pi5nvme/logrotate/boat-masterbus-native-events', 'utf8')
 const storageGuard = fs.readFileSync('infra/pi5nvme/scripts/check-derived-storage-pressure.sh', 'utf8')
 const storageGuardTimer = fs.readFileSync('infra/pi5nvme/systemd/boat-derived-storage-guard.timer', 'utf8')
+const healthCheck = fs.readFileSync('scripts/check-steady-state.sh', 'utf8')
 
 test('MasterBus installer deploys native decoded event logging in the single USB owner', () => {
   assert.match(masterbusInstall, /masterbus-signalk-native\.conf/)
@@ -34,6 +35,15 @@ test('derived storage guard enforces the 85 percent threshold without touching r
   assert.doesNotMatch(storageGuard, /boat-n2k-raw-receiver/)
   assert.match(storageGuardTimer, /OnUnitActiveSec=5min/)
   assert.match(install, /boat-derived-storage-guard\.timer/)
+})
+
+test('health check monitors the known NVMe and MasterBus USB failure modes', () => {
+  assert.match(healthCheck, /nvme_core\.default_ps_max_latency_us=0/)
+  assert.match(healthCheck, /pcie_aspm=off/)
+  assert.match(healthCheck, /pcie_port_pm=off/)
+  assert.match(healthCheck, /1a64:0000.*MasterBus/)
+  assert.match(healthCheck, /CSTS=0xffffffff/)
+  assert.match(healthCheck, /EXT4-fs error.*nvme/)
 })
 
 test('native MasterBus JSONL logrotate compresses replay logs without deleting recent history', () => {

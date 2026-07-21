@@ -102,6 +102,25 @@ echo time_epoch=$(date +%s)
 echo receiver_active=$(systemctl is-active boat-n2k-raw-receiver || true)
 echo signalk_active=$(systemctl is-active signalk-pi5nvme || true)
 echo masterbus_active=$(systemctl is-active masterbus-signalk || true)
+if grep -qw 'nvme_core.default_ps_max_latency_us=0' /proc/cmdline \
+   && grep -qw 'pcie_aspm=off' /proc/cmdline \
+   && grep -qw 'pcie_port_pm=off' /proc/cmdline; then
+  echo nvme_mitigation_active=yes
+else
+  echo nvme_mitigation_active=no
+fi
+if command -v lsusb >/dev/null 2>&1 && lsusb | grep -qi '1a64:0000.*MasterBus'; then
+  echo masterbus_usb_present=yes
+else
+  echo masterbus_usb_present=no
+fi
+if command -v journalctl >/dev/null 2>&1; then
+  nvme_storage_errors=$(journalctl -k -b --no-pager 2>/dev/null \
+    | grep -Eci 'CSTS=0xffffffff|nvme.*(I/O|controller is down|reset failure)|EXT4-fs error.*nvme' || true)
+  echo nvme_storage_errors_current_boot=${nvme_storage_errors:-0}
+else
+  echo nvme_storage_errors_current_boot=unknown
+fi
 if command -v vcgencmd >/dev/null 2>&1; then
   vcgencmd measure_temp | sed -n "s/temp=\([0-9.]*\).*/temp_c=\1/p" || true
   vcgencmd get_throttled | sed -n "s/throttled=\(0x[0-9a-fA-F]*\).*/throttled=\1/p" || true
@@ -178,6 +197,12 @@ for svc in receiver_active signalk_active masterbus_active; do
   val=$(kv_get "$svc" "$RUN_DIR/pi52.kv" || true)
   if [[ "$val" == active ]]; then record PASS "$svc=$val"; else record FAIL "$svc=$val"; fi
 done
+nvme_mitigation=$(kv_get nvme_mitigation_active "$RUN_DIR/pi52.kv" || true)
+if [[ "$nvme_mitigation" == yes ]]; then record PASS "pi5 NVMe power-state mitigation active"; else record FAIL "pi5 NVMe power-state mitigation missing"; fi
+masterbus_usb=$(kv_get masterbus_usb_present "$RUN_DIR/pi52.kv" || true)
+if [[ "$masterbus_usb" == yes ]]; then record PASS "MasterBus USB Link present"; else record FAIL "MasterBus USB Link absent"; fi
+nvme_errors=$(kv_get nvme_storage_errors_current_boot "$RUN_DIR/pi52.kv" || echo unknown)
+if [[ "$nvme_errors" == 0 ]]; then record PASS "pi5 current boot has no known NVMe/storage error signatures"; elif [[ "$nvme_errors" == unknown ]]; then record WARN "pi5 current-boot NVMe/storage errors unavailable"; else record FAIL "pi5 current boot has ${nvme_errors} known NVMe/storage error signatures"; fi
 pi_chrony_offset=$(kv_get chrony_system_offset_s "$RUN_DIR/pi52.kv" || true)
 pi_chrony_leap=$(kv_get chrony_leap_status "$RUN_DIR/pi52.kv" || true)
 if [[ -n "$pi_chrony_offset" ]]; then

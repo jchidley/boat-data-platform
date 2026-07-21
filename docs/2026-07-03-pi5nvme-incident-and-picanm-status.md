@@ -4,11 +4,27 @@
 
 Define operational limits after live-host storage and I/O incidents. This is a safety gate, not an architecture plan.
 
+## 2026-07-04 NVMe/PCIe storage-path incident
+
+The original live JSON-heavy N2K backfill generated severe PostgreSQL/WAL/index write amplification. During successive live imports the NVMe first disappeared from PCIe with `CSTS=0xffffffff`, reset failures and buffer I/O errors. A later import produced swap read errors, an aborted ext4 journal, a read-only root filesystem and a kernel panic. No classic undervoltage or throttling evidence was observed and a known-good Raspberry Pi PSU was in use, so the precise hardware cause was not proven; NVMe/HAT/ribbon/controller and PCIe power-state instability remained plausible.
+
+The retained diagnostic mitigation is:
+
+```text
+nvme_core.default_ps_max_latency_us=0 pcie_aspm=off pcie_port_pm=off
+```
+
+These arguments disable NVMe APST, PCIe ASPM and PCIe port power management. They slightly increase idle power/heat and do not establish that the underlying storage path is fault-free. Do not remove them casually. The standard bounded health check verifies that they remain active and scans the current boot for the known NVMe reset/I/O/ext4 signatures. It also checks physical presence of the MasterBus USB Link (`1a64:0000`) separately from `masterbus-signalk` service state because the USB device also disappeared during incident recovery.
+
+The architectural response is permanent: raw logs remain authoritative, the obsolete JSON-heavy table/importer is removed, and historical conversion runs on staging. Do not use a live boat-data import as an NVMe stress test.
+
 ## 2026-07-20 disk-pressure recurrence
 
 The `pi5nvme` NVMe filesystem reached 100% use at 2026-07-20 07:06 UTC (08:06 BST). `boat-n2k-raw-receiver.service` then crash-looped on `ENOSPC` until cleanup freed space at 2026-07-21 00:24 UTC. The host did not reboot; Signal K, MasterBus, PostgreSQL and Grafana remained running. Independent raw acquisition continued on `picanm`, and mirroring resumed after the receiver recovered.
 
 The apparent later SSH outage was a stale address: DHCP changed `pi5nvme` from `192.168.1.135` to `192.168.1.136`. The end-state cleanup and five-minute derived-storage guard were deployed and verified on 2026-07-21. Disk use after cleanup was 37%.
+
+A later read-only check confirmed the three mitigation arguments active, the MasterBus USB Link present, zero matching storage-error signatures in the current boot journal, and no `n2k_decoded_messages` relation. These observations are current-state checks, not proof that the historical hardware fault is cured.
 
 ## Current rule
 

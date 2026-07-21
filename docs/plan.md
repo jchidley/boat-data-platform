@@ -115,6 +115,7 @@ MasterBus mapped Signal K JSONL is only an interim fallback and captures only ma
 - No complete bus duplication in PostgreSQL without measured justification.
 - Stop rebuildable writers before disk pressure threatens source acquisition.
 - Add a PGN or metric to PostgreSQL only when it supports an identified query, dashboard, event or analysis need.
+- Keep the retained NVMe/PCIe mitigation arguments under bounded health monitoring, scan the current boot for the known reset/I/O/ext4 signatures, and check physical MasterBus USB presence independently from bridge process health.
 
 ## Route to the end state
 

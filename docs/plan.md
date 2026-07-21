@@ -189,11 +189,13 @@ Live-only apps continue to use Signal K.
 
 The settled-native rebuild gate, first bounded live native batch, seven-PGN Rust staging gate and durable engine-history deployment are complete.
 
-1. The repository-controlled Grafana history dashboard is deployed and validated against the first live MasterBus batch. Alternator, battery, transition and provenance panels show data; completed runtime correctly remains empty while the sole starboard interval is open. Use it to assess consumer value and query behavior.
-2. Complete port-only and both-running physical commissioning when safe; keep runtime out of operational/logbook claims until the typed transitions agree with all four physical combinations.
-3. Evaluate logbook integration after engine state/runtime is trustworthy.
-4. Decide whether to schedule additional MasterBus settled-file imports based on demonstrated dashboard/history value. Keep each additional batch explicitly approved until that operating model is reviewed.
-5. Approve a first live seven-PGN N2K import only for a named navigation-history consumer. Port or retain additional PGNs only through the existing consumer-driven parity gate.
+1. Improve the deployed Grafana consumer: distinguish zero completed runtime from query failure, display open intervals, and prevent manually imported history from aging out of both the default dashboard range and a hard-coded 24-hour view.
+2. Automate the deployed-schema/role preflight and Grafana upgrade/acceptance checks that were performed manually during the first import and dashboard deployment.
+3. Complete port-only and both-running physical commissioning when safe; keep runtime out of operational/logbook claims until the typed transitions agree with all four physical combinations.
+4. If staging identifies a later settled native file containing useful stop evidence, seek separate approval for that one file and verify that it closes runtime through typed evidence. Do not infer a stop from file boundaries.
+5. Decide whether to schedule additional MasterBus settled-file imports based on demonstrated dashboard/history value. Keep each additional batch explicitly approved until that operating model is reviewed.
+6. Evaluate logbook integration after engine state/runtime is trustworthy.
+7. Approve a first live seven-PGN N2K import only for a named navigation-history consumer. Port or retain additional PGNs only through the existing consumer-driven parity gate.
 
 ### Live schema and import gate
 
@@ -203,11 +205,25 @@ Before every live schema deployment or typed batch:
 2. Confirm the source file is settled, a later active segment exists, and checksum, byte count, source-event line count and first/last timestamps match staging evidence.
 3. Record explicit resource and transaction limits, confirm disk/service health and take a bounded pre-change snapshot.
 4. Run the converter with no database writes and require expected converter counts and zero unexpected skips.
-5. Import one approved batch transactionally, then verify immutable inventory provenance, expected merged counts, native/raw provenance labels and zero staging rows.
-6. Repeat the same batch once when required by the acceptance plan and require unchanged typed counts and inventory provenance.
-7. Rebuild dependent derived history, verify bounded consumers, and recheck disk, Signal K, MasterBus and raw acquisition health.
+5. As the actual ingest role, run a rollback-only exercise covering inventory upsert, staging cleanup/write privileges and merge-function execution; require no rows remain after rollback.
+6. Import one approved batch transactionally, then verify immutable inventory provenance, expected merged counts, native/raw provenance labels and zero staging rows.
+7. Repeat the same batch once when required by the acceptance plan and require unchanged typed counts and inventory provenance.
+8. Rebuild dependent derived history, verify bounded consumers through their real API/browser path, and recheck disk, Signal K, MasterBus and raw acquisition health.
+
+Fresh-install files do not prove an existing deployment was upgraded. Every live service configuration change needs an explicit idempotent upgrade or migration path plus rollback evidence.
 
 Source line count means physical source events, not distinct typed/coalesced source lines. Merge functions must never replace it with a derived count.
+
+### Consumer acceptance gate
+
+Static file tests, direct SQL and service health are necessary but not sufficient. For Grafana or another history consumer, require:
+
+1. provisioned identity/configuration is visible through the service API;
+2. datasource health passes;
+3. the service's own query API returns expected bounded rows/frames;
+4. the real browser/client renders expected data for a known interval;
+5. legitimate empty states are distinguishable from errors;
+6. restart and targeted rollback do not affect acquisition services.
 
 ## Deferred physical commissioning
 

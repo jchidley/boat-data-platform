@@ -202,6 +202,15 @@ Initial datasource health and direct/API SQL checks passed, but all browser pane
 
 The completed-runtime panel correctly shows no data: the first batch contains one starboard start and one open interval, with no typed stop or data-gap closure. Open intervals are intentionally excluded from completed runtime. This is an acceptance result, not a dashboard failure, and must not be changed by inferring a stop at file end.
 
+### Operational lessons from the first live consumer
+
+- Static dashboard tests, valid JSON, direct SQL and datasource health did not catch the missing Grafana 13 nested database setting. Future acceptance must include service query API and browser rendering.
+- Fresh installer content did not migrate the existing generated datasource UID. Existing-host changes need an explicit upgrade path, not only corrected installation templates.
+- A generic `No data` display cannot distinguish a valid empty aggregate from a broken query. Runtime UX should show zero closed runtime and expose open intervals separately.
+- The current 24-hour dashboard/view range will age out manually imported evidence. Historical consumers should use an intentional longer bounded range, and view-level filtering should not silently override the dashboard's requested range.
+- The converter-only dry run did not exercise live ingest-role privileges. Future preflight must include a rollback-only inventory/staging/merge transaction under the real role.
+- A later settled source file may contain genuine starboard stop evidence, but importing it remains separately approval-gated and must be selected/validated on staging first.
+
 ## 2026-07-21 seven-PGN Rust staging batch
 
 Source was settled mirrored picanm data `/srv/boat/raw-n2k/can0-20260713T070000Z.candump.log.gz`, copied locally as `/tmp/can0-20260713T070000Z.candump.log.gz`. Compressed source SHA-256 is `6a89f1e923f6285ba27c5a65e804f25298323f6f8ddacda991bfb2bf29dc2deb`, size 14,401,497 bytes, 1,395,606 lines, edge range `(1783925992.757488)` to `(1783929596.202725)`. The bounded sample was the first 10,000 settled lines, 509,000 prepared bytes, edge range `(1783925992.757488)`–`(1783926024.290631)`.

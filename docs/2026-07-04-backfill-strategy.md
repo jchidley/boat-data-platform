@@ -42,10 +42,11 @@ The wrapper requires `--allow-full-file` for complete files and supports input-s
 5. Prove failure cleanup and import-status reporting.
 6. Compare typed-only storage with envelope-plus-typed storage.
 7. Approve a bounded staging batch.
-8. Before any approved destination import, compare deployed functions, grants, columns and constraints with committed SQL and exercise required privileges as the ingest role.
-9. Take a bounded snapshot, run a no-write conversion and verify settled-source checksum, bytes, physical line count and timestamps.
-10. Import transactionally and verify immutable source provenance, expected typed counts, zero unexpected skips, zero residual staging rows and unchanged acquisition health.
-11. Verify PostgreSQL size and query usefulness before expanding scope.
+8. Before any approved destination import, compare deployed functions, grants, columns and constraints with committed SQL.
+9. As the actual ingest role, exercise inventory upsert, staging cleanup/write and merge execution inside a transaction that is always rolled back; prove no rows remain.
+10. Take a bounded snapshot, run a no-write conversion and verify settled-source checksum, bytes, physical line count and timestamps.
+11. Import transactionally and verify immutable source provenance, expected typed counts, zero unexpected skips, zero residual staging rows and unchanged acquisition health.
+12. Verify PostgreSQL size and consumer usefulness through the consumer's own query API and browser/client path before expanding scope.
 
 ## Acceptance criteria
 

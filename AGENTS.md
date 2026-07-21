@@ -37,15 +37,16 @@ Use [`docs/signalk-llm-source-map.md`](docs/signalk-llm-source-map.md) for the c
 ## Active near-term order
 
 1. The PostgreSQL cleanup, disk guard, first bounded native MasterBus batch and engine-history migration were deployed on 2026-07-21. Broad conversion remains staging-only; every additional live typed batch requires explicit approval and the deployed-schema parity gate in `docs/plan.md`.
-2. The repository-controlled Grafana history dashboard is deployed. Grafana 13 requires `database: boatdata` both at datasource top level and under `jsonData`. Completed runtime correctly has no data while the sole starboard interval is open; do not infer a stop at file end. Use the dashboard to assess consumer value before scheduling additional imports.
+2. The repository-controlled Grafana history dashboard is deployed. Next improve its empty/open-runtime UX and historical range so manual evidence does not age out after 24 hours. Grafana 13 requires `database: boatdata` both at datasource top level and under `jsonData`. Completed runtime correctly has no data while the sole starboard interval is open; do not infer a stop at file end.
 3. Keep the deployed MasterBus input paths used by the live Signal K engine-state plugin:
    - `electrical.alternators.alpha-port.senseVoltage`
    - `electrical.alternators.alpha-stbd.senseVoltage`
 4. Complete port-only and both-running physical commissioning. Starboard-only and both-off are verified. Runtime history is derived from typed MasterBus intervals, not a separate hour-meter plugin, and is not yet trusted for logbook use.
 5. Evaluate logbook integration only after physical commissioning and typed runtime semantics are trustworthy.
-6. Decide whether additional settled MasterBus imports warrant a schedule based on demonstrated consumer value; keep each batch approval-gated until reviewed.
-7. Define a named navigation-history consumer before any live N2K import. Start with only the seven parity-gated Rust PGNs and use the static PGN capability/source-attribution inventories before expanding scope.
-8. Use schema-safe alphanumeric instance ids for new Signal K mappings. Do not expand the current hyphenated boat-specific names.
+6. Automate deployed-schema/grant parity, rollback-only ingest-role preflight and Grafana API/browser acceptance before scheduling more imports.
+7. A later settled MasterBus file may close the open starboard interval, but select/validate it on staging and obtain separate approval before import. Decide whether additional imports warrant a schedule based on demonstrated consumer value.
+8. Define a named navigation-history consumer before any live N2K import. Start with only the seven parity-gated Rust PGNs and use the static PGN capability/source-attribution inventories before expanding scope.
+9. Use schema-safe alphanumeric instance ids for new Signal K mappings. Do not expand the current hyphenated boat-specific names.
 
 ## Operational notes
 

@@ -104,13 +104,14 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 The first native live batch, seven-PGN staging gate and engine-history deployment are complete. Continue in this order:
 
-1. The repository-controlled Grafana dashboard is deployed and validated against the first live MasterBus batch. Continue checking its usefulness and query behavior before scheduling more imports.
-2. Complete port-only and both-running physical commissioning when safe. Do not present runtime as trusted operational/logbook history until these observations agree with the typed-derived transitions.
-3. Evaluate logbook integration only after engine state/runtime is trustworthy.
-4. Use the first dashboard to decide whether ongoing MasterBus imports provide enough value to justify a schedule. Approve each additional settled-file batch separately; do not turn the importer into an unattended live writer yet.
-5. Define a named navigation-history consumer before approving any live N2K import. Start with only the seven parity-gated Rust PGNs; parity-gate every additional PGN before inclusion.
+1. Improve the deployed Grafana dashboard semantics before treating it as an operational consumer: show `0 h` rather than generic no-data for no closed runtime, expose open engine intervals explicitly, and use a historical range that will not make manually imported data disappear after 24 hours. Remove or redesign the view-level fixed 24-hour filter so Grafana's bounded time filter owns the requested range.
+2. Turn the repeated live preflight checks into repository-controlled scripts/tests: deployed function/schema/grant parity, rollback-only ingest-role staging/merge exercise, and Grafana datasource/dashboard/API/browser acceptance. Add an explicit existing-install Grafana migration path; fresh-installer configuration alone is not an upgrade procedure.
+3. Complete port-only and both-running physical commissioning when safe. Do not present runtime as trusted operational/logbook history until these observations agree with the typed-derived transitions.
+4. Consider one separately approved later settled MasterBus file only after staging confirms it contains useful stop/closure evidence. Close runtime from typed evidence only; never infer a stop at file end. Use the dashboard results to decide whether ongoing imports justify a reviewed schedule.
+5. Evaluate logbook integration only after engine state/runtime is trustworthy.
+6. Define a named navigation-history consumer before approving any live N2K import. Start with only the seven parity-gated Rust PGNs; parity-gate every additional PGN before inclusion.
 
-Before every live schema change or typed import, compare deployed functions, grants, columns and constraints with committed SQL. Take a bounded pre-change snapshot, verify a settled source checksum/size/line count and later active file, run a no-write conversion, then verify immutable source provenance, expected typed counts, zero skips, zero staging rows, idempotence, disk and service health after import.
+Before every live schema change or typed import, compare deployed functions, grants, columns and constraints with committed SQL. Take a bounded pre-change snapshot, verify a settled source checksum/size/line count and later active file, run a no-write conversion, then exercise the actual ingest role in a rollback-only staging/merge transaction. After import, verify immutable source provenance, expected typed counts, zero skips, zero staging rows, idempotence, dependent rebuilds, browser/API consumers, disk and service health.
 
 ## Do not do
 

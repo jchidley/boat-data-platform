@@ -137,9 +137,10 @@ Do not discover repository/live drift during COPY. Before every live schema chan
 - snapshot the bounded pre-change schema/data scope;
 - prove the source is settled and record checksum, bytes, physical source-event lines and event-time range;
 - run a no-write conversion under the approved limits;
-- require expected converter counts and zero unexpected skips before COPY.
+- require expected converter counts and zero unexpected skips before COPY;
+- exercise inventory, staging cleanup/write and merge-function privileges as the actual ingest role inside a transaction that is always rolled back, then prove it left no rows.
 
-After import, require exact immutable inventory provenance, expected merged typed counts, correct source labels, zero residual staging rows, idempotent retry where specified, successful dependent-history rebuild and unchanged disk/acquisition health. Source-event line count is source provenance and must never be replaced by a typed, distinct or coalesced row count.
+After import, require exact immutable inventory provenance, expected merged typed counts, correct source labels, zero residual staging rows, idempotent retry where specified, successful dependent-history rebuild and unchanged disk/acquisition health. Verify consumers through their own query API and browser/client path rather than relying only on direct SQL or health endpoints. Source-event line count is source provenance and must never be replaced by a typed, distinct or coalesced row count.
 
 ## Acceptance criteria
 

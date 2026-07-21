@@ -42,7 +42,7 @@ Current state:
 
 Do not assume this state remains true. Verify it at Checkpoint 0.
 
-Tasks 1–4 were completed on 2026-07-21. A new agent should begin with Task 5 unless explicitly asked to audit or redeploy Grafana.
+Tasks 1–4 were completed on 2026-07-21. A new agent should begin with Task 4A, then continue to physical Task 5 when the human can safely operate engines.
 
 ## Absolute boundaries
 
@@ -362,6 +362,32 @@ docs/plan.md
 ```
 
 Record backup path, checksums, health result and deployment time. Run `npm test`, commit and push documentation.
+
+## Task 4A — improve dashboard historical and open-runtime UX
+
+Repository work may proceed without live approval. Live SQL/dashboard deployment still requires explicit approval.
+
+Required behavior:
+
+- rename completed runtime to make clear it counts closed intervals only;
+- return `0 h` for port/starboard when no closed interval exists instead of generic no-data;
+- add a bounded table/stat for open intervals with engine and start time;
+- use a deliberate bounded historical default such as 30 days while imports remain manual;
+- remove the hard-coded `now() - interval '24 hours'` predicate from `v_masterbus_recent_electrical_v1`, or replace the view so the dashboard's `$__timeFilter(time)` controls the range;
+- retain numeric `LIMIT` clauses on every dashboard query.
+
+Do not close an interval, fabricate a stop, or include open duration in completed runtime.
+
+Repository checks:
+
+```bash
+npm test
+npm run test:engine-history:integration
+node -e "JSON.parse(require('fs').readFileSync('infra/pi5nvme/grafana/dashboards/boat-history.json'))"
+git diff --check
+```
+
+Before any live deployment, use a disposable PostgreSQL test for view/migration changes and obtain explicit approval. After deployment, verify datasource health, Grafana query API and browser rendering. Success means closed runtime visibly shows zero, the open starboard interval is visible separately, historical electrical data remains visible beyond 24 hours, and acquisition services remain unchanged.
 
 ## Task 5 — collect remaining physical engine observations
 

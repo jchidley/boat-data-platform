@@ -5,6 +5,8 @@ import test from 'node:test'
 test('Grafana history provisioning is repository-controlled and bounded', () => {
   const dashboard = JSON.parse(fs.readFileSync('infra/pi5nvme/grafana/dashboards/boat-history.json', 'utf8'))
   assert.equal(dashboard.uid, 'boat-typed-history')
+  assert.equal(dashboard.time.from, 'now-24h')
+  assert.equal(dashboard.time.to, 'now')
   assert.ok(dashboard.panels.length >= 4)
   const targets = dashboard.panels.flatMap(panel => panel.targets ?? [])
   const sql = targets.map(target => target.rawSql ?? '').join('\n')

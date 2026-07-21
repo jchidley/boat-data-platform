@@ -41,7 +41,7 @@
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "time": {"from": "now-6h", "to": "now"},
+  "time": {"from": "now-24h", "to": "now"},
   "title": "Boat typed history",
   "uid": "boat-typed-history",
   "version": 1

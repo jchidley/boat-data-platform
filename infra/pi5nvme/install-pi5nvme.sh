@@ -91,6 +91,7 @@ datasources:
     secureJsonData:
       password: ${GRAFANA_READER_PASSWORD}
     jsonData:
+      database: boatdata
       sslmode: disable
       postgresVersion: 1500
       timescaledb: true

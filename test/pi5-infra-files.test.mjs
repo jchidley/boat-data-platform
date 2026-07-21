@@ -38,6 +38,7 @@ test('pi5 installer enforces the two-path service layout and fails fast on SQL e
   assert.match(install, /disable --now boat-signalk-collector\.service/)
   assert.match(install, /rm -f \/etc\/systemd\/system\/boat-signalk-collector\.service/)
   assert.match(install, /psql -X -v ON_ERROR_STOP=1 -d boatdata -f/)
+  assert.match(install, /jsonData:\n      database: boatdata\n      sslmode: disable/)
 })
 
 test('derived storage guard enforces the 85 percent threshold without touching raw acquisition', () => {

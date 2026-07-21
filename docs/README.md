@@ -21,7 +21,7 @@ Read other documents only when their specific subject is needed.
 ## Current rules
 
 - Treat raw NMEA 2000 candump logs as the source of truth for N2K.
-- Treat MasterBus discovery/config snapshots and replayable MasterBus logs as the source material for Mastervolt/MasterBus. Current MasterBus JSONL logging captures mapped Signal K deltas, not raw MasterBus traffic; investigate rawer logging before relying on it as complete history.
+- Treat MasterBus discovery/config snapshots and append-only `masterbus-native-event-v1` logs as the source material for Mastervolt/MasterBus. Native decoded events are captured inside the single USB-owning bridge before Signal K mapping. Mapped Signal K JSONL is retained comparison/fallback evidence only.
 - The project is experimental, but work is directed at the documented end state rather than maintaining transitional designs.
 - Signal K owns current normalized state; PostgreSQL owns selected typed history and durable events. Signal K and the historical importer decode the same authoritative raw N2K format for different purposes. Do not build a complete Signal K mirror or duplicate every raw bus message in PostgreSQL without measured justification.
 - PostgreSQL has controlled inputs for distinct domains—typed N2K, typed MasterBus, derived events, and health—but each historical fact has exactly one owner. Grafana and other historical consumers read PostgreSQL; normal operation does not replay SQL history into Signal K.

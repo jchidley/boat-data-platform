@@ -152,13 +152,12 @@ Pin the `canboat-rs` revision and embedded schema version in `Cargo.lock`; retai
 
 ### 3. Build the direct native MasterBus history path
 
-1. Inspect the deployed Mastervolt/MasterBus decoder and identify the earliest stable native decoded field-event interface before Signal K mapping.
-2. Define a versioned append-only event format containing edge/source timestamp, device identity, native field/register identity, decoded value and unit, decoder/schema version and replay position.
-3. Preserve rotated native event logs, discovery snapshots and configuration/schema caches under `/srv/boat/masterbus/`; database outages must not lose source events.
-4. Convert selected native events directly into typed alternator, battery, inverter/charger and solar PostgreSQL tables, with file/position provenance and idempotent merge.
-5. Validate representative real operating states and prove replay, failure cleanup and delete/rebuild. Battery validation through mapped JSONL is useful converter evidence but does not validate the native source path.
-6. Keep mapped Signal K JSONL only as a temporary comparison/fallback source until native replay is proven, then remove it from the normal historical path.
-7. Derive port/starboard engine transitions from typed native alternator evidence and runtime from durable transition intervals.
+1. Native capture is deployed inside `masterbus-signalk`, before Signal K mapping, so one process owns the USB interface. `masterbus-native-event-v1` records timestamp, native device/field identity, class/instance/group/name/unit and decoded value.
+2. Selected useful native fields are appended under `/srv/boat/masterbus/native-events/`; unchanged values are suppressed with a 60-second heartbeat. Signal K emission remains independent. If a device absent at startup later appears, the bridge exits so systemd restarts full discovery and subscriptions.
+3. The bounded native converter/importer supports typed alternator, battery, inverter/charger and solar tables with file/line provenance. A real 257-event sample covered all four domains with zero skips and repeated disposable staging import was idempotent.
+4. Complete operational validation of settled-file rotation/compression, disk growth, discovery recovery and delete/rebuild before approving a limited live PostgreSQL batch.
+5. Keep mapped Signal K JSONL only as retained comparison/fallback evidence; its separate logger is removed from normal deployment.
+6. Derive port/starboard engine transitions from typed native alternator evidence and runtime from durable transition intervals.
 
 This path is receive-only. Do not write to MasterBus devices or add protocol control behavior.
 
@@ -185,12 +184,11 @@ Live-only apps continue to use Signal K.
 
 ## Immediate work order
 
-1. Implement the append-only native Mastervolt/MasterBus field-event capture path before Signal K mapping, while leaving the working live Signal K path unchanged.
-2. Implement native-event-to-typed-PostgreSQL conversion and validate real battery, alternator, inverter/charger and solar replay; the existing mapped-JSONL battery result is comparison evidence only.
-3. Select and run the first explicitly bounded seven-PGN Rust staging import.
-4. Implement durable engine transitions/runtime from typed native MasterBus alternator history and verify all four live physical engine combinations.
-5. Build Grafana health and first useful typed-history dashboards.
-6. Evaluate logbook integration after engine state/runtime is trustworthy.
+1. Finish native MasterBus operational validation and approve the first bounded native batch into PostgreSQL; capture and disposable-staging conversion are working.
+2. Select and run the first explicitly bounded seven-PGN Rust staging import.
+3. Implement durable engine transitions/runtime from typed native MasterBus alternator history and verify all four live physical engine combinations.
+4. Build Grafana health and first useful typed-history dashboards.
+5. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Done means
 

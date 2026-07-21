@@ -1,0 +1,10 @@
+/srv/boat/masterbus/native-events/*.jsonl {
+    daily
+    rotate 90
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+    su root root
+}

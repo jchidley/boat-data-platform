@@ -1,9 +1,9 @@
 -- MasterBus history schema v1.
 --
 -- MasterBus is not recoverable from picanm NMEA 2000 candump logs. Preserve
--- replayable MasterBus Signal K delta logs, then load typed electrical tables
--- from those logs. The JSONL files are the replay source; these SQL tables are
--- derived and rebuildable from those files plus MasterBus config snapshots.
+-- append-only masterbus-native-event-v1 logs captured before Signal K mapping,
+-- then load typed electrical tables from those logs. These SQL tables are
+-- derived and rebuildable from native events plus MasterBus config snapshots.
 
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
@@ -110,7 +110,8 @@ SELECT create_hypertable('masterbus_solar_samples_v1', 'time', if_not_exists => 
 CREATE INDEX IF NOT EXISTS masterbus_solar_samples_v1_key_time_idx ON masterbus_solar_samples_v1 (controller_key, time DESC);
 
 -- Unlogged COPY staging tables. These are disposable import targets for replay
--- from MasterBus JSONL logs.
+-- from native decoded MasterBus event logs. Mapped Signal K JSONL is fallback
+-- comparison input only.
 CREATE UNLOGGED TABLE IF NOT EXISTS masterbus_alternator_stage_v1 (LIKE masterbus_alternator_samples_v1 INCLUDING DEFAULTS);
 CREATE UNLOGGED TABLE IF NOT EXISTS masterbus_battery_stage_v1 (LIKE masterbus_battery_samples_v1 INCLUDING DEFAULTS);
 CREATE UNLOGGED TABLE IF NOT EXISTS masterbus_inverter_charger_stage_v1 (LIKE masterbus_inverter_charger_samples_v1 INCLUDING DEFAULTS);

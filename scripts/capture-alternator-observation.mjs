@@ -12,7 +12,7 @@ function has(name) { return args.includes(name) }
 const usage = `Usage:
   node scripts/capture-alternator-observation.mjs --label engines-off [--duration-sec 60] [--interval-sec 2] [--url http://192.168.1.135:3001]
 
-Captures only Signal K /electrical/alternators for controlled engine-state observations.
+Captures Signal K alternator and derived propulsion state for controlled engine-state observations.
 Suggested labels: engines-off, port-only, starboard-only, both-engines.
 `
 
@@ -66,15 +66,20 @@ let sampleNo = 0
 while ((Date.now() - started) / 1000 < durationSec || sampleNo === 0) {
   sampleNo += 1
   const capturedAt = new Date().toISOString()
-  const res = await fetch(`${baseUrl}/signalk/v1/api/vessels/self/electrical/alternators`, {
+  const res = await fetch(`${baseUrl}/signalk/v1/api/vessels/self`, {
     signal: AbortSignal.timeout(5000)
   })
-  if (!res.ok) throw new Error(`GET alternators failed: ${res.status} ${res.statusText}`)
+  if (!res.ok) throw new Error(`GET vessel state failed: ${res.status} ${res.statusText}`)
   const json = await res.json()
-  const rows = flatten(json).map(row => ({ captured_at: capturedAt, sample: sampleNo, ...row }))
+  const selected = {
+    electrical: { alternators: json?.electrical?.alternators ?? {} },
+    propulsion: json?.propulsion ?? {}
+  }
+  const rows = flatten(selected).map(row => ({ captured_at: capturedAt, sample: sampleNo, ...row }))
   samples.push(...rows)
   await fs.appendFile(samplesPath, JSON.stringify({ captured_at: capturedAt, sample: sampleNo, rows }) + '\n')
-  if ((Date.now() - started) / 1000 + intervalSec < durationSec) await sleep(intervalSec * 1000)
+  const remainingMs = durationSec * 1000 - (Date.now() - started)
+  if (remainingMs > 0) await sleep(Math.min(intervalSec * 1000, remainingMs))
 }
 
 const byPath = new Map()

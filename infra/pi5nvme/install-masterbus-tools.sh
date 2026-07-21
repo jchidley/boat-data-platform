@@ -61,11 +61,15 @@ install -m 0755 /home/jack/.cargo/bin/masterbus-signalk /usr/local/bin/masterbus
 install -m 0755 /home/jack/.cargo/bin/masterbus-set-field /usr/local/bin/masterbus-set-field
 
 install -d -m 0755 /etc/default/masterbus /etc/default/masterbus-signalk /var/lib/masterbus /srv/boat/masterbus
+install -d -m 0750 /srv/boat/masterbus/native-events
 chown jack:jack /srv/boat/masterbus
 install -m 0755 infra/pi5nvme/scripts/capture-masterbus-snapshot.sh /usr/local/bin/capture-masterbus-snapshot
 install -m 0644 infra/pi5nvme/masterbus/config.ini /etc/default/masterbus/config.ini
 install -m 0644 infra/pi5nvme/masterbus/masterbus-signalk.env /etc/default/masterbus-signalk/config
 install -m 0644 /home/jack/src/masterbus/crates/masterbus-tools/etc/masterbus-signalk.service /etc/systemd/system/masterbus-signalk.service
+install -d -m 0755 /etc/systemd/system/masterbus-signalk.service.d /etc/logrotate.d
+install -m 0644 infra/pi5nvme/systemd/masterbus-signalk-native.conf /etc/systemd/system/masterbus-signalk.service.d/native-events.conf
+install -m 0644 infra/pi5nvme/logrotate/boat-masterbus-native-events /etc/logrotate.d/boat-masterbus-native-events
 install -m 0644 infra/pi5nvme/udev/70-mastervolt-masterbus.rules /etc/udev/rules.d/70-mastervolt-masterbus.rules
 
 udevadm control --reload-rules

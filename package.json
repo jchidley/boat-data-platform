@@ -7,6 +7,8 @@
   "scripts": {
     "collect:masterbus-log": "node scripts/collect-masterbus-signalk-log.mjs",
     "convert:masterbus-copy": "node scripts/masterbus-jsonl-to-copy.mjs",
+    "convert:masterbus-native-copy": "node scripts/masterbus-native-jsonl-to-copy.mjs",
+    "import:masterbus:native-copy": "node scripts/import-masterbus-native-v1-copy.mjs",
     "import:n2k:v2-copy": "node scripts/import-n2k-v2-copy.mjs",
     "build:n2k-rust": "cargo build --release --manifest-path tools/n2k-rust-importer/Cargo.toml",
     "test:n2k-rust": "cargo test --release --manifest-path tools/n2k-rust-importer/Cargo.toml",

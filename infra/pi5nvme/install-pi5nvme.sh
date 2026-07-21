@@ -30,7 +30,7 @@ LIST
 apt-get update
 apt-get install -y timescaledb-2-postgresql-15 grafana
 
-install -d -m 0755 /srv/boat/raw-n2k/live /srv/boat/masterbus /srv/boat/masterbus/signalk-jsonl /srv/boat/processed /etc/boat-data-platform
+install -d -m 0755 /srv/boat/raw-n2k/live /srv/boat/masterbus /srv/boat/processed /etc/boat-data-platform
 chown -R jack:jack /srv/boat
 install -m 0755 "$SCRIPT_DIR/boat-raw-log-mirror.sh" /usr/local/bin/boat-raw-log-mirror
 install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-stream-segment-writer.sh" /usr/local/bin/boat-n2k-stream-segment-writer
@@ -44,9 +44,12 @@ install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-log-mirror.timer" /etc/systemd/sys
 install -m 0644 "$SCRIPT_DIR/systemd/boat-n2k-raw-receiver.service" /etc/systemd/system/boat-n2k-raw-receiver.service
 install -m 0644 "$SCRIPT_DIR/systemd/boat-derived-storage-guard.service" /etc/systemd/system/boat-derived-storage-guard.service
 install -m 0644 "$SCRIPT_DIR/systemd/boat-derived-storage-guard.timer" /etc/systemd/system/boat-derived-storage-guard.timer
-install -m 0644 "$SCRIPT_DIR/systemd/boat-masterbus-signalk-log.service" /etc/systemd/system/boat-masterbus-signalk-log.service
+# The old Signal K WebSocket JSONL logger is retained in the repository only as
+# a comparison/fallback tool. Native decoded events are logged inside the single
+# MasterBus USB owner installed by install-masterbus-tools.sh.
+systemctl disable --now boat-masterbus-signalk-log.service 2>/dev/null || true
+rm -f /etc/systemd/system/boat-masterbus-signalk-log.service
 install -d -m 0755 /etc/logrotate.d
-install -m 0644 "$SCRIPT_DIR/logrotate/boat-masterbus-signalk-jsonl" /etc/logrotate.d/boat-masterbus-signalk-jsonl
 systemctl enable --now postgresql
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='boatdata'" | grep -q 1 || sudo -u postgres createdb boatdata
 sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='boat_ingest'" | grep -q 1 || sudo -u postgres createuser boat_ingest
@@ -102,7 +105,7 @@ systemctl disable --now boat-signalk-collector.service 2>/dev/null || true
 rm -f /etc/systemd/system/boat-signalk-collector.service
 systemctl daemon-reload
 systemctl enable --now chrony.service || true
-systemctl enable --now boat-raw-log-mirror.timer boat-n2k-raw-receiver.service boat-masterbus-signalk-log.service boat-derived-storage-guard.timer grafana-server
+systemctl enable --now boat-raw-log-mirror.timer boat-n2k-raw-receiver.service boat-derived-storage-guard.timer grafana-server
 if ! grep -q '^GRAFANA_ADMIN_PASSWORD=' /etc/boat-data-platform/grafana.env 2>/dev/null; then
   umask 077
   grafana_pw=$(openssl rand -base64 24)

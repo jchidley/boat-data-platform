@@ -1,8 +1,47 @@
 diff --git a/crates/masterbus-tools/src/bin/masterbus-signalk.rs b/crates/masterbus-tools/src/bin/masterbus-signalk.rs
-index 987bebc..c1cd9ab 100644
+index 987bebc..b721056 100644
 --- a/crates/masterbus-tools/src/bin/masterbus-signalk.rs
 +++ b/crates/masterbus-tools/src/bin/masterbus-signalk.rs
-@@ -77,6 +77,7 @@ struct FieldRec {
+@@ -25,12 +25,13 @@
+ //! `true`/`false` flags while the service is stopped. Without `MAPPING`, every
+ //! mapped field is published.
+
+-use std::collections::{BTreeMap, BTreeSet, HashMap};
+-use std::io::Write;
++use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
++use std::fs::{File, OpenOptions};
++use std::io::{BufWriter, Write};
+ use std::net::{TcpListener, TcpStream};
+ use std::path::{Path, PathBuf};
+ use std::sync::{Arc, Mutex};
+-use std::time::{Duration, SystemTime, UNIX_EPOCH};
++use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+
+ use masterbus::{Config, DeviceId, FieldId, MasterBus, Menu, Value};
+ use serde_json::json;
+@@ -46,8 +47,11 @@ const RATE: Duration = Duration::from_millis(1000);
+
+ fn main() {
+     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
+-    let listen = std::env::args().nth(1).unwrap_or_else(|| DEFAULT_LISTEN.to_string());
++    let listen = std::env::args()
++        .nth(1)
++        .unwrap_or_else(|| DEFAULT_LISTEN.to_string());
+     let mapping = std::env::var_os("MAPPING").map(PathBuf::from);
++    let native_log_dir = std::env::var_os("MASTERBUS_NATIVE_LOG_DIR").map(PathBuf::from);
+
+     let bus = match MasterBus::auto(Config::default()) {
+         Ok(b) => b,
+@@ -56,7 +60,7 @@ fn main() {
+             std::process::exit(2);
+         }
+     };
+-    if let Err(e) = run(bus, &listen, mapping.as_deref()) {
++    if let Err(e) = run(bus, &listen, mapping.as_deref(), native_log_dir.as_deref()) {
+         eprintln!("masterbus-signalk: {e}");
+         std::process::exit(1);
+     }
+@@ -77,21 +81,95 @@ struct FieldRec {
  struct FieldMeta {
      class: String,
      instance: String,
@@ -10,25 +49,287 @@ index 987bebc..c1cd9ab 100644
      name: String,
      unit: String,
  }
-@@ -231,7 +232,7 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+
++/// Append-only, hourly native decoded field-event logger. PostgreSQL imports
++/// these files; Signal K mapping is deliberately not the historical source.
++struct NativeLogger {
++    dir: PathBuf,
++    hour: String,
++    out: BufWriter<File>,
++    last: HashMap<(DeviceId, FieldId), (Value, SystemTime)>,
++}
++
++impl NativeLogger {
++    fn open(dir: &Path, timestamp: &str) -> std::io::Result<Self> {
++        std::fs::create_dir_all(dir)?;
++        let hour = timestamp[..13].replace(['-', ':'], "");
++        let path = dir.join(format!("masterbus-native-{hour}0000Z.jsonl"));
++        let out = BufWriter::new(OpenOptions::new().create(true).append(true).open(path)?);
++        Ok(Self {
++            dir: dir.to_path_buf(),
++            hour,
++            out,
++            last: HashMap::new(),
++        })
++    }
++
++    fn write(
++        &mut self,
++        timestamp: &str,
++        device: DeviceId,
++        field: FieldId,
++        meta: &FieldMeta,
++        value: &Value,
++    ) -> std::io::Result<()> {
++        let now = SystemTime::now();
++        if let Some((previous, written_at)) = self.last.get(&(device, field))
++            && previous == value
++            && now.duration_since(*written_at).unwrap_or_default() < Duration::from_secs(60)
++        {
++            return Ok(());
++        }
++        self.last.insert((device, field), (value.clone(), now));
++        let hour = timestamp[..13].replace(['-', ':'], "");
++        if hour != self.hour {
++            self.out.flush()?;
++            *self = Self::open(&self.dir, timestamp)?;
++        }
++        serde_json::to_writer(
++            &mut self.out,
++            &json!({
++                "schema": "masterbus-native-event-v1",
++                "decoderVersion": env!("CARGO_PKG_VERSION"),
++                "observedAt": timestamp,
++                "device": device.to_string(),
++                "field": field,
++                "class": meta.class,
++                "instance": meta.instance,
++                "group": meta.group,
++                "name": meta.name,
++                "unit": meta.unit,
++                "value": value,
++            }),
++        )?;
++        self.out.write_all(b"\n")
++    }
++
++    fn flush(&mut self) -> std::io::Result<()> {
++        self.out.flush()
++    }
++}
++
+ /// Parse a mapping file (`<instance>.<menu>[.<group>] = true|false`, `#` comments).
+ fn load_mapping(path: &Path) -> BTreeMap<String, bool> {
+     let mut map = BTreeMap::new();
+-    let Ok(text) = std::fs::read_to_string(path) else { return map };
++    let Ok(text) = std::fs::read_to_string(path) else {
++        return map;
++    };
+     for line in text.lines() {
+         let line = line.trim();
+         if line.is_empty() || line.starts_with('#') {
+             continue;
+         }
+         if let Some((k, v)) = line.split_once('=') {
+-            let on = matches!(v.trim().to_ascii_lowercase().as_str(), "true" | "1" | "yes" | "on");
++            let on = matches!(
++                v.trim().to_ascii_lowercase().as_str(),
++                "true" | "1" | "yes" | "on"
++            );
+             map.insert(k.trim().to_string(), on);
+         }
+     }
+@@ -117,7 +195,10 @@ fn save_mapping(
+         let glist = groups.iter().cloned().collect::<Vec<_>>().join(", ");
+         out.push_str(&format!("# {instance} \u{2014} groups: {glist}\n"));
+         let mk = format!("{instance}.{MENU}");
+-        out.push_str(&format!("{mk} = {}\n", map.get(&mk).copied().unwrap_or(false)));
++        out.push_str(&format!(
++            "{mk} = {}\n",
++            map.get(&mk).copied().unwrap_or(false)
++        ));
+         for g in groups {
+             let gk = format!("{instance}.{MENU}.{g}");
+             if let Some(&v) = map.get(&gk) {
+@@ -141,11 +222,19 @@ fn enabled(map: &BTreeMap<String, bool>, instance: &str, menu: &str, group: &str
+     group == "cluster"
+ }
+
+-fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Result<()> {
++fn run(
++    bus: MasterBus,
++    listen: &str,
++    mapping_path: Option<&Path>,
++    native_log_dir: Option<&Path>,
++) -> std::io::Result<()> {
+     // TCP server: clients (e.g. a Signal K server) connect and receive the delta
+     // stream. The listener thread appends new connections to the shared set.
+     let listener = TcpListener::bind(listen)?;
+-    eprintln!("masterbus-signalk: listening on {} (Signal K delta, ndjson)", listener.local_addr()?);
++    eprintln!(
++        "masterbus-signalk: listening on {} (Signal K delta, ndjson)",
++        listener.local_addr()?
++    );
+     let clients: Arc<Mutex<Vec<TcpStream>>> = Arc::new(Mutex::new(Vec::new()));
+     {
+         let clients = clients.clone();
+@@ -153,7 +242,10 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+             for stream in listener.incoming().flatten() {
+                 let _ = stream.set_nodelay(true);
+                 let _ = stream.set_write_timeout(Some(Duration::from_secs(5)));
+-                eprintln!("masterbus-signalk: client connected: {:?}", stream.peer_addr().ok());
++                eprintln!(
++                    "masterbus-signalk: client connected: {:?}",
++                    stream.peer_addr().ok()
++                );
+                 clients.lock().unwrap().push(stream);
+             }
+         });
+@@ -162,6 +254,8 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+     // Discover the monitoring menu of every device, recording each field with its
+     // (sanitized) group so the mapping file can gate it.
+     let devices = bus.devices_all();
++    let initial_devices: HashSet<DeviceId> = devices.iter().map(|device| device.id()).collect();
++    let mut next_device_check = Instant::now() + Duration::from_secs(60);
+     let mut fields: Vec<FieldRec> = Vec::new();
+     let mut groups_by_instance: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+     for dev in &devices {
+@@ -169,7 +263,11 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+         let class = name.split_whitespace().next().unwrap_or("").to_string();
+         // Instance id = the device name without its leading class word (already
+         // implied by the SK path category), lowercased/sanitized.
+-        let label = name.split_whitespace().skip(1).collect::<Vec<_>>().join(" ");
++        let label = name
++            .split_whitespace()
++            .skip(1)
++            .collect::<Vec<_>>()
++            .join(" ");
+         let instance = if !label.is_empty() {
+             sanitize(&label)
+         } else if !name.is_empty() {
+@@ -178,10 +276,15 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+             dev.id().to_string()
+         };
+
+-        let Ok(groups) = dev.tab(Menu::Monitoring) else { continue };
++        let Ok(groups) = dev.tab(Menu::Monitoring) else {
++            continue;
++        };
+         for group in groups {
+             let gname = sanitize(&group.name().unwrap_or_default());
+-            groups_by_instance.entry(instance.clone()).or_default().insert(gname.clone());
++            groups_by_instance
++                .entry(instance.clone())
++                .or_default()
++                .insert(gname.clone());
+             for field in group.fields().unwrap_or_default() {
+                 fields.push(FieldRec {
+                     device: dev.id(),
+@@ -231,7 +334,13 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
          if on {
              meta.insert(
                  (f.device, f.index),
 -                FieldMeta { class: f.class.clone(), instance: f.instance.clone(), name: f.name.clone(), unit: f.unit.clone() },
-+                FieldMeta { class: f.class.clone(), instance: f.instance.clone(), group: f.group.clone(), name: f.name.clone(), unit: f.unit.clone() },
++                FieldMeta {
++                    class: f.class.clone(),
++                    instance: f.instance.clone(),
++                    group: f.group.clone(),
++                    name: f.name.clone(),
++                    unit: f.unit.clone(),
++                },
              );
              per_device.entry(f.device).or_default().push(f.index);
          }
-@@ -262,7 +263,7 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+@@ -240,6 +349,9 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+     for (device, indices) in per_device {
+         subs.push(bus.subscribe(device, indices, RATE, false));
+     }
++    let mut native_logger = native_log_dir
++        .map(|dir| NativeLogger::open(dir, &now_rfc3339()))
++        .transpose()?;
+
+     eprintln!(
+         "masterbus-signalk: streaming {} of {} fields from {} device(s){}",
+@@ -248,8 +360,30 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+         devices.len(),
+         if gated { " (mapping-gated)" } else { "" },
+     );
++    if let Some(dir) = native_log_dir {
++        eprintln!(
++            "masterbus-signalk: native decoded events logging to {}",
++            dir.display()
++        );
++    }
+
+     loop {
++        // Discovery is intentionally rebuilt through the normal startup path.
++        // If a device was absent during initial discovery but later appears,
++        // exit with an error so systemd restarts us and subscribes its fields.
++        if Instant::now() >= next_device_check {
++            let current: HashSet<DeviceId> =
++                bus.devices().iter().map(|device| device.id()).collect();
++            if current
++                .iter()
++                .any(|device| !initial_devices.contains(device))
++            {
++                return Err(std::io::Error::other(
++                    "new MasterBus device appeared; restarting discovery",
++                ));
++            }
++            next_device_check = Instant::now() + Duration::from_secs(60);
++        }
+         // Skip building deltas when nobody is listening (the channels are still
+         // drained below so they don't grow unbounded).
+         let have_clients = !clients.lock().unwrap().is_empty();
+@@ -260,16 +394,28 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+             // values rapidly, and we emit those too).
+             let mut latest: HashMap<String, serde_json::Value> = HashMap::new();
              while let Some(u) = sub.try_recv() {
-                 if have_clients
-                     && let Some(m) = meta.get(&(u.device, u.field))
+-                if have_clients
+-                    && let Some(m) = meta.get(&(u.device, u.field))
 -                    && let Some((path, value)) = map_field(&m.class, &m.instance, &m.name, &m.unit, &u.value)
-+                    && let Some((path, value)) = map_field(&m.class, &m.instance, &m.group, &m.name, &m.unit, &u.value)
-                 {
-                     latest.insert(path, value);
+-                {
+-                    latest.insert(path, value);
++                if let Some(m) = meta.get(&(u.device, u.field)) {
++                    let mapped =
++                        map_field(&m.class, &m.instance, &m.group, &m.name, &m.unit, &u.value);
++                    if mapped.is_some() {
++                        let observed_at = now_rfc3339();
++                        if let Some(logger) = native_logger.as_mut()
++                            && let Err(e) =
++                                logger.write(&observed_at, u.device, u.field, m, &u.value)
++                        {
++                            eprintln!("masterbus-signalk: native event log write failed: {e}");
++                        }
++                    }
++                    if have_clients && let Some((path, value)) = mapped {
++                        latest.insert(path, value);
++                    }
                  }
-@@ -302,6 +303,7 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+             }
+             if !latest.is_empty() {
+-                let values: Vec<_> =
+-                    latest.into_iter().map(|(path, value)| json!({ "path": path, "value": value })).collect();
++                let values: Vec<_> = latest
++                    .into_iter()
++                    .map(|(path, value)| json!({ "path": path, "value": value }))
++                    .collect();
+                 let delta = json!({
+                     "updates": [{
+                         "$source": "masterbus",
+@@ -281,6 +427,11 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+                 batch.push(b'\n');
+             }
+         }
++        if let Some(logger) = native_logger.as_mut()
++            && let Err(e) = logger.flush()
++        {
++            eprintln!("masterbus-signalk: native event log flush failed: {e}");
++        }
+         if !batch.is_empty() {
+             let mut cs = clients.lock().unwrap();
+             let before = cs.len();
+@@ -302,6 +453,7 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
  fn map_field(
      class: &str,
      id: &str,
@@ -36,20 +337,44 @@ index 987bebc..c1cd9ab 100644
      name: &str,
      unit: &str,
      value: &Value,
-@@ -323,15 +325,41 @@ fn map_field(
+@@ -316,24 +468,86 @@ fn map_field(
+         _ => None,
+     };
+     let seconds = match value {
+-        Value::Time(t) => {
+-            Some(t.days as f64 * 86400.0 + t.hour as f64 * 3600.0 + t.min as f64 * 60.0 + t.sec as f64)
+-        }
++        Value::Time(t) => Some(
++            t.days as f64 * 86400.0 + t.hour as f64 * 3600.0 + t.min as f64 * 60.0 + t.sec as f64,
++        ),
+         _ => None,
      };
      let num = |v: f64| serde_json::Value::from(v);
 
 +    if id.starts_with("alpha-") {
 +        let alt = format!("electrical.alternators.{id}");
 +        match (group, name, unit) {
-+            ("shunt", "Battery current", "A") => return float.map(|v| (format!("{alt}.current"), num(v))),
-+            ("shunt", "Battery voltage", "V") => return float.map(|v| (format!("{alt}.voltage"), num(v))),
-+            ("shunt", "Battery temp.", "\u{b0}C") => return celsius.map(|c| (format!("{alt}.temperature"), num(c + 273.15))),
-+            ("alternator", "Alternator volt.", "V") => return float.map(|v| (format!("{alt}.alternatorVoltage"), num(v))),
-+            ("alternator", "Sense voltage", "V") => return float.map(|v| (format!("{alt}.senseVoltage"), num(v))),
-+            ("alternator", "Field current", "A") => return float.map(|v| (format!("{alt}.fieldCurrent"), num(v))),
-+            ("alternator", "Alternator temp.", "\u{b0}C") => return celsius.map(|c| (format!("{alt}.alternatorTemperature"), num(c + 273.15))),
++            ("shunt", "Battery current", "A") => {
++                return float.map(|v| (format!("{alt}.current"), num(v)));
++            }
++            ("shunt", "Battery voltage", "V") => {
++                return float.map(|v| (format!("{alt}.voltage"), num(v)));
++            }
++            ("shunt", "Battery temp.", "\u{b0}C") => {
++                return celsius.map(|c| (format!("{alt}.temperature"), num(c + 273.15)));
++            }
++            ("alternator", "Alternator volt.", "V") => {
++                return float.map(|v| (format!("{alt}.alternatorVoltage"), num(v)));
++            }
++            ("alternator", "Sense voltage", "V") => {
++                return float.map(|v| (format!("{alt}.senseVoltage"), num(v)));
++            }
++            ("alternator", "Field current", "A") => {
++                return float.map(|v| (format!("{alt}.fieldCurrent"), num(v)));
++            }
++            ("alternator", "Alternator temp.", "\u{b0}C") => {
++                return celsius.map(|c| (format!("{alt}.alternatorTemperature"), num(c + 273.15)));
++            }
 +            _ => {}
 +        }
 +    }
@@ -57,11 +382,21 @@ index 987bebc..c1cd9ab 100644
 +    if id.ends_with("-solars") {
 +        let solar = format!("electrical.solar.{id}");
 +        match (name, unit) {
-+            ("Solar voltage", "V") => return float.map(|v| (format!("{solar}.panelVoltage"), num(v))),
-+            ("Charge current", "A") => return float.map(|v| (format!("{solar}.chargeCurrent"), num(v))),
-+            ("Battery voltage", "V") => return float.map(|v| (format!("{solar}.batteryVoltage"), num(v))),
-+            ("Battery temp.", "\u{b0}C") => return celsius.map(|c| (format!("{solar}.temperature"), num(c + 273.15))),
-+            ("Total energy", "kWh") => return float.map(|kwh| (format!("{solar}.yieldTotal"), num(kwh * 3_600_000.0))),
++            ("Solar voltage", "V") => {
++                return float.map(|v| (format!("{solar}.panelVoltage"), num(v)));
++            }
++            ("Charge current", "A") => {
++                return float.map(|v| (format!("{solar}.chargeCurrent"), num(v)));
++            }
++            ("Battery voltage", "V") => {
++                return float.map(|v| (format!("{solar}.batteryVoltage"), num(v)));
++            }
++            ("Battery temp.", "\u{b0}C") => {
++                return celsius.map(|c| (format!("{solar}.temperature"), num(c + 273.15)));
++            }
++            ("Total energy", "kWh") => {
++                return float.map(|kwh| (format!("{solar}.yieldTotal"), num(kwh * 3_600_000.0)));
++            }
 +            _ => {}
 +        }
 +    }
@@ -71,13 +406,92 @@ index 987bebc..c1cd9ab 100644
          "BAT" => {
              let b = format!("electrical.batteries.{id}");
              match (name, unit) {
-                 ("State of charge", _) => float.map(|v| (format!("{b}.capacity.stateOfCharge"), num(v / 100.0))),
+-                ("State of charge", _) => float.map(|v| (format!("{b}.capacity.stateOfCharge"), num(v / 100.0))),
 -                ("Battery", "V") => float.map(|v| (format!("{b}.voltage"), num(v))),
 -                ("Battery", "A") => float.map(|v| (format!("{b}.current"), num(v))),
 -                ("Battery", "\u{b0}C") => celsius.map(|c| (format!("{b}.temperature"), num(c + 273.15))),
-+                ("Battery", "V") | ("Voltage", "V") => float.map(|v| (format!("{b}.voltage"), num(v))),
-+                ("Battery", "A") | ("Current", "A") => float.map(|v| (format!("{b}.current"), num(v))),
-+                ("Battery", "\u{b0}C") | ("Temperature", "\u{b0}C") => celsius.map(|c| (format!("{b}.temperature"), num(c + 273.15))),
-                 ("Time remaining", _) => seconds.map(|s| (format!("{b}.capacity.timeRemaining"), num(s))),
-                 ("Cap. consumed", _) => float.map(|ah| (format!("{b}.capacity.dischargeSinceFull"), num(ah * 3600.0))),
+-                ("Time remaining", _) => seconds.map(|s| (format!("{b}.capacity.timeRemaining"), num(s))),
+-                ("Cap. consumed", _) => float.map(|ah| (format!("{b}.capacity.dischargeSinceFull"), num(ah * 3600.0))),
++                ("State of charge", _) => {
++                    float.map(|v| (format!("{b}.capacity.stateOfCharge"), num(v / 100.0)))
++                }
++                ("Battery", "V") | ("Voltage", "V") => {
++                    float.map(|v| (format!("{b}.voltage"), num(v)))
++                }
++                ("Battery", "A") | ("Current", "A") => {
++                    float.map(|v| (format!("{b}.current"), num(v)))
++                }
++                ("Battery", "\u{b0}C") | ("Temperature", "\u{b0}C") => {
++                    celsius.map(|c| (format!("{b}.temperature"), num(c + 273.15)))
++                }
++                ("Time remaining", _) => {
++                    seconds.map(|s| (format!("{b}.capacity.timeRemaining"), num(s)))
++                }
++                ("Cap. consumed", _) => {
++                    float.map(|ah| (format!("{b}.capacity.dischargeSinceFull"), num(ah * 3600.0)))
++                }
                  _ => None,
+             }
+         }
+@@ -344,16 +558,26 @@ fn map_field(
+             match (name, unit) {
+                 ("Battery voltage", "V") => float.map(|v| (format!("{inv}.dc.voltage"), num(v))),
+                 ("Battery current", "A") => float.map(|v| (format!("{inv}.dc.current"), num(v))),
+-                ("Battery temp.", "\u{b0}C") => celsius.map(|c| (format!("{inv}.dc.temperature"), num(c + 273.15))),
++                ("Battery temp.", "\u{b0}C") => {
++                    celsius.map(|c| (format!("{inv}.dc.temperature"), num(c + 273.15)))
++                }
+                 ("Output voltage", "V") => float.map(|v| (format!("{inv}.ac.voltage"), num(v))),
+                 ("Output power", "W") => float.map(|v| (format!("{inv}.ac.power"), num(v))),
+-                ("Output frequency", "Hz") => float.map(|v| (format!("{inv}.ac.frequency"), num(v))),
++                ("Output frequency", "Hz") => {
++                    float.map(|v| (format!("{inv}.ac.frequency"), num(v)))
++                }
+                 ("Input voltage", "V") => float.map(|v| (format!("{chg}.acin.voltage"), num(v))),
+                 ("Input current", "A") => float.map(|v| (format!("{chg}.acin.current"), num(v))),
+-                ("Input frequency", "Hz") => float.map(|v| (format!("{chg}.acin.frequency"), num(v))),
++                ("Input frequency", "Hz") => {
++                    float.map(|v| (format!("{chg}.acin.frequency"), num(v)))
++                }
+                 ("AC IN limit", "A") => float.map(|v| (format!("{chg}.acin.currentLimit"), num(v))),
+-                ("Inverter", _) => boolean.map(|b| (format!("{inv}.enabled"), serde_json::Value::Bool(b))),
+-                ("Charger", _) => boolean.map(|b| (format!("{chg}.enabled"), serde_json::Value::Bool(b))),
++                ("Inverter", _) => {
++                    boolean.map(|b| (format!("{inv}.enabled"), serde_json::Value::Bool(b)))
++                }
++                ("Charger", _) => {
++                    boolean.map(|b| (format!("{chg}.enabled"), serde_json::Value::Bool(b)))
++                }
+                 _ => None,
+             }
+         }
+@@ -366,14 +590,26 @@ fn map_field(
+ fn sanitize(s: &str) -> String {
+     let cleaned: String = s
+         .chars()
+-        .map(|c| if c.is_ascii_alphanumeric() || c == '-' { c.to_ascii_lowercase() } else { '-' })
++        .map(|c| {
++            if c.is_ascii_alphanumeric() || c == '-' {
++                c.to_ascii_lowercase()
++            } else {
++                '-'
++            }
++        })
+         .collect();
+-    if cleaned.is_empty() { "0".into() } else { cleaned }
++    if cleaned.is_empty() {
++        "0".into()
++    } else {
++        cleaned
++    }
+ }
+
+ /// Current UTC time as an ISO-8601 / RFC-3339 string (no date dependency).
+ fn now_rfc3339() -> String {
+-    let d = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default();
++    let d = SystemTime::now()
++        .duration_since(UNIX_EPOCH)
++        .unwrap_or_default();
+     let secs = d.as_secs();
+     let millis = d.subsec_millis();
+     let (h, m, s) = ((secs / 3600) % 24, (secs / 60) % 60, secs % 60);

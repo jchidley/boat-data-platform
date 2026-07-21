@@ -14,7 +14,7 @@ NMEA 2000:
 
 MasterBus/Mastervolt:
   discovery/config/mapping snapshots from pi5nvme
-  mapped JSONL replay logs until a rawer native event source is available
+  append-only native decoded field-event logs captured before Signal K mapping
 
 Repository:
   scripts, SQL, systemd units, docs, and config templates
@@ -25,14 +25,13 @@ Derived/rebuildable:
 ```text
 Signal K current state/cache
 TimescaleDB decoded N2K rows
-TimescaleDB Signal K measurement rows
 inventory tables/views
 summary tables/views
 Grafana dashboards, if provisioned from repo
 optional sidecar summaries
 ```
 
-Important caveat: MasterBus history cannot be rebuilt from NMEA 2000 candump logs. Preserve mapped JSONL replay logs and snapshots now, and pursue a rawer native event source. PostgreSQL remains derived; it must not be the only copy of MasterBus historical source material.
+Important caveat: MasterBus history cannot be rebuilt from NMEA 2000 candump logs. Preserve `/srv/boat/masterbus/native-events/` and discovery/config snapshots. Mapped Signal K JSONL is comparison/fallback evidence only. PostgreSQL remains derived and must not be the only copy of MasterBus historical source material.
 
 ## Must-preserve locations
 
@@ -68,7 +67,7 @@ A rebuild should need only:
 
 1. this repository;
 2. raw N2K candump logs from `/srv/boat/raw-n2k/` or `/var/log/n2k/`;
-3. MasterBus snapshots/configs from `/srv/boat/masterbus/` and/or current USB rediscovery;
+3. MasterBus native event logs and snapshots/configs from `/srv/boat/masterbus/`, plus current USB rediscovery where available;
 4. local credential/env files from `/etc/boat-data-platform/` or regenerated equivalents.
 
 ## Rebuild outline
@@ -205,7 +204,7 @@ raw N2K files present and checksummed
 Signal K current N2K and MasterBus paths fresh
 selected typed N2K rows traceable to raw_file_id/message_index
 no broad research EAV rows from normal imports
-MasterBus replay logs/snapshots present and selected typed rows rebuildable from them
+native MasterBus event logs/snapshots present and selected typed rows rebuildable from them
 known devices/PGNs visible in typed inventory views
 ```
 

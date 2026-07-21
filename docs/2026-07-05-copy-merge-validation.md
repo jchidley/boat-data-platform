@@ -124,6 +124,12 @@ A bounded real mapped Signal K JSONL validation completed on 2026-07-21. A 65-se
 
 This validation found and fixed an inventory bug: merge previously replaced the source JSONL `line_count` with the number of coalesced typed rows. Source line count now remains immutable import provenance.
 
+### Native MasterBus source validation
+
+On 2026-07-21, native `masterbus-native-event-v1` capture was deployed inside `masterbus-signalk` before Signal K mapping. A live 257-event sample converted with zero skips into 82 alternator, 77 battery, 57 inverter/charger and 41 solar staging rows. Repeated merge into a disposable PostgreSQL clone remained idempotent at 69 alternator, 42 battery, 45 inverter/charger and 30 solar typed rows; lower merged counts reflect sparse same-timestamp/device coalescing. No batch was loaded into live PostgreSQL.
+
+During a physical starboard-only run at approximately 1500 RPM, Signal K reported `alpha-stbd.senseVoltage` around 13.79 V, field current around 3.02 A, alternator voltage around 13.72 V and the derived starboard engine state `started`. Port sense voltage was 0 V. The observation also exposed a startup-only discovery failure; restarting the bridge recovered both Alpha paths, and the deployed bridge now requests a systemd restart if a previously absent device later appears.
+
 ## Current limitations
 
 - Validation samples are deliberately small.

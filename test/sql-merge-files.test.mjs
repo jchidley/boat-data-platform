@@ -4,6 +4,7 @@ import fs from 'node:fs'
 
 const n2kSchemaSql = fs.readFileSync('infra/pi5nvme/sql/005_relational_n2k_v2.sql', 'utf8')
 const n2kSql = fs.readFileSync('infra/pi5nvme/sql/007_n2k_v2_merge.sql', 'utf8')
+const masterbusSchemaSql = fs.readFileSync('infra/pi5nvme/sql/006_masterbus_v1.sql', 'utf8')
 const masterbusSql = fs.readFileSync('infra/pi5nvme/sql/008_masterbus_v1_merge.sql', 'utf8')
 const inventoryViewsSql = fs.readFileSync('infra/pi5nvme/sql/009_inventory_views.sql', 'utf8')
 const cleanupSql = fs.readFileSync('infra/pi5nvme/sql/010_end_state_cleanup.sql', 'utf8')
@@ -102,6 +103,7 @@ test('engine history SQL is native-source, deterministic, indexed, and gap-aware
 })
 
 test('MasterBus v1 merge SQL covers typed tables and import status', () => {
+  assert.match(masterbusSchemaSql, /GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO boat_ingest;/)
   assert.match(masterbusSql, /CREATE OR REPLACE FUNCTION masterbus_merge_staged_log_v1\(p_log_file_id bigint\)/)
   for (const table of [
     'masterbus_alternator_samples_v1',

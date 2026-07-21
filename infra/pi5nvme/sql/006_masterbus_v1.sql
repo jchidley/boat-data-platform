@@ -117,6 +117,6 @@ CREATE UNLOGGED TABLE IF NOT EXISTS masterbus_battery_stage_v1 (LIKE masterbus_b
 CREATE UNLOGGED TABLE IF NOT EXISTS masterbus_inverter_charger_stage_v1 (LIKE masterbus_inverter_charger_samples_v1 INCLUDING DEFAULTS);
 CREATE UNLOGGED TABLE IF NOT EXISTS masterbus_solar_stage_v1 (LIKE masterbus_solar_samples_v1 INCLUDING DEFAULTS);
 
-GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO boat_ingest;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO boat_ingest;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO boat_ingest;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO grafana_reader;

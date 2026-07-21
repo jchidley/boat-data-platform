@@ -10,7 +10,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
 
 apt-get update
-apt-get install -y ca-certificates curl gnupg lsb-release rsync postgresql postgresql-contrib nodejs socat gzip chrony
+apt-get install -y ca-certificates curl gnupg lsb-release rsync postgresql postgresql-contrib nodejs socat gzip chrony logrotate
 
 install -d -m 0755 /etc/apt/keyrings
 if [ ! -f /etc/apt/keyrings/timescale.gpg ]; then
@@ -30,21 +30,23 @@ LIST
 apt-get update
 apt-get install -y timescaledb-2-postgresql-15 grafana
 
-install -d -m 0755 /srv/boat/raw-n2k/live /srv/boat/masterbus /srv/boat/processed /etc/boat-data-platform
+install -d -m 0755 /srv/boat/raw-n2k/live /srv/boat/masterbus /srv/boat/masterbus/signalk-jsonl /srv/boat/processed /etc/boat-data-platform
 chown -R jack:jack /srv/boat
 install -m 0755 "$SCRIPT_DIR/boat-raw-log-mirror.sh" /usr/local/bin/boat-raw-log-mirror
 install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-stream-segment-writer.sh" /usr/local/bin/boat-n2k-stream-segment-writer
 install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-raw-receiver.sh" /usr/local/bin/boat-n2k-raw-receiver
 install -m 0755 "$SCRIPT_DIR/scripts/boat-n2k-raw-receiver.mjs" /usr/local/bin/boat-n2k-raw-receiver.mjs
 install -m 0755 "$SCRIPT_DIR/scripts/check-pi5-boat-health.sh" /usr/local/bin/check-pi5-boat-health
+install -m 0755 "$SCRIPT_DIR/scripts/check-derived-storage-pressure.sh" /usr/local/bin/check-derived-storage-pressure
 install -m 0755 "$SCRIPT_DIR/scripts/capture-masterbus-snapshot.sh" /usr/local/bin/capture-masterbus-snapshot
 install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-log-mirror.service" /etc/systemd/system/boat-raw-log-mirror.service
 install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-log-mirror.timer" /etc/systemd/system/boat-raw-log-mirror.timer
 install -m 0644 "$SCRIPT_DIR/systemd/boat-n2k-raw-receiver.service" /etc/systemd/system/boat-n2k-raw-receiver.service
-install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-n2k-import.service" /etc/systemd/system/boat-raw-n2k-import.service
-install -m 0644 "$SCRIPT_DIR/systemd/boat-raw-n2k-import.timer" /etc/systemd/system/boat-raw-n2k-import.timer
-install -m 0644 "$SCRIPT_DIR/systemd/boat-signalk-collector.service" /etc/systemd/system/boat-signalk-collector.service
-
+install -m 0644 "$SCRIPT_DIR/systemd/boat-derived-storage-guard.service" /etc/systemd/system/boat-derived-storage-guard.service
+install -m 0644 "$SCRIPT_DIR/systemd/boat-derived-storage-guard.timer" /etc/systemd/system/boat-derived-storage-guard.timer
+install -m 0644 "$SCRIPT_DIR/systemd/boat-masterbus-signalk-log.service" /etc/systemd/system/boat-masterbus-signalk-log.service
+install -d -m 0755 /etc/logrotate.d
+install -m 0644 "$SCRIPT_DIR/logrotate/boat-masterbus-signalk-jsonl" /etc/logrotate.d/boat-masterbus-signalk-jsonl
 systemctl enable --now postgresql
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='boatdata'" | grep -q 1 || sudo -u postgres createdb boatdata
 sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname='boat_ingest'" | grep -q 1 || sudo -u postgres createuser boat_ingest
@@ -94,13 +96,13 @@ if [ -f "$REPO_ROOT/package.json" ]; then
   sudo -u jack bash -lc "cd '$REPO_ROOT' && npm install"
 fi
 
+# Enforce the two-path end state: Signal K is live-only; PostgreSQL is fed from
+# typed N2K/MasterBus source conversion, not a Signal K telemetry collector.
+systemctl disable --now boat-signalk-collector.service 2>/dev/null || true
+rm -f /etc/systemd/system/boat-signalk-collector.service
 systemctl daemon-reload
 systemctl enable --now chrony.service || true
-systemctl enable --now boat-raw-log-mirror.timer boat-n2k-raw-receiver.service grafana-server
-# Raw N2K import/backfill is intentionally opt-in after the 2026-07-03 pi5nvme
-# overload incident. Install the units, but do not enable the timer by default.
-systemctl disable --now boat-raw-n2k-import.timer boat-raw-n2k-import.service 2>/dev/null || true
-
+systemctl enable --now boat-raw-log-mirror.timer boat-n2k-raw-receiver.service boat-masterbus-signalk-log.service boat-derived-storage-guard.timer grafana-server
 if ! grep -q '^GRAFANA_ADMIN_PASSWORD=' /etc/boat-data-platform/grafana.env 2>/dev/null; then
   umask 077
   grafana_pw=$(openssl rand -base64 24)

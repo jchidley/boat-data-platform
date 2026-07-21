@@ -7,7 +7,7 @@ Use this when `pi5nvme` is down or unreachable. Keep checks low-impact; `picanm`
 ```bash
 check-picanm-health
 check-raw-spool-space
-systemctl is-active can0-nmea2000 n2k-raw-logger n2k-raw-forwarder signalk
+systemctl is-active can0-nmea2000 n2k-raw-logger n2k-raw-forwarder
 journalctl -u n2k-raw-forwarder -n 30 --no-pager
 ```
 
@@ -22,6 +22,8 @@ Expected while `pi5nvme` is offline:
 ## Do not do on picanm
 
 Do not run decode/import/database/analyzer jobs on `picanm`.
+
+Do not install/start Signal K, Node.js, or npm on `picanm` unless there is a new explicit requirement.
 
 Do not delete raw logs unless all are safely mirrored to `pi5nvme` and checksummed. While `pi5nvme` is down, assume `picanm:/var/log/n2k/` is the only current raw source of truth.
 

@@ -1,10 +1,10 @@
 # Rebuild from source material
 
-This runbook defines what must be preserved and how the experimental boat data platform should be rebuilt if derived state is deleted or a host is reinstalled.
+This runbook defines what must be preserved and how the boat data platform end state is rebuilt if derived state is deleted or a host is reinstalled.
 
 ## Rebuild principle
 
-The system is experimental. Preserve source material and documentation; treat derived stores as rebuildable.
+Preserve source material and documentation; treat Signal K state and PostgreSQL history as rebuildable outputs.
 
 Source material:
 
@@ -14,6 +14,7 @@ NMEA 2000:
 
 MasterBus/Mastervolt:
   discovery/config/mapping snapshots from pi5nvme
+  mapped JSONL replay logs until a rawer native event source is available
 
 Repository:
   scripts, SQL, systemd units, docs, and config templates
@@ -31,7 +32,7 @@ Grafana dashboards, if provisioned from repo
 optional sidecar summaries
 ```
 
-Important caveat: MasterBus historical values cannot be rebuilt from NMEA 2000 candump logs. If long-term MasterBus history matters, it must be retained in TimescaleDB or captured separately. The minimum source-material requirement is enough MasterBus discovery/config data to rediscover and remap the system.
+Important caveat: MasterBus history cannot be rebuilt from NMEA 2000 candump logs. Preserve mapped JSONL replay logs and snapshots now, and pursue a rawer native event source. PostgreSQL remains derived; it must not be the only copy of MasterBus historical source material.
 
 ## Must-preserve locations
 
@@ -91,8 +92,6 @@ signalk-pi5nvme
 masterbus-signalk
 boat-n2k-raw-receiver.service
 boat-raw-log-mirror.timer
-boat-signalk-collector.service
-boat-raw-n2k-import.timer
 ```
 
 ### 2. Restore raw N2K archive
@@ -140,54 +139,33 @@ Run committed SQL migrations from:
 infra/pi5nvme/sql/
 ```
 
-Expected core tables:
+Expected core layers:
 
 ```text
-boatdata.signal_k_measurements
-boatdata.n2k_decoded_messages
-boatdata.raw_n2k_log_files
-boatdata.masterbus_snapshots
+n2k_raw_files_v2                  raw-file provenance and import status
+n2k_<pgn-shaped>_v2               selected typed N2K history
+masterbus_*_samples_v1            selected typed MasterBus history
+health_observations               bounded health evidence
 ```
 
-Expected rebuildable inventory tables or views:
+Recreate inventory and app-facing views from typed tables.
+
+### 5. Re-import selected raw N2K history
+
+Historical conversion is a high CPU, memory, disk I/O, and PostgreSQL workload. Run it offline or on staging with explicit resource and disk limits.
+
+Current rebuild path:
 
 ```text
-boatdata.masterbus_snapshots
-boatdata.n2k_pgn_inventory
-boatdata.n2k_source_inventory
-boatdata.n2k_decode_examples
-boatdata.boat_data_summaries
-boatdata.data_quality_observations
+raw candump.gz
+  -> offline/staging analyzer/canboat
+  -> PGN-shaped TSV staging files
+  -> PostgreSQL COPY into unlogged staging tables
+  -> selected typed PGN tables with raw-file provenance
+  -> summaries/import status
 ```
 
-### 5. Re-import raw N2K
-
-Raw N2K import/backfill is a high CPU, memory, disk I/O, and PostgreSQL workload. On `2026-07-03`, a manual importer run likely overloaded `pi5nvme`; see `docs/2026-07-03-pi5nvme-incident-and-picanm-status.md`.
-
-Do **not** run import/backfill during live validation or without an approved import window.
-
-Safety gates now in place:
-
-- `boat-raw-n2k-import.timer` is installed but disabled by default.
-- `boat-raw-n2k-import.service` requires `/etc/boat-data-platform/allow-raw-n2k-import`.
-- `scripts/import-raw-n2k.mjs` requires `ALLOW_RAW_N2K_IMPORT=1` or `--yes-really-import`.
-- The systemd service has CPU, memory, task, and idle I/O limits.
-
-Approved manual import procedure only after checking temperature/load/free memory/disk:
-
-```bash
-sudo touch /etc/boat-data-platform/allow-raw-n2k-import
-sudo systemctl start boat-raw-n2k-import.service
-sudo rm -f /etc/boat-data-platform/allow-raw-n2k-import
-```
-
-Or, for a foreground run in a controlled shell:
-
-```bash
-ALLOW_RAW_N2K_IMPORT=1 LIMIT_FILES=1 npm run import:n2k
-```
-
-The importer should be idempotent: rerunning should not duplicate rows for the same raw file/segment.
+The wrapper, merge SQL and supported typed PGNs have bounded sample validation. Research output defaults to `none`; full-file use requires explicit permission and resource limits. Do not run a broad rebuild until typed-only versus envelope-plus-typed storage has been measured and approved.
 
 ### 6. Rebuild inventories and summaries
 
@@ -223,12 +201,12 @@ http://pi5nvme:3000/
 Minimum verification:
 
 ```text
-raw N2K files present on pi5nvme
-raw file manifests/checksums available or regenerated
-n2k_decoded_messages row count increasing after import
-signal_k_measurements row count increasing while live Signal K runs
-MasterBus USB visible or snapshots restored
-known devices/PGNs visible in inventory views/docs
+raw N2K files present and checksummed
+Signal K current N2K and MasterBus paths fresh
+selected typed N2K rows traceable to raw_file_id/message_index
+no broad research EAV rows from normal imports
+MasterBus replay logs/snapshots present and selected typed rows rebuildable from them
+known devices/PGNs visible in typed inventory views
 ```
 
 ## Documentation update rule
@@ -236,8 +214,8 @@ known devices/PGNs visible in inventory views/docs
 After a rebuild or rediscovery, update:
 
 ```text
+docs/llm-implementation-brief.md
 docs/plan.md
-docs/2026-07-03-edge-backend-migration-plan.md
 docs/2026-07-03-boat-discovery-and-decoder-inventory.md
 ```
 

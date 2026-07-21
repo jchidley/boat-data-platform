@@ -9,6 +9,15 @@ fi
 apt-get update
 apt-get install -y build-essential pkg-config libudev-dev curl ca-certificates git
 
+PATCH_DIR=/home/jack/boat-data-platform/infra/pi5nvme/masterbus
+PATCHES=(
+  "$PATCH_DIR/masterbus-signalk-alternator-mapping.patch"
+)
+# Experimental extra state mapping patch is intentionally not auto-applied:
+# masterbus-signalk-extra-state-mapping.patch regressed live discovery from
+# 94 fields / 8 devices to 21 fields / 2 devices during the 2026-07-04 deploy
+# attempt and must be fixed/tested before inclusion here.
+
 # Install/update Rust for the jack user; masterbus currently requires Rust 1.85+ / edition 2024.
 if [ ! -x /home/jack/.cargo/bin/rustup ]; then
   sudo -u jack bash -lc 'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal'
@@ -19,8 +28,31 @@ sudo -u jack mkdir -p /home/jack/src
 if [ ! -d /home/jack/src/masterbus/.git ]; then
   sudo -u jack git clone https://github.com/keesverruijt/masterbus.git /home/jack/src/masterbus
 else
+  # The checkout may already contain the local boat-specific patch. Reverse it
+  # before pulling upstream, then reapply below.
+  for ((i=${#PATCHES[@]}-1; i>=0; i--)); do
+    patch=${PATCHES[$i]}
+    if [ -f "$patch" ] && sudo -u jack bash -lc "cd /home/jack/src/masterbus && git apply --reverse --check '$patch'"; then
+      sudo -u jack bash -lc "cd /home/jack/src/masterbus && git apply --reverse '$patch'"
+    fi
+  done
   sudo -u jack bash -lc 'cd /home/jack/src/masterbus && git pull --ff-only'
 fi
+
+# Local boat-specific extensions: publish useful read-only MasterBus monitoring
+# values as Signal K paths until these mappings are upstreamed or replaced.
+for patch in "${PATCHES[@]}"; do
+  if [ -f "$patch" ]; then
+    if sudo -u jack bash -lc "cd /home/jack/src/masterbus && git apply --check '$patch'"; then
+      sudo -u jack bash -lc "cd /home/jack/src/masterbus && git apply '$patch'"
+    elif sudo -u jack bash -lc "cd /home/jack/src/masterbus && git apply --reverse --check '$patch'"; then
+      echo "$(basename "$patch") already applied"
+    else
+      echo "ERROR: $(basename "$patch") does not apply cleanly" >&2
+      exit 1
+    fi
+  fi
+done
 
 sudo -u jack bash -lc 'cd /home/jack/src/masterbus && cargo install --path crates/masterbus-tools --locked'
 

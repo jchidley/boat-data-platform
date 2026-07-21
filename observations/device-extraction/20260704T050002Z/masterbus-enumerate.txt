@@ -1,0 +1,63 @@
+8 device(s)
+
+=== CMR CombiMaster (id 1B6164) art=35513000 ser=RO27D0100 rev=AA0200 fw=4.1 status=On ===
+  [Monitoring] General
+        0 Device state                  ro List { index: 2, options: ["Off", "Charging", "Inverting", "Alarm", "Energy saving", "Supporting", "Standby"] }
+       23 AC IN limit              A    rw Float(30.0)
+       19 Inverter                      rw Boolean(true)
+       21 Charger                       rw Boolean(true)
+  [Monitoring] DC IN/OUT
+        1 Charger state                 ro List { index: 0, options: ["Off", "Bulk", "Absorption", "Float", "Stopped"] }
+       11 Battery voltage          V    ro Float(13.630001)
+       12 Battery current          A    ro Float(-11.0)
+       13 Battery temp.            °C   ro Float(NaN)
+  [Monitoring] AC IN
+        2 Input voltage            V    ro Float(0.0)
+        3 Input current            A    ro Float(0.0)
+        4 Input frequency          Hz   ro Float(0.0)
+  [Monitoring] AC OUT
+        5 Output voltage           V    ro Float(120.0)
+        8 Output power             W    ro Float(137.0)
+        6 Output frequency         Hz   ro Float(60.0)
+  [Configuration] Installer
+       18 Dry contact                   ro
+  [Configuration] Debug
+       15 Temp. heat sink          °C   ro
+       10 Bus voltage              V    ro
+        9 Output load.             %    ro
+       14 State of charge          %    ro
+       16 Device status                 ro
+        7 Output power             VA   ro
+       54 Alarms                        ro
+  [Configuration] Communication
+       24 Total sent                    ro
+       25 Total received                ro
+       26 Rcvd NAK                      ro
+       27 Rcvd invalid                  ro
+       28 Time out                      ro
+       29 CRC Error                     ro
+       30 UART Error                    ro
+       31 On packet                     ro
+  [Service]
+  [Monitoring] General
+        0 Device state                  ro List { index: 2, options: ["Off", "Charging", "Inverting", "Alarm", "Energy saving", "Supporting", "Standby"] }
+       23 AC IN limit              A    rw Float(30.0)
+       19 Inverter                      rw Boolean(true)
+       21 Charger                       rw Boolean(true)
+  [Monitoring] DC IN/OUT
+        1 Charger state                 ro List { index: 0, options: ["Off", "Bulk", "Absorption", "Float", "Stopped"] }
+       11 Battery voltage          V    ro Float(13.630001)
+       12 Battery current          A    ro Float(-11.0)
+       13 Battery temp.            °C   ro Float(NaN)
+  [Monitoring] General
+        0 Device state                  ro List { index: 2, options: ["Off", "Charging", "Inverting", "Alarm", "Energy saving", "Supporting", "Standby"] }
+       23 AC IN limit              A    rw Float(30.0)
+       19 Inverter                      rw Boolean(true)
+       21 Charger                       rw Boolean(true)
+  [Monitoring] DC IN/OUT
+        1 Charger state                 ro List { index: 0, options: ["Off", "Bulk", "Absorption", "Float", "Stopped"] }
+       11 Battery voltage          V    ro Float(13.630001)
+       12 Battery current          A    ro Float(-11.0)
+       13 Battery temp.            °C   ro Float(NaN)
+
+=== APR Alpha Port (id 302388) art=45513000 ser=S319J0008 rev=AA0400 fw=4.0 status=On ===

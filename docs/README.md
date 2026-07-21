@@ -1,23 +1,34 @@
 # Documentation map
 
-Use these docs as the current source of truth.
+Use these docs as the current source of truth. Document roles are intentionally separated:
+
+- `plan.md`: stable target architecture and ownership boundaries;
+- `llm-implementation-brief.md`: deployed state and next operational tasks;
+- thematic plans: detailed implementation design;
+- dated documents: evidence and incident history, not competing current plans.
 
 ## Read first
 
-1. [`llm-implementation-brief.md`](llm-implementation-brief.md) — concise task brief for agents.
-2. [`plan.md`](plan.md) — current target architecture, roles, and next steps.
-3. [`2026-07-03-edge-backend-migration-plan.md`](2026-07-03-edge-backend-migration-plan.md) — migration details and go/no-go checks.
-4. [`rebuild-from-source-material.md`](rebuild-from-source-material.md) — rebuild from raw N2K logs, MasterBus snapshots, and repo scripts.
-5. [`2026-07-03-boat-discovery-and-decoder-inventory.md`](2026-07-03-boat-discovery-and-decoder-inventory.md) — discovered boat systems, available decoders, and gaps.
+1. [`plan.md`](plan.md) — end state and shortest route to it.
+2. [`llm-implementation-brief.md`](llm-implementation-brief.md) — deployed state and immediate operational task.
+3. [`postgresql-storage-plan.md`](postgresql-storage-plan.md) — implementation rules for the new typed historical path.
+4. [`postgresql-end-state-migration.md`](postgresql-end-state-migration.md) — one-time removal of deployed objects outside the end state.
+5. [`2026-07-03-boat-discovery-and-decoder-inventory.md`](2026-07-03-boat-discovery-and-decoder-inventory.md) — devices, available data and decoder gaps.
+6. [`2026-07-03-pi5nvme-incident-and-picanm-status.md`](2026-07-03-pi5nvme-incident-and-picanm-status.md) — resource-safety limits for live-host work.
+
+Read other documents only when their specific subject is needed.
 
 ## Current rules
 
 - Treat raw NMEA 2000 candump logs as the source of truth for N2K.
-- Treat MasterBus discovery/config snapshots as the source material for Mastervolt/MasterBus.
-- Treat Signal K, TimescaleDB rows, Grafana dashboards, inventories, and summaries as derived and rebuildable while the system is experimental.
-- Keep `picanm` boring: collect, timestamp, log, forward.
+- Treat MasterBus discovery/config snapshots and replayable MasterBus logs as the source material for Mastervolt/MasterBus. Current MasterBus JSONL logging captures mapped Signal K deltas, not raw MasterBus traffic; investigate rawer logging before relying on it as complete history.
+- The project is experimental, but work is directed at the documented end state rather than maintaining transitional designs.
+- Signal K owns current normalized state; PostgreSQL owns selected typed history and durable events. Signal K and the historical importer decode the same authoritative raw N2K format for different purposes. Do not build a complete Signal K mirror or duplicate every raw bus message in PostgreSQL without measured justification.
+- PostgreSQL has controlled inputs for distinct domains—typed N2K, typed MasterBus, derived events, and health—but each historical fact has exactly one owner. Grafana and other historical consumers read PostgreSQL; normal operation does not replay SQL history into Signal K.
+- Keep `picanm` boring: collect, timestamp, log, forward. Signal K, Node.js, and npm are removed from `picanm`.
 - Keep heavy services on `pi5nvme`: Signal K, MasterBus tooling, Postgres/TimescaleDB, Grafana, imports, analysis.
 - Do not enable NMEA 2000 transmit/control without a separate safety review.
+- Run historical N2K conversion/import only offline or on staging with explicit resource limits.
 
 ## Update order
 
@@ -28,16 +39,11 @@ When implementation changes, update docs in this order:
 3. the relevant runbook or inventory doc
 4. historical notes only when they need stale-status clarification
 
-## Historical/status documents
+## Reference documents
 
-These files record point-in-time setup or evidence. Do not use them as current plans if they conflict with the current docs above.
+- [`2026-07-04-manuals-relevance-review.md`](2026-07-04-manuals-relevance-review.md) — boat and equipment facts from local manuals.
+- [`2026-07-04-static-pgn-capability-matrix.md`](2026-07-04-static-pgn-capability-matrix.md) — observed and supported PGNs.
+- [`2026-07-04-source-attribution-inventory.md`](2026-07-04-source-attribution-inventory.md) — current device/source attribution.
+- [`signalk-llm-source-map.md`](signalk-llm-source-map.md) — local Signal K and canboat source references.
 
-- `archive/2026-06-30-picanm-setup-summary.md`
-- `archive/2026-06-30-pi5nvme-setup-summary.md`
-- `archive/2026-06-30-live-instrument-inventory.md`
-- `archive/2026-06-30-masterbus-tooling.md`
-- `archive/2026-06-30-masterbus-live.md`
-- `archive/2026-07-03-decoding-and-postgres-status.md`
-- `archive/2026-07-03-migration-plan-review.md`
-
-When facts change, update the current docs first. Leave historical docs intact unless adding a stale-status note.
+Keep current architecture in `plan.md`, deployed status in `llm-implementation-brief.md`, and detailed facts only in the relevant reference or runbook.

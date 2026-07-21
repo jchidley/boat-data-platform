@@ -1,0 +1,10 @@
+{
+  "captured_at": "2026-07-03T23:32:29.320Z",
+  "label": "current-state-remote",
+  "baseUrl": "http://192.168.1.135:3001",
+  "durationSec": 30,
+  "intervalSec": 2,
+  "samples": 99,
+  "rows": 1386,
+  "note": "Signal K /electrical/alternators controlled engine-state observation. Record actual physical engine state separately if not represented by label."
+}

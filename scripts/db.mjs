@@ -29,11 +29,3 @@ export function makePool(role = 'ingest') {
     max: Number(process.env.PGPOOL_MAX || 4)
   })
 }
-
-export function splitValue(value) {
-  if (typeof value === 'number' && Number.isFinite(value)) return { value_double: value, value_text: null, value_json: null }
-  if (typeof value === 'string') return { value_double: null, value_text: value, value_json: null }
-  if (typeof value === 'boolean') return { value_double: value ? 1 : 0, value_text: String(value), value_json: value }
-  if (value === null || value === undefined) return { value_double: null, value_text: null, value_json: null }
-  return { value_double: null, value_text: null, value_json: value }
-}

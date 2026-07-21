@@ -1,125 +1,76 @@
-# 2026-07-03 pi5nvme incident and picanm status
+# pi5nvme resource-safety gate and picanm status
 
-## Incident summary
+## Purpose
 
-During validation of the pi5 raw-stream Signal K path, a manual start of `boat-raw-n2k-import.service` was run on `pi5nvme`.
+Define operational limits after live-host storage and I/O incidents. This is a safety gate, not an architecture plan.
 
-That service runs `node scripts/import-raw-n2k.mjs`, which decompresses raw candump logs, runs canboat `analyzerjs`, and bulk inserts decoded rows into PostgreSQL. This is a high CPU / memory / disk I/O / database workload and should not have been run on the live Pi 5 without explicit approval and resource limits.
+## 2026-07-20 disk-pressure recurrence
 
-Observed sequence after serial recovery and journal inspection:
+The `pi5nvme` NVMe filesystem reached 100% use at 2026-07-20 07:06 UTC (08:06 BST). `boat-n2k-raw-receiver.service` then crash-looped on `ENOSPC` until cleanup freed space at 2026-07-21 00:24 UTC. The host did not reboot; Signal K, MasterBus, PostgreSQL and Grafana remained running. Independent raw acquisition continued on `picanm`, and mirroring resumed after the receiver recovered.
 
-1. `pi5nvme` raw receiver and Signal K raw fanout had been working.
-2. `boat-raw-n2k-import.service` had also run automatically at `11:49:44` and imported one file successfully: `can0-20260630T103825Z.candump.log.gz`, `774194` decoded rows, `43.981s` CPU.
-3. Manual importer start at `12:05:18` imported `can0-20260630T234436Z.candump.log.gz`, `771532` decoded rows, and completed successfully at `12:06:34`, consuming `46.358s` CPU.
-4. Follow-up Postgres row-count checks then ran. The last recorded entry in boot `4261dfdf7bc24cb5a477fbe68d044ea2` is a `sudo -u postgres psql` count/max query starting at `12:07:11`; there is no matching close entry.
-5. Boot `4261dfdf7bc24cb5a477fbe68d044ea2` ends abruptly after that with no clean shutdown markers, no OOM log, no thermal log, and no under-voltage log. This is consistent with a hard hang/reset/power/thermal event where the kernel had no chance to persist a final cause.
-6. The next boot, `0fe7413170ad40fc85878d51c68e9a7a`, started with a bad clock (`09:17`) and only stepped to correct time at `16:52:39`. This made the outage timeline confusing.
-7. At serial recovery time, `masterbus-signalk.service` was restart-looping because no MasterBus USB Link was visible. Signal K logged repeated `ECONNREFUSED 127.0.0.1:3009`.
-8. A manual serial `sudo reboot` at `16:56:55` caused the clean shutdown/reboot into current boot `9f4c1b0625d44785b3c1d8af584dfaee`.
+The apparent later SSH outage was a stale address: DHCP changed `pi5nvme` from `192.168.1.135` to `192.168.1.136`. The end-state cleanup and five-minute derived-storage guard were deployed and verified on 2026-07-21. Disk use after cleanup was 37%.
 
-Current best diagnosis: the live host likely hard-hung or reset shortly after the import/backfill plus repeated Postgres count/max checks. The importer completed, but it substantially increased database size and cache/I/O pressure; the final recorded operation was a database count/max query, not the importer process itself. There is no evidence of a Linux OOM kill or clean thermal shutdown in the journal.
+## Current rule
 
-Current state after subsequent reboot/recovery: `pi5nvme` is reachable by SSH, temperature/throttling/memory/disk are healthy, raw receiver and Signal K are active, MasterBus is active again, and importer service/timer are inactive/disabled. The repo importer safeguards have now been deployed to `/etc/systemd/system` and `scripts/import-raw-n2k.mjs` on `pi5nvme`.
+Do not run historical N2K conversion, backfills, broad analyzer jobs, or large PostgreSQL aggregates on live `pi5nvme`.
 
-The temporary MasterBus failure was caused by the MasterBus USB Link not being visible during serial recovery. After reconnect/reboot, `lsusb` shows `ID 1a64:0000 Mastervolt MasterBus Link`; `masterbus-signalk.service` starts cleanly, listens on `0.0.0.0:3009`, and streams 94 mapped fields from 8 devices. It is enabled for boot again.
+Historical conversion belongs on offline/staging infrastructure and must follow [`2026-07-04-backfill-strategy.md`](2026-07-04-backfill-strategy.md) and [`postgresql-storage-plan.md`](postgresql-storage-plan.md).
 
-## Mandatory next actions on pi5nvme
+## Required safeguards
 
-Completed after serial access:
+Any approved conversion run must have explicit limits for:
 
-```bash
-sudo systemctl stop boat-raw-n2k-import.service
-sudo systemctl disable --now boat-raw-n2k-import.timer
-```
+- source bytes and file count;
+- process runtime;
+- CPU and memory;
+- temporary workspace;
+- minimum free filesystem space;
+- transaction scope;
+- expected output tables and rows;
+- cleanup after failure.
 
-Importer service/timer are currently inactive/disabled.
+Avoid broad `count(*)`, unbounded time ranges and full-table scans on the live database. Use catalog estimates, bounded time windows and narrow indexed queries.
 
-Before any further implementation or import/backfill work:
+## pi5nvme responsibilities
 
-1. Keep `boat-raw-n2k-import.timer` disabled unless an explicit import window is approved.
-2. Keep `/etc/boat-data-platform/allow-raw-n2k-import` absent except during an approved import window.
-3. Do not restart importers, run backfills, run analyzer jobs, or run broad database aggregate checks on the live host unless resource limits are active and the import/query window is explicitly approved.
-4. Treat `masterbus-signalk.service` as normal active infrastructure now that the USB Link is visible again; if the USB Link disappears, stop the service to avoid a restart loop before troubleshooting USB/power/wiring.
+Safe live services are:
 
-## Required safeguards now added in repo
+- raw N2K receiver/archive and localhost fanout;
+- Signal K current-state server;
+- MasterBus live integration;
+- PostgreSQL/TimescaleDB for bounded live writes and selected typed history;
+- Grafana;
+- health and disk-pressure monitoring.
 
-The repo has been hardened so raw import/backfill is no longer an automatic live-host workload:
+The derived-storage guard must stop rebuildable writers before filesystem exhaustion without stopping raw acquisition.
 
-- `infra/pi5nvme/install-pi5nvme.sh` installs the importer units but does **not** enable `boat-raw-n2k-import.timer` by default.
-- `infra/pi5nvme/systemd/boat-raw-n2k-import.service` is gated by `ConditionPathExists=/etc/boat-data-platform/allow-raw-n2k-import`.
-- `scripts/import-raw-n2k.mjs` refuses to run unless `ALLOW_RAW_N2K_IMPORT=1` is set or `--yes-really-import` is passed.
-- importer service has conservative resource controls:
-  - `CPUQuota=50%`
-  - `MemoryMax=768M`
-  - `Nice=10`
-  - `IOSchedulingClass=idle`
-  - `IOSchedulingPriority=7`
-  - `TasksMax=64`
-  - `TimeoutStartSec=20min`
-- importer timer cadence was relaxed and made non-persistent; it should still remain disabled unless explicitly approved.
+## picanm responsibilities
 
-Before any importer/backfill is run on `pi5nvme`, still require explicit approval and an import window. Prefer offline/backfill-window processing, not during live validation.
+`picanm` remains the independent acquisition edge:
 
-## Current status after pi5nvme reboot/recovery
+- keep `can0` at 250 kbit/s;
+- timestamp and write compressed raw candump segments;
+- retain a local spool during backend outages;
+- forward live raw data to `pi5nvme.local:20200` when reachable;
+- run no Signal K, database, Node.js applications or analysis jobs.
 
-Checked again at about `2026-07-03T17:25+01:00` after `pi5nvme` was rebooted.
+If `pi5nvme` is unavailable, local raw collection continues. Use [`picanm-offline-operations.md`](picanm-offline-operations.md) for bounded checks.
 
-`pi5nvme` current state:
+## Connectivity caveat
 
-- reachable by SSH again;
-- uptime about 4 minutes at check time;
-- temperature about `52.7'C`;
-- `vcgencmd get_throttled` returned `0x0`;
-- memory healthy: about `3.2GiB` available, no swap used;
-- disk healthy: `/` about `36%` used with about `145G` free;
-- failed units: none;
-- active: `postgresql`, `signalk-pi5nvme`, `boat-n2k-raw-receiver`, `masterbus-signalk`;
-- inactive/disabled: `boat-raw-n2k-import.service`, `boat-raw-n2k-import.timer`;
-- raw receiver listening on `0.0.0.0:20200` and fanout on `127.0.0.1:20201`;
-- Signal K raw source present: `picanm-raw-candump-fanout`; latest low-impact check observed 22 N2K sources and 38 PGNs;
-- old transitional Signal K source still present: `can0-nmea2000` with 16 N2K sources and 27 PGNs observed;
-- MasterBus service recovered after reboot and is streaming 94 mapped fields from 8 devices;
-- Signal K vessel data contains 15 live electrical battery/charger/inverter paths with `$source: "masterbus"`; `/signalk/v1/api/sources` may show sparse/empty `masterbus` metadata despite live vessel paths.
+Starlink/WSL hostname resolution can fail while the host is healthy. Use short timeouts and try, in order:
 
-Observed reboot history includes reboots at about `16:52`, `16:57`, and `17:18`. Journald reported an unclean previous shutdown and replaced a corrupted journal file. The 12:05 importer run is visible in retained logs and imported one compressed raw file with about `771532` decoded rows in about 76 seconds, consuming about 46 seconds CPU. Kernel logs retained after the reboot did not show a clear OOM/thermal/undervoltage smoking gun, so the precise failure mechanism remains unproven. The safest conclusion remains: raw import/backfill is a high-impact workload and must stay gated/resource-limited.
+1. `pi5nvme.local` for Pi-to-Pi mDNS;
+2. `pi5nvme-ip` for operator SSH from WSL;
+3. the known IPv4 address.
 
-A forwarding gap after reboot was traced to name resolution: on `picanm`, bare `pi5nvme` resolved to IPv6 addresses from Starlink/local DNS, while `boat-n2k-raw-receiver` listens on IPv4 `0.0.0.0:20200`. Direct IPv4 worked, and mDNS `pi5nvme.local` resolved to IPv4 `192.168.1.135`. The deployed and committed `picanm` forwarder now uses `DEST_HOST=pi5nvme.local`.
+Do not repeatedly retry an unresponsive host.
 
-`picanm` remains stable and preserving raw N2K source material.
+## Recovery priority
 
-## picanm status after pi5nvme outage
-
-Checked at `2026-07-03T12:23:34+01:00`.
-
-`picanm` is stable and preserving raw N2K source material:
-
-- uptime: 58 minutes
-- load average: `0.57, 0.59, 0.70`
-- temperature: `52.6'C`
-- throttled: `0x80000` (historical throttling bit set, not necessarily currently throttled)
-- memory: `415Mi total`, `134Mi available`, `60Mi swap used`
-- disk: `/` and `/var/log/n2k` have about `24G` free, `13%` used
-- `can0`: `UP`, `ERROR-ACTIVE`, 250 kbit/s
-- CAN counters at check time: `RX packets 1192105`, `RX errors 7`, `RX dropped 73`, `bus-off 0`
-- active services:
-  - `can0-nmea2000`
-  - `n2k-raw-logger`
-  - `n2k-raw-forwarder`
-  - `signalk`
-- active raw log:
-  - `/var/log/n2k/can0-20260703T110000Z.candump.log.tmp`
-  - about `499415` lines at check time
-- completed raw segment present:
-  - `/var/log/n2k/can0-20260703T100000Z.candump.log.gz`
-
-At the initial outage check, `n2k-raw-forwarder` was retrying the then-configured `pi5nvme:20200`, as expected while `pi5nvme` was offline. Local raw logging is independent of forwarding and continued.
-
-After the outage, the deployed `picanm` forwarder retry interval was reduced from 5 seconds to 30 seconds by setting `RETRY_SEC=30` in `n2k-raw-forwarder.service`. This reduces log spam and connection churn if `pi5nvme` is down.
-
-After `pi5nvme` rebooted, `picanm` still failed to reconnect by bare hostname because `pi5nvme` resolved to IPv6 addresses and the receiver is IPv4-only. `.local` mDNS resolution works on the Starlink LAN, so the deployed `n2k-raw-forwarder.service` now uses `DEST_HOST=pi5nvme.local`, which resolves to IPv4. The TCP stream is established again:
-
-```text
-picanm 192.168.1.235:xxxxx -> pi5nvme 192.168.1.135:20200 ESTABLISHED
-```
-
-The raw logger, CAN service, and picanm Signal K were not restarted for this change.
+1. Preserve raw source material.
+2. Restore raw acquisition and forwarding.
+3. Restore Signal K current state.
+4. Restore MasterBus live integration.
+5. Restore bounded PostgreSQL writers.
+6. Resume historical work only on staging after explicit review.

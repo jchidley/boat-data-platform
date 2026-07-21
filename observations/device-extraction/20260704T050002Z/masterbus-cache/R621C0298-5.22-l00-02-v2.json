@@ -1,0 +1,140 @@
+[
+  {
+    "id": 0,
+    "name": "General",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 2,
+        "name": "Device state",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": false,
+        "min": 0.0,
+        "max": 3.0,
+        "step": 0.0,
+        "options": [
+          "Standby",
+          "Charging",
+          "Alarm"
+        ]
+      },
+      {
+        "index": 3,
+        "name": "Charge state",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": false,
+        "min": 0.0,
+        "max": 5.0,
+        "step": 0.0,
+        "options": [
+          "Off",
+          "Bulk",
+          "Absorption",
+          "Float",
+          "---"
+        ]
+      },
+      {
+        "index": 4,
+        "name": "Solar voltage",
+        "unit": "V",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 100.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 5,
+        "name": "Charge current",
+        "unit": "A",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 60.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 6,
+        "name": "Battery voltage",
+        "unit": "V",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 65.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 7,
+        "name": "Battery temp.",
+        "unit": "°C",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 150.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 9,
+        "name": "Total energy",
+        "unit": "kWh",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 0.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 12,
+        "name": "On/Off",
+        "unit": "",
+        "viz_type": "CheckBox",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "name": "Shunt",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 10,
+        "name": "State",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": false,
+        "min": 0.0,
+        "max": 3.0,
+        "step": 0.0,
+        "options": [
+          "Connection lost",
+          "Connected",
+          "Not selected"
+        ]
+      },
+      {
+        "index": 11,
+        "name": "State of charge",
+        "unit": "%",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 100.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  }
+]

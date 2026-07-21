@@ -1,0 +1,198 @@
+[
+  {
+    "id": 0,
+    "name": "General",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 0,
+        "name": "Device state",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": false,
+        "min": 0.0,
+        "max": 7.0,
+        "step": 0.0,
+        "options": [
+          "Off",
+          "Charging",
+          "Inverting",
+          "Alarm",
+          "Energy saving",
+          "Supporting",
+          "Standby"
+        ]
+      },
+      {
+        "index": 23,
+        "name": "AC IN limit",
+        "unit": "A",
+        "viz_type": "Float",
+        "writeable": true,
+        "min": 0.0,
+        "max": 30.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 19,
+        "name": "Inverter",
+        "unit": "",
+        "viz_type": "CheckBox",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 21,
+        "name": "Charger",
+        "unit": "",
+        "viz_type": "CheckBox",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "name": "DC IN/OUT",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 1,
+        "name": "Charger state",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": false,
+        "min": 0.0,
+        "max": 5.0,
+        "step": 0.0,
+        "options": [
+          "Off",
+          "Bulk",
+          "Absorption",
+          "Float",
+          "Stopped"
+        ]
+      },
+      {
+        "index": 11,
+        "name": "Battery voltage",
+        "unit": "V",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 32.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 12,
+        "name": "Battery current",
+        "unit": "A",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 120.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 13,
+        "name": "Battery temp.",
+        "unit": "°C",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 150.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "AC IN",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 2,
+        "name": "Input voltage",
+        "unit": "V",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 300.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 3,
+        "name": "Input current",
+        "unit": "A",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 30.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 4,
+        "name": "Input frequency",
+        "unit": "Hz",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 70.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "AC OUT",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 5,
+        "name": "Output voltage",
+        "unit": "V",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 300.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 8,
+        "name": "Output power",
+        "unit": "W",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 6000.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 6,
+        "name": "Output frequency",
+        "unit": "Hz",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 70.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  }
+]

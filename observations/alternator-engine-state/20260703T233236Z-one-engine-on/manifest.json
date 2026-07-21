@@ -1,0 +1,10 @@
+{
+  "captured_at": "2026-07-03T23:33:36.405Z",
+  "label": "one-engine-on",
+  "baseUrl": "http://192.168.1.135:3001",
+  "durationSec": 60,
+  "intervalSec": 2,
+  "samples": 186,
+  "rows": 2604,
+  "note": "Signal K /electrical/alternators controlled engine-state observation. Record actual physical engine state separately if not represented by label."
+}

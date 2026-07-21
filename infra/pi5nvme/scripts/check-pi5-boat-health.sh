@@ -52,8 +52,10 @@ fi
 
 echo "--- database freshness ---"
 if command -v psql >/dev/null 2>&1; then
-  psql "${DATABASE_URL:-boatdata}" -Atc "select 'signal_k_measurements', count(*), max(time) from signal_k_measurements; select 'n2k_decoded_messages', count(*), max(time) from n2k_decoded_messages;" 2>/dev/null || true
 fi
 
+echo "--- MasterBus replay logs ---"
+find /srv/boat/masterbus/signalk-jsonl -maxdepth 1 -type f -name 'masterbus-signalk-*.jsonl*' -printf '%TY-%Tm-%TdT%TH:%TM:%TSZ %s %p\n' 2>/dev/null | sort | tail -20 || true
+
 echo "--- services ---"
-systemctl --no-pager --full status boat-n2k-raw-receiver.service boat-raw-log-mirror.timer boat-raw-n2k-import.timer signalk-pi5nvme.service masterbus-signalk.service || true
+systemctl --no-pager --full status boat-n2k-raw-receiver.service boat-raw-log-mirror.timer boat-masterbus-signalk-log.service signalk-pi5nvme.service masterbus-signalk.service || true

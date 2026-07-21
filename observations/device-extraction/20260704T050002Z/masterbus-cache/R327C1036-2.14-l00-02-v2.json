@@ -1,0 +1,173 @@
+[
+  {
+    "id": 0,
+    "name": "Cluster",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 0,
+        "name": "State of charge",
+        "unit": "%",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 100.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 4,
+        "name": "Time remaining",
+        "unit": "",
+        "viz_type": "Time",
+        "writeable": false,
+        "min": 0.0,
+        "max": 1000.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 1,
+        "name": "Voltage",
+        "unit": "V",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 40.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 2,
+        "name": "Current",
+        "unit": "A",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 600.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 5,
+        "name": "Temperature",
+        "unit": "°C",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 120.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "name": "Battery",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 112,
+        "name": "State of charge",
+        "unit": "%",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 100.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 115,
+        "name": "Time remaining",
+        "unit": "",
+        "viz_type": "Time",
+        "writeable": false,
+        "min": 0.0,
+        "max": 1000.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 113,
+        "name": "Voltage",
+        "unit": "V",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 30.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 114,
+        "name": "Current",
+        "unit": "A",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 600.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 116,
+        "name": "Temperature",
+        "unit": "°C",
+        "viz_type": "Float",
+        "writeable": false,
+        "min": 0.0,
+        "max": 120.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Relay",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 34,
+        "name": "Relay close",
+        "unit": "",
+        "viz_type": "CheckBox",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 36,
+        "name": "Relay open",
+        "unit": "",
+        "viz_type": "CheckBox",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 38,
+        "name": "Relay state",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": false,
+        "min": 0.0,
+        "max": 6.0,
+        "step": 0.0,
+        "options": [
+          "Closed",
+          "Open",
+          "Not connected",
+          "Connected",
+          "Waiting",
+          "Closing"
+        ]
+      }
+    ]
+  }
+]

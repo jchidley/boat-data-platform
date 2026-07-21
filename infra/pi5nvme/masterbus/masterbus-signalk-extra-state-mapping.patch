@@ -1,0 +1,54 @@
+--- a/crates/masterbus-tools/src/bin/masterbus-signalk.rs
++++ b/crates/masterbus-tools/src/bin/masterbus-signalk.rs
+@@ -323,11 +323,19 @@
+         }
+         _ => None,
+     };
++    let list_string = match value {
++        Value::List { index, options } => options.get(*index as usize).map(|s| s.to_ascii_lowercase()),
++        _ => None,
++    };
+     let num = |v: f64| serde_json::Value::from(v);
+
+     if id.starts_with("alpha-") {
+         let alt = format!("electrical.alternators.{id}");
+         match (group, name, unit) {
++            ("general", "Device state", "") => return list_string.map(|s| (format!("{alt}.operatingState"), serde_json::Value::String(s))),
++            ("general", "Charger state", "") => return list_string.map(|s| (format!("{alt}.chargeMode"), serde_json::Value::String(s))),
++            ("shunt", "State", "") => return list_string.map(|s| (format!("{alt}.shunt.state"), serde_json::Value::String(s))),
++            ("shunt", "State of charge", "%") => return float.map(|v| (format!("{alt}.shunt.stateOfCharge"), num(v / 100.0))),
+             ("shunt", "Battery current", "A") => return float.map(|v| (format!("{alt}.current"), num(v))),
+             ("shunt", "Battery voltage", "V") => return float.map(|v| (format!("{alt}.voltage"), num(v))),
+             ("shunt", "Battery temp.", "\u{b0}C") => return celsius.map(|c| (format!("{alt}.temperature"), num(c + 273.15))),
+@@ -341,12 +349,16 @@
+
+     if id.ends_with("-solars") {
+         let solar = format!("electrical.solar.{id}");
+-        match (name, unit) {
+-            ("Solar voltage", "V") => return float.map(|v| (format!("{solar}.panelVoltage"), num(v))),
+-            ("Charge current", "A") => return float.map(|v| (format!("{solar}.chargeCurrent"), num(v))),
+-            ("Battery voltage", "V") => return float.map(|v| (format!("{solar}.batteryVoltage"), num(v))),
+-            ("Battery temp.", "\u{b0}C") => return celsius.map(|c| (format!("{solar}.temperature"), num(c + 273.15))),
+-            ("Total energy", "kWh") => return float.map(|kwh| (format!("{solar}.yieldTotal"), num(kwh * 3_600_000.0))),
++        match (group, name, unit) {
++            ("general", "Device state", "") => return list_string.map(|s| (format!("{solar}.operatingState"), serde_json::Value::String(s))),
++            ("general", "Charge state", "") => return list_string.map(|s| (format!("{solar}.chargeMode"), serde_json::Value::String(s))),
++            ("general", "Solar voltage", "V") => return float.map(|v| (format!("{solar}.panelVoltage"), num(v))),
++            ("general", "Charge current", "A") => return float.map(|v| (format!("{solar}.chargeCurrent"), num(v))),
++            ("general", "Battery voltage", "V") => return float.map(|v| (format!("{solar}.batteryVoltage"), num(v))),
++            ("general", "Battery temp.", "\u{b0}C") => return celsius.map(|c| (format!("{solar}.temperature"), num(c + 273.15))),
++            ("general", "Total energy", "kWh") => return float.map(|kwh| (format!("{solar}.yieldTotal"), num(kwh * 3_600_000.0))),
++            ("shunt", "State", "") => return list_string.map(|s| (format!("{solar}.shunt.state"), serde_json::Value::String(s))),
++            ("shunt", "State of charge", "%") => return float.map(|v| (format!("{solar}.shunt.stateOfCharge"), num(v / 100.0))),
+             _ => {}
+         }
+     }
+@@ -380,6 +392,8 @@
+                 ("Input current", "A") => float.map(|v| (format!("{chg}.acin.current"), num(v))),
+                 ("Input frequency", "Hz") => float.map(|v| (format!("{chg}.acin.frequency"), num(v))),
+                 ("AC IN limit", "A") => float.map(|v| (format!("{chg}.acin.currentLimit"), num(v))),
++                ("Device state", "") => list_string.map(|s| (format!("{inv}.operatingState"), serde_json::Value::String(s))),
++                ("Charger state", "") => list_string.map(|s| (format!("{chg}.chargeMode"), serde_json::Value::String(s))),
+                 ("Inverter", _) => boolean.map(|b| (format!("{inv}.enabled"), serde_json::Value::Bool(b))),
+                 ("Charger", _) => boolean.map(|b| (format!("{chg}.enabled"), serde_json::Value::Bool(b))),
+                 _ => None,

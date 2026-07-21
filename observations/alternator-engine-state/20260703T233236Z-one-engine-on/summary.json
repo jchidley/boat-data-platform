@@ -1,0 +1,142 @@
+[
+  {
+    "path": "alpha-port.alternatorTemperature",
+    "source": "masterbus",
+    "count": 186,
+    "min": 302.15,
+    "avg": 302.15000000000094,
+    "max": 302.15,
+    "latest": 302.15,
+    "latestTimestamp": "2026-07-03T23:33:36.149Z"
+  },
+  {
+    "path": "alpha-port.alternatorVoltage",
+    "source": "masterbus",
+    "count": 186,
+    "min": 13.367522239685059,
+    "avg": 13.384960759070612,
+    "max": 13.394328117370605,
+    "latest": 13.385393142700195,
+    "latestTimestamp": "2026-07-03T23:33:35.996Z"
+  },
+  {
+    "path": "alpha-port.current",
+    "source": "masterbus",
+    "count": 186,
+    "min": -6.346074104309082,
+    "avg": 1.6620984077453613,
+    "max": 6.811637878417969,
+    "latest": 6.811637878417969,
+    "latestTimestamp": "2026-07-03T23:33:36.199Z"
+  },
+  {
+    "path": "alpha-port.fieldCurrent",
+    "source": "masterbus",
+    "count": 186,
+    "min": 0,
+    "avg": 0,
+    "max": 0,
+    "latest": 0,
+    "latestTimestamp": "2026-07-03T23:33:36.149Z"
+  },
+  {
+    "path": "alpha-port.senseVoltage",
+    "source": "masterbus",
+    "count": 186,
+    "min": 0,
+    "avg": 0,
+    "max": 0,
+    "latest": 0,
+    "latestTimestamp": "2026-07-03T23:33:33.638Z"
+  },
+  {
+    "path": "alpha-port.temperature",
+    "source": "masterbus",
+    "count": 186,
+    "min": 304.98333206176756,
+    "avg": 304.9833320617685,
+    "max": 304.98333206176756,
+    "latest": 304.98333206176756,
+    "latestTimestamp": "2026-07-03T23:33:35.896Z"
+  },
+  {
+    "path": "alpha-port.voltage",
+    "source": "masterbus",
+    "count": 186,
+    "min": 13.399518966674805,
+    "avg": 13.404003389420048,
+    "max": 13.404439926147461,
+    "latest": 13.404439926147461,
+    "latestTimestamp": "2026-07-03T23:33:36.149Z"
+  },
+  {
+    "path": "alpha-stbd.alternatorTemperature",
+    "source": "masterbus",
+    "count": 186,
+    "min": 332.15,
+    "avg": 332.150000000001,
+    "max": 332.15,
+    "latest": 332.15,
+    "latestTimestamp": "2026-07-03T23:33:35.644Z"
+  },
+  {
+    "path": "alpha-stbd.alternatorVoltage",
+    "source": "masterbus",
+    "count": 186,
+    "min": 13.501554489135742,
+    "avg": 13.51966562066027,
+    "max": 13.528361320495605,
+    "latest": 13.519425392150879,
+    "latestTimestamp": "2026-07-03T23:33:35.644Z"
+  },
+  {
+    "path": "alpha-stbd.current",
+    "source": "masterbus",
+    "count": 186,
+    "min": -4.449403285980225,
+    "avg": 0.6751848891858132,
+    "max": 3.7155661582946777,
+    "latest": 3.7155661582946777,
+    "latestTimestamp": "2026-07-03T23:33:35.695Z"
+  },
+  {
+    "path": "alpha-stbd.fieldCurrent",
+    "source": "masterbus",
+    "count": 186,
+    "min": 0.6170635223388672,
+    "avg": 0.9199229184017387,
+    "max": 1.316468358039856,
+    "latest": 1.1190476417541504,
+    "latestTimestamp": "2026-07-03T23:33:35.695Z"
+  },
+  {
+    "path": "alpha-stbd.senseVoltage",
+    "source": "masterbus",
+    "count": 186,
+    "min": 13.479774475097656,
+    "avg": 13.4930390901463,
+    "max": 13.501554489135742,
+    "latest": 13.492618560791016,
+    "latestTimestamp": "2026-07-03T23:33:35.594Z"
+  },
+  {
+    "path": "alpha-stbd.temperature",
+    "source": "masterbus",
+    "count": 186,
+    "min": 304.98333206176756,
+    "avg": 304.9833320617685,
+    "max": 304.98333206176756,
+    "latest": 304.98333206176756,
+    "latestTimestamp": "2026-07-03T23:33:35.644Z"
+  },
+  {
+    "path": "alpha-stbd.voltage",
+    "source": "masterbus",
+    "count": 186,
+    "min": 13.399518966674805,
+    "avg": 13.402892205022997,
+    "max": 13.404439926147461,
+    "latest": 13.404439926147461,
+    "latestTimestamp": "2026-07-03T23:33:35.695Z"
+  }
+]

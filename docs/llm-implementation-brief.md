@@ -1,122 +1,128 @@
 # LLM implementation brief
 
-Use this file before changing code or services.
+Use this file for deployed state and the next task. Use [`plan.md`](plan.md) for the end state and [`postgresql-storage-plan.md`](postgresql-storage-plan.md) for historical-storage rules.
 
-## Mission
+## End-state rule
 
-Turn `picanm` into a raw NMEA 2000 acquisition edge. Run decoding, Signal K, MasterBus, TimescaleDB/Postgres, Grafana, and analysis on `pi5nvme`.
+There are two processing paths:
+
+```text
+preserved source -> Signal K -> current state and live apps
+preserved source -> typed PostgreSQL -> Grafana, history apps and analysis
+```
+
+Do not create a third general Signal K-to-PostgreSQL telemetry path. The collector and obsolete tables have been removed from both the repository schema and the live host. [`postgresql-end-state-migration.md`](postgresql-end-state-migration.md) was applied successfully on 2026-07-21; no import or backfill was run.
+
+## Deployed live path
+
+### `picanm`
+
+- `can0` at 250 kbit/s;
+- edge-timestamped compressed candump logging under `/var/log/n2k/`;
+- local spool during backend outages;
+- live forwarding to `pi5nvme.local:20200`;
+- no Signal K, Node.js, database, apps or analysis.
+
+### `pi5nvme`
+
+- raw receiver/archive under `/srv/boat/raw-n2k/live/`;
+- localhost fanout on `127.0.0.1:20201`;
+- Signal K on port `3001`, decoding the raw fanout with canboat;
+- MasterBus USB integration on port `3009` feeding Signal K;
+- PostgreSQL/TimescaleDB and Grafana;
+- KIP, Freeboard-SK and InstrumentPanel;
+- repo-controlled `signalk-two-engine-state` plugin.
+
+The engine-state plugin currently uses:
+
+```text
+electrical.alternators.alpha-port.senseVoltage
+electrical.alternators.alpha-stbd.senseVoltage
+```
+
+and emits:
+
+```text
+propulsion.port.state
+propulsion.starboard.state
+```
+
+with a `13.25 V` threshold and debounce. Physical verification of all engine combinations remains required.
+
+## New typed historical path
+
+Repo support exists for:
+
+```text
+raw candump
+  -> analyzer/canboat
+  -> PGN-shaped TSV
+  -> PostgreSQL COPY staging
+  -> typed PGN tables and summaries
+```
+
+Supported typed PGNs include navigation, heading, rudder, rate of turn, attitude, magnetic variation, switch bank, speed, depth, distance log, route/waypoints, GNSS quality, common AIS, wind and environmental data.
+
+Current safeguards:
+
+- research output defaults to `none`;
+- selected research requires explicit PGNs;
+- complete-file conversion requires explicit permission;
+- input size and process runtime are bounded by default;
+- broad historical work runs offline/staging, not on live `pi5nvme`.
+
+MasterBus typed schemas/converters exist for alternator, battery, inverter/charger and solar samples, but replay into those tables still needs bounded real-data validation.
 
 ## Source material
 
-Preserve these first:
+Preserve:
 
 ```text
-picanm:/var/log/n2k/        raw NMEA 2000 candump spool
-pi5nvme:/srv/boat/raw-n2k/  mirrored/received raw NMEA 2000 archive
-pi5nvme:/srv/boat/masterbus/ MasterBus discovery/config/snapshots
-repo: docs/, scripts/, SQL migrations, systemd units, config templates
+picanm:/var/log/n2k/
+pi5nvme:/srv/boat/raw-n2k/
+pi5nvme:/srv/boat/masterbus/
+repo code, SQL, services and documentation
 ```
 
-Treat these as derived and rebuildable while experimental:
+Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must be preserved independently because MasterBus is not in the N2K archive.
 
-```text
-Signal K state/cache
-TimescaleDB decoded rows
-Signal K measurement rows
-inventories/summaries/views
-Grafana dashboards
-optional sidecar files
-```
+## Safety
 
-## Current architecture
+- Receive-only on NMEA 2000 and MasterBus.
+- No autopilot, switching or charging control.
+- No broad conversion/backfill on live `pi5nvme`.
+- No broad database aggregates on the live host.
+- Use short timeouts and bounded queries.
+- Keep raw acquisition independent from derived writers.
+- Use `pi5nvme-ip` / `picanm-ip` or `.local` mDNS; bare Starlink hostnames can resolve badly from WSL.
 
-```text
-picanm:
-  can0 + raw candump logger + raw forwarder connected to pi5nvme.local:20200 + minimal Signal K on :3000
+## Immediate task
 
-pi5nvme:
-  fat Signal K on :3001 fed by picanm Signal K during transition
-  MasterBus USB via masterbus-signalk
-  PostgreSQL/TimescaleDB
-  Grafana
-  raw log mirror/importers/collectors
-  live raw candump receiver on :20200 writing /srv/boat/raw-n2k/live/
-```
+Complete the new typed historical path in this order:
 
-## Target architecture
+1. On staging, compare typed-only storage with envelope-plus-typed storage using a bounded real sample.
+2. Select the final provenance model.
+3. Validate MasterBus replay into typed tables with a small real log.
+4. Implement typed engine transition/runtime history from MasterBus alternator evidence.
+5. Point health/Grafana queries at typed tables.
+6. Build the first historical Grafana dashboards.
+7. Evaluate logbook integration after engine state/runtime is trustworthy.
 
-```text
-picanm:
-  can0
-  raw candump logger
-  raw candump forwarder
-  health checks only
-  no Signal K after validation
+## Do not do
 
-pi5nvme:
-  raw archive receiver active on TCP 20200
-  primary Signal K
-  MasterBus USB
-  TimescaleDB/Postgres
-  Grafana
-  import/inventory/rebuild tooling
-```
+- Do not add another database.
+- Do not store every bus field merely because it can be decoded.
+- Do not retain complete frame envelopes without measured value.
+- Do not write proprietary decoders without a concrete missing-data use case.
+- Do not add new Signal K apps until the typed historical path and engine semantics are stable.
+- Do not change the working live Signal K path while building PostgreSQL history.
 
-## Safety gate after 2026-07-03 pi5nvme incident
+## Local references
 
-Before any `pi5nvme` work, read the overload/thermal incident notes in `docs/2026-07-03-pi5nvme-incident-and-picanm-status.md`; heavy jobs require explicit approval and resource limits.
-
-`pi5nvme` has rebooted and is working again: raw receiver, Signal K, PostgreSQL, and MasterBus are active. The raw importer remains disabled/gated, and the repo safeguards have been deployed to the host. Do not run importers, backfills, canboat/analyzer bulk jobs, broad database aggregate checks, or other heavy jobs on `pi5nvme` without explicit approval and resource limits.
-
-`picanm` remains the safe active acquisition edge and is still writing raw N2K logs locally. The live forwarder uses `pi5nvme.local:20200` because Starlink/local DNS returns IPv6 first for bare `pi5nvme` while the raw receiver is IPv4-only. If `pi5nvme` is unavailable, use `docs/picanm-offline-operations.md` and only run low-impact picanm health/spool checks. For Starlink LAN hostname behaviour, mDNS, and WSL caveats, read `docs/starlink-lan-name-resolution.md`.
-
-## Proven in latest implementation slice
-
-- `picanm` raw logger/forwarder services are deployed and active.
-- `picanm` forwarder uses `DEST_HOST=pi5nvme.local` and is connected to `pi5nvme.local:20200` over IPv4.
-- `pi5nvme` raw receiver is deployed and active on TCP `20200`.
-- Live raw candump lines are being written under `/srv/boat/raw-n2k/live/`.
-- `analyzerjs` decoded a received live-stream sample.
-- MasterBus snapshot capture ran under `/srv/boat/masterbus/`.
-- Exact Signal K/canboat raw input method is proven: Signal K `providers/simple` with `type: "NMEA2000"`, `subOptions.type: "n2k-ip-gateway-canboatjs"`, `format: "candump3"`, connected to a read-only local fanout on `127.0.0.1:20201`.
-- `pi5nvme` raw receiver now archives the picanm stream from TCP `20200` and fans the same candump lines to Signal K on localhost `20201`.
-- pi5 Signal K has both feeds enabled for overlap: old `picanm:3000` Signal K and new raw candump/canboat feed.
-- MasterBus is active again on `pi5nvme`: `masterbus-signalk` listens on TCP `3009`, Signal K has live vessel paths with `$source: "masterbus"`, and the bridge streams 94 mapped fields from 8 devices. Note: `/signalk/v1/api/sources` may show sparse/empty `masterbus` metadata even while vessel paths are live.
-
-## Do next
-
-1. Compare old and new feeds in parallel: PGNs, Signal K paths, timestamps, source metadata, and key values.
-2. Confirm MasterBus vessel paths remain present while the raw N2K feed is active; check `/signalk/v1/api/vessels/self`, not only `/signalk/v1/api/sources`.
-3. Plan decoded N2K import/backfill only as a separate approved, resource-limited maintenance window; do not use importer/backfill as a casual live validation step.
-4. Disable `picanm` Signal K only after the go/no-go checklist passes.
-
-## Do not do yet
-
-- Do not replace `picanm` with CANPico.
-- Do not move MasterBus to `picanm` unless wiring forces it.
-- Do not build full JSONL copies of every raw frame.
-- Do not design complex per-domain schemas.
-- Do not write proprietary PGN parsers without a concrete use case.
-- Do not enable NMEA 2000 transmit/control.
-- Do not make Signal K or TimescaleDB the source of truth for N2K.
-
-## Go/no-go for disabling `picanm` Signal K
-
-All must pass:
-
-- `picanm` writes continuous raw candump logs with edge timestamps.
-- `pi5nvme` receives and archives live raw frames.
-- Missed forwarder periods recover from mirrored spool files.
-- pi5 Signal K receives N2K data without `picanm:3000`.
-- TimescaleDB Signal K row counts increase during live validation; decoded N2K row counts increase only during an approved/resource-limited import window.
-- Key values match during overlap: position, COG/SOG, heading, wind, depth, STW, rudder, AIS.
-- MasterBus paths remain present on pi5 Signal K.
-- CAN errors/drops do not increase.
-- Rollback is documented and tested.
-
-## Read for detail
-
-- `docs/plan.md`
-- `docs/2026-07-03-edge-backend-migration-plan.md`
-- `docs/rebuild-from-source-material.md`
-- `docs/2026-07-03-boat-discovery-and-decoder-inventory.md`
+- Signal K/canboat source map: [`signalk-llm-source-map.md`](signalk-llm-source-map.md)
+- Storage implementation: [`postgresql-storage-plan.md`](postgresql-storage-plan.md)
+- Deployed-object cleanup: [`postgresql-end-state-migration.md`](postgresql-end-state-migration.md)
+- Historical import limits: [`2026-07-04-backfill-strategy.md`](2026-07-04-backfill-strategy.md)
+- Device inventory: [`2026-07-03-boat-discovery-and-decoder-inventory.md`](2026-07-03-boat-discovery-and-decoder-inventory.md)
+- Engine-state design: [`two-engine-state-plugin-plan.md`](two-engine-state-plugin-plan.md)
+- Resource safety: [`2026-07-03-pi5nvme-incident-and-picanm-status.md`](2026-07-03-pi5nvme-incident-and-picanm-status.md)

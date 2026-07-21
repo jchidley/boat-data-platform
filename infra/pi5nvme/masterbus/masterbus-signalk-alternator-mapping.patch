@@ -1,0 +1,83 @@
+diff --git a/crates/masterbus-tools/src/bin/masterbus-signalk.rs b/crates/masterbus-tools/src/bin/masterbus-signalk.rs
+index 987bebc..c1cd9ab 100644
+--- a/crates/masterbus-tools/src/bin/masterbus-signalk.rs
++++ b/crates/masterbus-tools/src/bin/masterbus-signalk.rs
+@@ -77,6 +77,7 @@ struct FieldRec {
+ struct FieldMeta {
+     class: String,
+     instance: String,
++    group: String,
+     name: String,
+     unit: String,
+ }
+@@ -231,7 +232,7 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+         if on {
+             meta.insert(
+                 (f.device, f.index),
+-                FieldMeta { class: f.class.clone(), instance: f.instance.clone(), name: f.name.clone(), unit: f.unit.clone() },
++                FieldMeta { class: f.class.clone(), instance: f.instance.clone(), group: f.group.clone(), name: f.name.clone(), unit: f.unit.clone() },
+             );
+             per_device.entry(f.device).or_default().push(f.index);
+         }
+@@ -262,7 +263,7 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+             while let Some(u) = sub.try_recv() {
+                 if have_clients
+                     && let Some(m) = meta.get(&(u.device, u.field))
+-                    && let Some((path, value)) = map_field(&m.class, &m.instance, &m.name, &m.unit, &u.value)
++                    && let Some((path, value)) = map_field(&m.class, &m.instance, &m.group, &m.name, &m.unit, &u.value)
+                 {
+                     latest.insert(path, value);
+                 }
+@@ -302,6 +303,7 @@ fn run(bus: MasterBus, listen: &str, mapping_path: Option<&Path>) -> std::io::Re
+ fn map_field(
+     class: &str,
+     id: &str,
++    group: &str,
+     name: &str,
+     unit: &str,
+     value: &Value,
+@@ -323,15 +325,41 @@ fn map_field(
+     };
+     let num = |v: f64| serde_json::Value::from(v);
+
++    if id.starts_with("alpha-") {
++        let alt = format!("electrical.alternators.{id}");
++        match (group, name, unit) {
++            ("shunt", "Battery current", "A") => return float.map(|v| (format!("{alt}.current"), num(v))),
++            ("shunt", "Battery voltage", "V") => return float.map(|v| (format!("{alt}.voltage"), num(v))),
++            ("shunt", "Battery temp.", "\u{b0}C") => return celsius.map(|c| (format!("{alt}.temperature"), num(c + 273.15))),
++            ("alternator", "Alternator volt.", "V") => return float.map(|v| (format!("{alt}.alternatorVoltage"), num(v))),
++            ("alternator", "Sense voltage", "V") => return float.map(|v| (format!("{alt}.senseVoltage"), num(v))),
++            ("alternator", "Field current", "A") => return float.map(|v| (format!("{alt}.fieldCurrent"), num(v))),
++            ("alternator", "Alternator temp.", "\u{b0}C") => return celsius.map(|c| (format!("{alt}.alternatorTemperature"), num(c + 273.15))),
++            _ => {}
++        }
++    }
++
++    if id.ends_with("-solars") {
++        let solar = format!("electrical.solar.{id}");
++        match (name, unit) {
++            ("Solar voltage", "V") => return float.map(|v| (format!("{solar}.panelVoltage"), num(v))),
++            ("Charge current", "A") => return float.map(|v| (format!("{solar}.chargeCurrent"), num(v))),
++            ("Battery voltage", "V") => return float.map(|v| (format!("{solar}.batteryVoltage"), num(v))),
++            ("Battery temp.", "\u{b0}C") => return celsius.map(|c| (format!("{solar}.temperature"), num(c + 273.15))),
++            ("Total energy", "kWh") => return float.map(|kwh| (format!("{solar}.yieldTotal"), num(kwh * 3_600_000.0))),
++            _ => {}
++        }
++    }
++
+     match class {
+         // Battery monitors → electrical.batteries.<id>
+         "BAT" => {
+             let b = format!("electrical.batteries.{id}");
+             match (name, unit) {
+                 ("State of charge", _) => float.map(|v| (format!("{b}.capacity.stateOfCharge"), num(v / 100.0))),
+-                ("Battery", "V") => float.map(|v| (format!("{b}.voltage"), num(v))),
+-                ("Battery", "A") => float.map(|v| (format!("{b}.current"), num(v))),
+-                ("Battery", "\u{b0}C") => celsius.map(|c| (format!("{b}.temperature"), num(c + 273.15))),
++                ("Battery", "V") | ("Voltage", "V") => float.map(|v| (format!("{b}.voltage"), num(v))),
++                ("Battery", "A") | ("Current", "A") => float.map(|v| (format!("{b}.current"), num(v))),
++                ("Battery", "\u{b0}C") | ("Temperature", "\u{b0}C") => celsius.map(|c| (format!("{b}.temperature"), num(c + 273.15))),
+                 ("Time remaining", _) => seconds.map(|s| (format!("{b}.capacity.timeRemaining"), num(s))),
+                 ("Cap. consumed", _) => float.map(|ah| (format!("{b}.capacity.dischargeSinceFull"), num(ah * 3600.0))),
+                 _ => None,

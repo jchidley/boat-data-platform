@@ -1,0 +1,16 @@
+[Unit]
+Description=Stop rebuildable boat-data writers before disk exhaustion
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/check-derived-storage-pressure
+User=root
+Group=root
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

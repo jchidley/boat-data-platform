@@ -1,0 +1,9 @@
+[2026-07-04T05:00:33Z INFO  masterbus::runtime::reader] device 0x4FF08C alive
+[2026-07-04T05:00:33Z INFO  masterbus::runtime::reader] device 0x51CBE6 alive
+[2026-07-04T05:00:33Z INFO  masterbus::runtime] connected (first device after 40.264428ms, heartbeat_master=None)
+[2026-07-04T05:00:33Z INFO  masterbus::runtime::reader] device 0x302388 alive
+[2026-07-04T05:00:34Z INFO  masterbus::runtime::reader] device 0x1B6164 alive
+[2026-07-04T05:00:34Z INFO  masterbus::runtime::reader] device 0x33ABF4 alive
+[2026-07-04T05:00:34Z INFO  masterbus::runtime::reader] device 0x33AC6A alive
+[2026-07-04T05:00:34Z INFO  masterbus::runtime::reader] device 0x4FF08E alive
+[2026-07-04T05:00:34Z INFO  masterbus::runtime::reader] device 0x313BAF alive

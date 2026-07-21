@@ -1,0 +1,9 @@
+total 20
+drwxr-xr-x 2 root root 4096 Jun 30 07:53 .
+drwxr-xr-x 4 root root 4096 Jul  3 11:51 ..
+-rw-r--r-- 1 root root   85 Jun 30 07:40 config
+-rw-r--r-- 1 root root 1020 Jun 30 07:53 mapping.ini
+-rw-r--r-- 1 root root 1028 Jun 30 07:53 mapping.ini.bak.20260630T065309Z
+==
+==
+==

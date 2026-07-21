@@ -31,7 +31,13 @@ fi
 sudo -u jack npm --prefix /srv/boat/signalk install \
   @mxtommy/kip \
   @signalk/freeboard-sk \
-  @signalk/instrumentpanel
+  @signalk/instrumentpanel \
+  "$(pwd)/infra/pi5nvme/signalk-plugins/signalk-two-engine-state"
+
+install -d -o jack -g jack -m 0755 /srv/boat/signalk/plugin-config-data
+if [ -d infra/pi5nvme/signalk-plugin-config-data ]; then
+  install -o jack -g jack -m 0644 infra/pi5nvme/signalk-plugin-config-data/*.json /srv/boat/signalk/plugin-config-data/
+fi
 
 install -m 0644 infra/pi5nvme/systemd/signalk-pi5nvme.service /etc/systemd/system/signalk-pi5nvme.service
 systemctl daemon-reload

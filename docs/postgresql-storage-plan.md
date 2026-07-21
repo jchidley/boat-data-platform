@@ -1,0 +1,124 @@
+# PostgreSQL storage plan
+
+## Purpose
+
+Define the current storage model for compact, rebuildable historical data without duplicating authoritative source material.
+
+## Ownership
+
+| Fact | Historical owner |
+|---|---|
+| Complete NMEA 2000 frames | Compressed edge-timestamped candump files |
+| Selected decoded N2K values | PGN-shaped typed PostgreSQL tables |
+| Selected MasterBus values | Typed MasterBus PostgreSQL tables sourced from the best replayable MasterBus log available |
+| Engine transitions and runtime | Typed PostgreSQL events derived from typed MasterBus history |
+| Health and import evidence | Bounded metadata tables |
+
+A historical fact has one owner. Signal K provides current state and does not provide the end-state historical feed to PostgreSQL.
+
+## Data flow
+
+```text
+NMEA 2000 bus
+  -> picanm raw acquisition
+  -> compressed candump source archive
+       |-> live fanout -> Signal K current state
+       `-> offline/staging decoder -> selected typed PostgreSQL history
+
+MasterBus USB
+  |-> live mapper -> Signal K current state
+  `-> replay/native event log -> selected typed PostgreSQL history
+
+PostgreSQL
+  -> Grafana
+  -> logbook/history consumers
+  -> reports and custom APIs
+```
+
+Normal operation does not replay PostgreSQL history into Signal K.
+
+## N2K storage
+
+Raw candump files are complete and replayable. PostgreSQL stores only selected values that are useful for queries, dashboards, analysis or durable events.
+
+Current typed flow:
+
+```text
+raw candump
+  -> analyzer output used as a temporary conversion format
+  -> PGN-shaped TSV
+  -> unlogged PostgreSQL staging tables
+  -> set-based merge
+  -> typed PGN tables and summaries
+```
+
+Normal conversion uses:
+
+- research mode `none` by default;
+- `untyped` mode only for bounded investigation of PGNs without a typed converter;
+- `selected` mode only for an explicit PGN list;
+- explicit permission for full-file conversion;
+- input-size and process-runtime limits.
+
+The current frame-envelope table is a validation and provenance mechanism. Before broad retention, compare:
+
+1. typed rows carrying `raw_file_id` and `message_index`; and
+2. envelope-plus-typed rows.
+
+Retain complete envelopes only if measured query or provenance value justifies their volume.
+
+## Signal K history collector removal
+
+The general Signal K history collector is not part of the two-path design and has been removed from the repository. Apply [`postgresql-end-state-migration.md`](postgresql-end-state-migration.md) when `pi5nvme` is reachable to remove its deployed service, derived table and other duplicate objects after dependency checks.
+
+Typed MasterBus and engine-event history must come from the source replay path, not Signal K.
+
+## MasterBus history
+
+Mapped Signal K JSONL preserves only fields mapped at capture time. Keep it as an interim replay source while investigating native decoded MasterBus field-event logging.
+
+Preserve together:
+
+- discovery snapshots;
+- configuration/schema caches;
+- mapping versions;
+- rotated replay logs;
+- import checksums and status.
+
+Do not add new hardware or undertake broad protocol reverse engineering unless the existing library cannot provide the required field events.
+
+## Disk and resource safety
+
+The derived-storage guard checks the PostgreSQL filesystem every five minutes:
+
+```text
+75% used: warning
+85% used: stop rebuildable PostgreSQL writers
+90% used: critical/operator action
+```
+
+Raw acquisition on `picanm` is independent and must not be stopped by this guard.
+
+Historical conversion remains offline/staging work. Any approved import must set limits for:
+
+- source bytes and file count;
+- process runtime;
+- CPU and memory;
+- temporary workspace;
+- minimum free disk;
+- transaction scope.
+
+## Acceptance criteria
+
+The storage design is complete when:
+
+- raw N2K archives remain continuous, checksummed and replayable;
+- selected typed N2K rows trace back to raw file and message position;
+- normal conversion emits no research rows;
+- complete frame-envelope retention has a measured decision;
+- each retained historical fact has one documented owner;
+- only the live Signal K and typed PostgreSQL processing paths remain;
+- durable engine events and runtime are derived from typed MasterBus history;
+- MasterBus history can be replayed from preserved source logs, subject to documented mapping limits;
+- disk pressure stops rebuildable writers before source acquisition is endangered;
+- PostgreSQL can be rebuilt from preserved source material and committed schema/tools.

@@ -2,7 +2,7 @@
 
 This document records what has been discovered about the boat so far: visible networks, devices/systems, available decoders, and known decoding gaps.
 
-It is a point-in-time inventory. Treat raw NMEA 2000 candump logs as the source material for N2K. Treat MasterBus discovery/config snapshots as the source material for Mastervolt/MasterBus, because MasterBus data cannot be rebuilt from NMEA 2000 candump logs. This document is the human/LLM-readable summary.
+It is a point-in-time inventory, not an architecture plan. Current ownership and storage rules are defined in [`plan.md`](plan.md) and [`plan.md`](plan.md). Treat raw NMEA 2000 candump logs as authoritative N2K source material and MasterBus discovery/config plus the best available replay log as MasterBus source material.
 
 ## Architecture context
 
@@ -10,18 +10,19 @@ Current discovery sources:
 
 ```text
 NMEA 2000 / PiCAN-M / picanm
-  → raw candump logs
-  → picanm minimal Signal K
-  → pi5nvme fat Signal K
-  → TimescaleDB decoded N2K + Signal K history
+  → authoritative raw candump logs
+  → live raw fanout to Signal K for current state
+  → offline/staging decode of the same raw format for selected typed PostgreSQL history
 
 Mastervolt MasterBus USB / pi5nvme
-  → masterbus-signalk
-  → pi5nvme fat Signal K
-  → TimescaleDB Signal K history
+  → masterbus-signalk → Signal K current state
+  → replay/native event source → selected typed MasterBus PostgreSQL history
+
+PostgreSQL typed history/events
+  → Grafana, logbook/history consumers, reports and custom APIs
 ```
 
-Raw N2K candump files remain the authoritative source for NMEA 2000 reprocessing. MasterBus needs its own lightweight snapshot/export trail; Signal K mappings alone are partial.
+Raw N2K candump files remain authoritative for NMEA 2000 reprocessing. MasterBus needs its own lightweight snapshot/export/log trail; Signal K mappings alone are partial.
 
 ## Visible NMEA 2000 systems
 

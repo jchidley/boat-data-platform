@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "enableDebug": false,
+  "enableLogging": false,
+  "configuration": {
+    "threshold": 13.25,
+    "startDebounceSeconds": 10,
+    "stopDebounceSeconds": 30,
+    "subscriptionPeriodMs": 1000,
+    "engines": [
+      {
+        "name": "port",
+        "inputPath": "electrical.alternators.alpha-port.senseVoltage",
+        "outputPath": "propulsion.port.state"
+      },
+      {
+        "name": "starboard",
+        "inputPath": "electrical.alternators.alpha-stbd.senseVoltage",
+        "outputPath": "propulsion.starboard.state"
+      }
+    ]
+  }
+}

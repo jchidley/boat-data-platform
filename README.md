@@ -26,7 +26,6 @@ Start here:
 - [documentation map](docs/README.md)
 - [LLM implementation brief](docs/llm-implementation-brief.md)
 - [platform plan](docs/plan.md)
-- [edge/backend migration plan](docs/2026-07-03-edge-backend-migration-plan.md)
 - [rebuild runbook](docs/rebuild-from-source-material.md)
 - [boat discovery and decoder inventory](docs/2026-07-03-boat-discovery-and-decoder-inventory.md)
 

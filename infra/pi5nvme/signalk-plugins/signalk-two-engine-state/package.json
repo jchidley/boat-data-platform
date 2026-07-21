@@ -1,0 +1,15 @@
+{
+  "name": "signalk-two-engine-state",
+  "version": "0.1.0",
+  "description": "Signal K plugin that derives twin-engine state from alternator sense voltage",
+  "main": "index.js",
+  "type": "commonjs",
+  "license": "MIT OR Apache-2.0",
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk-category-utility"
+  ],
+  "signalk": {
+    "displayName": "Two Engine State"
+  }
+}

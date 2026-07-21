@@ -69,6 +69,69 @@ ssh pi5nvme.local
 ssh 192.168.1.135
 ```
 
-## Future option
+If `ssh pi5nvme` hangs or times out from WSL, do not immediately treat that as host failure. On 2026-07-03, `ssh pi5nvme` timed out under short timeouts while direct IPv4 access worked immediately:
 
-A more robust long-term fix would be to make `boat-n2k-raw-receiver` listen dual-stack on IPv6 as well as IPv4, or run local DNS with stable A/AAAA records. For now, `pi5nvme.local` is the simplest working service name.
+```bash
+ssh -o StrictHostKeyChecking=accept-new 192.168.1.135 'date -u +%FT%TZ && hostname'
+```
+
+The address `192.168.1.135` is DHCP-provided and may change; verify from the Starlink router/DHCP lease table or another working hostname/mDNS path if it stops working.
+
+WSL SSH aliases were added on the operator machine to bypass DNS/mDNS for urgent access:
+
+```text
+pi5nvme-ip -> 192.168.1.135
+picanm-ip  -> 192.168.1.235
+```
+
+## mDNS operational checklist
+
+For Pi-to-Pi service names, keep `.local` working deliberately rather than relying on Starlink bare-hostname DNS:
+
+```bash
+systemctl is-active avahi-daemon
+getent ahosts pi5nvme.local
+getent ahosts picanm.local
+```
+
+On each Pi, verify name-service switching includes mDNS before generic DNS for `.local` names. Typical Debian/Raspberry Pi OS shape:
+
+```text
+hosts: files mdns4_minimal [NOTFOUND=return] dns mdns4
+```
+
+If `.local` resolution fails between Pis:
+
+1. Confirm `avahi-daemon` is installed, enabled, and active on both Pis.
+2. Confirm `libnss-mdns` is installed on both Pis.
+3. Confirm `/etc/nsswitch.conf` has a sane `hosts:` line with `mdns4_minimal` before `dns`.
+4. Confirm Starlink/router Wi-Fi client isolation, guest network isolation, VLANs, or firewall rules are not blocking multicast UDP 5353.
+5. Confirm both Pis are on the same L2 LAN segment and can reach each other by IPv4.
+6. Only after those checks, change application service hostnames.
+
+Verified on 2026-07-03:
+
+```text
+pi5nvme: avahi-daemon active; hosts: files mdns4_minimal [NOTFOUND=return] dns
+pi5nvme: getent ahosts picanm.local -> 192.168.1.235
+pi5nvme: getent ahosts pi5nvme.local -> 192.168.1.135
+picanm: avahi-daemon active; hosts: files mdns4_minimal [NOTFOUND=return] dns
+picanm: getent ahosts pi5nvme.local -> 192.168.1.135
+picanm: getent ahosts picanm.local -> 192.168.1.235
+picanm: /dev/tcp/pi5nvme.local/20200 reachable
+```
+
+WSL/operator resolution is separate: `picanm.local` failed from WSL in the same session, while direct IPv4 SSH worked.
+
+For WSL/operator access, `.local` may still be unreliable because WSL name resolution is not the same as Pi-to-Pi LAN resolution. Prefer direct IPv4 for urgent human/agent SSH when bare names hang.
+
+## Future options
+
+More robust long-term fixes would be:
+
+- make `boat-n2k-raw-receiver` listen dual-stack on IPv6 as well as IPv4;
+- create stable DHCP reservations in Starlink and document the reserved IPv4 addresses;
+- run local DNS with stable A/AAAA records;
+- add SSH host aliases on the operator machine for direct IPv4 access.
+
+For now, `pi5nvme.local` is the simplest working Pi-to-Pi service name, and direct IPv4 is the most reliable WSL fallback.

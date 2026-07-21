@@ -7,7 +7,7 @@
   "pipedProviders": [
     {
       "id": "picanm-signalk-ws",
-      "enabled": true,
+      "enabled": false,
       "pipeElements": [
         {
           "type": "providers/simple",

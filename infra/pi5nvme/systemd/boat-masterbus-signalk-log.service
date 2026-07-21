@@ -1,0 +1,19 @@
+[Unit]
+Description=Boat MasterBus Signal K replay JSONL logger
+After=network-online.target signalk-pi5nvme.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=jack
+WorkingDirectory=/home/jack/boat-data-platform
+Environment=SIGNALK_WS_URL=ws://127.0.0.1:3001/signalk/v1/stream?subscribe=none
+Environment=MASTERBUS_LOG_DIR=/srv/boat/masterbus/signalk-jsonl
+Environment=FLUSH_MS=1000
+ExecStart=/usr/bin/npm run collect:masterbus-log
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

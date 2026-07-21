@@ -1,0 +1,201 @@
+[
+  {
+    "id": 0,
+    "name": "General",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 38,
+        "name": "Language",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": true,
+        "min": 0.0,
+        "max": 11.0,
+        "step": 0.0,
+        "options": [
+          "English",
+          "Nederlands",
+          "Deutsch",
+          "Français",
+          "Castellano",
+          "Italiano",
+          "Norsk",
+          "Svenska",
+          "Suomi",
+          "Dansk",
+          "Russian"
+        ]
+      },
+      {
+        "index": 45,
+        "name": "Alarm sound",
+        "unit": "",
+        "viz_type": "CheckBox",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "name": "Switches",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 32,
+        "name": "Switch 1",
+        "unit": "",
+        "viz_type": "Float",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 33,
+        "name": "Switch 2",
+        "unit": "",
+        "viz_type": "Float",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 34,
+        "name": "Switch 3",
+        "unit": "",
+        "viz_type": "Float",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 35,
+        "name": "Switch 4",
+        "unit": "",
+        "viz_type": "Float",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 36,
+        "name": "Switch 5",
+        "unit": "",
+        "viz_type": "Float",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      },
+      {
+        "index": 37,
+        "name": "Switch 6",
+        "unit": "",
+        "viz_type": "Float",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Power save",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 40,
+        "name": "Standby time",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": true,
+        "min": 0.0,
+        "max": 4.0,
+        "step": 0.0,
+        "options": [
+          "2 minutes",
+          "5 minutes",
+          "10 minutes",
+          "Always on"
+        ]
+      },
+      {
+        "index": 41,
+        "name": "Auto off",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": true,
+        "min": 0.0,
+        "max": 3.0,
+        "step": 0.0,
+        "options": [
+          "Always on",
+          "1 day",
+          "2 days"
+        ]
+      },
+      {
+        "index": 42,
+        "name": "Backlight",
+        "unit": "%",
+        "viz_type": "Float",
+        "writeable": true,
+        "min": 0.0,
+        "max": 100.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Widgets",
+    "menu": "Monitoring",
+    "fields": [
+      {
+        "index": 43,
+        "name": "Page duration",
+        "unit": "",
+        "viz_type": "DropDown",
+        "writeable": true,
+        "min": 0.0,
+        "max": 6.0,
+        "step": 0.0,
+        "options": [
+          "15 seconds",
+          "20 seconds",
+          "30 seconds",
+          "40 seconds",
+          "50 seconds",
+          "60 seconds"
+        ]
+      },
+      {
+        "index": 44,
+        "name": "Slideshow",
+        "unit": "",
+        "viz_type": "CheckBox",
+        "writeable": true,
+        "min": 0.0,
+        "max": 1.0,
+        "step": 0.0,
+        "options": []
+      }
+    ]
+  }
+]

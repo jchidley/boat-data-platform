@@ -1,0 +1,12 @@
+/srv/boat/masterbus/signalk-jsonl/*.jsonl {
+    daily
+    rotate 90
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    dateext
+    dateformat -%Y%m%d
+    create 0644 jack jack
+}

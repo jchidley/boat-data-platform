@@ -247,12 +247,10 @@ SELECT time, alternator_key AS device_key, 'alternator'::text AS device_class,
        sense_voltage_v AS voltage_v, current_a, field_current_a,
        alternator_temperature_k AS temperature_k, source, raw_log_file_id, raw_line_number
 FROM public.masterbus_alternator_samples_v1
-WHERE time >= now() - interval '24 hours'
 UNION ALL
 SELECT time, battery_key, 'battery', voltage_v, current_a, NULL,
        temperature_k, source, raw_log_file_id, raw_line_number
-FROM public.masterbus_battery_samples_v1
-WHERE time >= now() - interval '24 hours';
+FROM public.masterbus_battery_samples_v1;
 
 DO $$
 BEGIN

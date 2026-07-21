@@ -18,11 +18,18 @@
       "fieldConfig": {"defaults": {}, "overrides": []}
     },
     {
-      "type": "stat", "title": "Completed runtime",
+      "type": "table", "title": "Completed runtime — closed intervals only",
       "gridPos": {"h": 6, "w": 8, "x": 0, "y": 8},
       "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
-      "targets": [{"rawSql": "SELECT engine_key, round((sum(duration_seconds) / 3600.0)::numeric, 2) AS runtime_hours FROM masterbus_engine_runtime_intervals_v1 WHERE $__timeFilter(started_at) AND end_reason <> 'open' GROUP BY engine_key ORDER BY engine_key LIMIT 100", "format": "table", "refId": "A"}],
-      "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "auto"}
+      "targets": [{"rawSql": "WITH engines(engine_key) AS (VALUES ('port'::text), ('starboard'::text)), closed AS (SELECT engine_key, sum(duration_seconds) / 3600.0 AS runtime_hours FROM masterbus_engine_runtime_intervals_v1 WHERE $__timeFilter(started_at) AND end_reason <> 'open' GROUP BY engine_key) SELECT e.engine_key, round(coalesce(c.runtime_hours, 0)::numeric, 2) AS runtime_hours FROM engines e LEFT JOIN closed c USING (engine_key) ORDER BY e.engine_key LIMIT 2", "format": "table", "refId": "A"}],
+      "options": {"showHeader": true}
+    },
+    {
+      "type": "table", "title": "Open engine intervals",
+      "gridPos": {"h": 6, "w": 8, "x": 0, "y": 14},
+      "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
+      "targets": [{"rawSql": "SELECT engine_key, started_at, start_evidence_time, start_raw_log_file_id, start_raw_line_number, source FROM masterbus_engine_runtime_intervals_v1 WHERE end_reason = 'open' AND $__timeFilter(started_at) ORDER BY started_at DESC LIMIT 20", "format": "table", "refId": "A"}],
+      "options": {"showHeader": true}
     },
     {
       "type": "table", "title": "Engine transitions and provenance",
@@ -33,7 +40,7 @@
     },
     {
       "type": "table", "title": "Latest acquisition provenance",
-      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 14},
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 20},
       "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
       "targets": [{"rawSql": "SELECT device_class, device_key, max(time) AS last_seen, max(source) AS source, max(raw_log_file_id) AS raw_log_file_id FROM v_masterbus_recent_electrical_v1 WHERE $__timeFilter(time) GROUP BY device_class, device_key ORDER BY last_seen DESC LIMIT 100", "format": "table", "refId": "A"}],
       "options": {"showHeader": true}
@@ -41,7 +48,7 @@
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "time": {"from": "now-24h", "to": "now"},
+  "time": {"from": "now-30d", "to": "now"},
   "title": "Boat typed history",
   "uid": "boat-typed-history",
   "version": 1

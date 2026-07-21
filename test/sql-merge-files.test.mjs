@@ -9,6 +9,7 @@ const masterbusSql = fs.readFileSync('infra/pi5nvme/sql/008_masterbus_v1_merge.s
 const inventoryViewsSql = fs.readFileSync('infra/pi5nvme/sql/009_inventory_views.sql', 'utf8')
 const cleanupSql = fs.readFileSync('infra/pi5nvme/sql/010_end_state_cleanup.sql', 'utf8')
 const engineSql = fs.readFileSync('infra/pi5nvme/sql/011_masterbus_engine_history_v1.sql', 'utf8')
+const historyConsumerUpgradeSql = fs.readFileSync('infra/pi5nvme/sql/012_masterbus_history_consumer_upgrade.sql', 'utf8')
 
 test('active SQL defines summary-backed N2K views and end-state cleanup', () => {
   assert.match(inventoryViewsSql, /FROM n2k_file_pgn_summary_v2/)
@@ -100,6 +101,15 @@ test('engine history SQL is native-source, deterministic, indexed, and gap-aware
   assert.match(engineSql, /IF EXISTS \(SELECT FROM pg_roles WHERE rolname = 'grafana_reader'\)/)
   assert.match(engineSql, /v_masterbus_engine_runtime_summary_v1/)
   assert.doesNotMatch(engineSql, /propulsion\.port\.state|signalk-two-engine-state/)
+  assert.doesNotMatch(engineSql, /WHERE time >= now\(\) - interval '24 hours'/)
+
+  assert.match(historyConsumerUpgradeSql, /CREATE OR REPLACE VIEW public\.v_masterbus_recent_electrical_v1 AS/)
+  assert.match(historyConsumerUpgradeSql, /FROM public\.masterbus_alternator_samples_v1/)
+  assert.match(historyConsumerUpgradeSql, /FROM public\.masterbus_battery_samples_v1/)
+  assert.match(historyConsumerUpgradeSql, /GRANT SELECT ON public\.v_masterbus_recent_electrical_v1 TO grafana_reader/)
+  assert.match(historyConsumerUpgradeSql, /GRANT SELECT ON public\.v_masterbus_recent_electrical_v1 TO boat_ingest/)
+  assert.doesNotMatch(historyConsumerUpgradeSql, /now\(\) - interval '24 hours'/)
+  assert.doesNotMatch(historyConsumerUpgradeSql, /CREATE TABLE|CREATE FUNCTION|TRUNCATE|rebuild_masterbus_engine_history_v1/)
 })
 
 test('MasterBus v1 merge SQL covers typed tables and import status', () => {

@@ -8,7 +8,8 @@ Historical N2K conversion runs offline or on a staging host. Do not run broad co
 
 ```text
 compressed candump archive
-  -> bounded analyzer/canboat conversion
+  -> bounded direct Rust/canboat-core conversion for parity-gated PGNs
+     (canboatjs/analyzer remains the fallback for other typed PGNs)
   -> PGN-shaped TSV
   -> PostgreSQL COPY staging
   -> selected typed tables with raw provenance

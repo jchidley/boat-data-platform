@@ -100,7 +100,7 @@ Preserve together:
 - discovery snapshots;
 - configuration/schema caches;
 - decoder/schema versions;
-- current mapped JSONL during migration;
+- retained mapped JSONL evidence and fallback tooling during migration;
 - import checksums and status.
 
 PostgreSQL consumes selected native events through typed staging and idempotent merge. It must not be the only sink because database downtime must not lose source evidence. Signal K continues as the independent live-state consumer and is not mirrored into PostgreSQL.

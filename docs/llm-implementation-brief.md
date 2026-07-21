@@ -55,7 +55,7 @@ Repo support exists for:
 
 ```text
 raw candump
-  -> analyzer/canboat
+  -> pinned direct Rust/canboat-core decoder (canboatjs fallback)
   -> PGN-shaped TSV
   -> PostgreSQL COPY staging
   -> typed PGN tables and summaries
@@ -75,7 +75,7 @@ Current safeguards:
 
 Native decoded Mastervolt/MasterBus event capture was deployed on 2026-07-21 inside the single `masterbus-signalk` USB owner. It logs selected mapped-native fields before Signal K path conversion under `/srv/boat/masterbus/native-events/`, suppressing unchanged values except for a 60-second heartbeat. A startup-discovery fault that hid alternator paths was recovered; the bridge now exits for systemd restart when a device absent at startup later appears.
 
-The native batch converter/importer emitted alternator, battery, inverter/charger and solar typed rows from a 257-event live sample with zero skips. Repeated import into disposable PostgreSQL staging was idempotent at 69 alternator, 42 battery, 45 inverter/charger and 30 solar rows. No native batch was imported into live `pi5nvme` PostgreSQL. Mapped Signal K JSONL is fallback evidence only and its separate logger is not part of normal deployment.
+The native batch converter/importer emitted alternator, battery, inverter/charger and solar typed rows from a 257-event live sample with zero skips. Repeated import into disposable PostgreSQL staging was idempotent at 69 alternator, 42 battery, 45 inverter/charger and 30 solar rows. The empty MasterBus typed schema and merge function were deployed to live `boatdata` on 2026-07-21; all typed tables and file inventory remain empty, and no native batch was imported. The pre-change schema backup is `/home/jack/boat-masterbus-schema-backup-20260721T073938Z`. Mapped Signal K JSONL is fallback evidence only and its separate logger is not part of normal deployment.
 
 ## Source material
 
@@ -104,7 +104,7 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 Complete the new typed historical path in this order:
 
-1. Complete native MasterBus operational validation: observe device-discovery restart recovery, hourly rotation/compression, disk growth and a settled-file delete/rebuild. Then approve a bounded native typed batch for live PostgreSQL; none has been loaded there yet.
+1. Complete native MasterBus operational validation. Device-discovery restart recovery and live file growth are verified. Still observe an hourly file boundary, daily logrotate compression/retention and a settled-file delete/rebuild; then approve a bounded native typed batch for live PostgreSQL. The schema is deployed empty and no batch has been loaded.
 2. Select and run the first explicitly bounded seven-PGN staging import. The direct Rust decoder gate is complete for PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`; parity-gate any additional PGN before inclusion.
 3. Implement typed engine transition/runtime history from native MasterBus alternator evidence and verify all four physical engine combinations.
 4. Point health/Grafana queries at typed tables and build the first historical dashboards.

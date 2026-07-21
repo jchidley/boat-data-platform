@@ -1,12 +1,12 @@
 -- MasterBus v1 staging merge helpers.
 --
--- COPY replayed MasterBus JSONL TSV into masterbus_*_stage_v1 tables first,
+-- COPY converted native MasterBus event TSV into masterbus_*_stage_v1 tables first,
 -- then call:
 --
 --   SELECT masterbus_merge_staged_log_v1(<masterbus_log_file_id>);
 --
--- The JSONL files remain the replay source. These typed SQL tables are
--- rebuildable derived history for Grafana/SQL/app queries.
+-- The append-only masterbus-native-event-v1 files remain the replay source.
+-- These typed SQL tables are rebuildable history for Grafana/SQL/app queries.
 
 CREATE OR REPLACE FUNCTION masterbus_merge_staged_log_v1(p_log_file_id bigint)
 RETURNS void

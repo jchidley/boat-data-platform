@@ -153,20 +153,38 @@ Recreate inventory and app-facing views from typed tables.
 
 Historical conversion is a high CPU, memory, disk I/O, and PostgreSQL workload. Run it offline or on staging with explicit resource and disk limits.
 
-Current rebuild path:
+Current preferred rebuild path for the initial validated PGNs:
 
 ```text
 raw candump.gz
-  -> offline/staging analyzer/canboat
+  -> pinned direct Rust/canboat-core converter
   -> PGN-shaped TSV staging files
   -> PostgreSQL COPY into unlogged staging tables
   -> selected typed PGN tables with raw-file provenance
   -> summaries/import status
 ```
 
-The wrapper, merge SQL and supported typed PGNs have bounded sample validation. Research output defaults to `none`; full-file use requires explicit permission and resource limits. Do not run a broad rebuild until typed-only versus envelope-plus-typed storage has been measured and approved.
+The canboatjs/analyzer converter remains the comparison oracle and fallback for typed PGNs not yet ported to Rust. The wrapper, merge SQL and initial seven Rust PGNs have bounded parity, idempotence and delete/rebuild validation. Research output defaults to `none`; full-file use requires explicit permission and resource limits. Typed-only provenance was selected after measured staging comparison. Broad rebuilds remain staging work under the historical import limits.
 
-### 6. Rebuild inventories and summaries
+### 6. Re-import selected native MasterBus history
+
+Restore settled `masterbus-native-event-v1` files from:
+
+```text
+/srv/boat/masterbus/native-events/
+```
+
+Use the bounded native importer on staging:
+
+```text
+npm run import:masterbus:native-copy -- \
+  --raw-file FILE \
+  --sample-lines N
+```
+
+Complete settled files require explicit `--allow-full-file`. Validate file checksum, line count, typed row counts and zero unexpected skips before loading an approved batch. Repeated imports must remain idempotent. Do not import an active hourly JSONL file.
+
+### 7. Rebuild inventories and summaries
 
 Use inventory tooling, currently:
 
@@ -176,7 +194,7 @@ npm run inventory:n2k
 
 Future tooling should populate compact SQL views/tables first; optional markdown/json sidecars can then be generated from SQL.
 
-### 7. Restore Signal K/Grafana convenience layers
+### 8. Restore Signal K/Grafana convenience layers
 
 Signal K and Grafana are useful but not the source of truth.
 
@@ -195,7 +213,7 @@ http://pi5nvme:3001/
 http://pi5nvme:3000/
 ```
 
-### 8. Verify rebuild
+### 9. Verify rebuild
 
 Minimum verification:
 

@@ -104,7 +104,7 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 The first native live batch, seven-PGN staging gate and engine-history deployment are complete. Continue in this order:
 
-1. Deploy the repository-controlled Grafana provisioning/dashboard set and validate its bounded electrical and engine-history queries against the first live MasterBus batch.
+1. The repository-controlled Grafana dashboard is deployed and validated against the first live MasterBus batch. Continue checking its usefulness and query behavior before scheduling more imports.
 2. Complete port-only and both-running physical commissioning when safe. Do not present runtime as trusted operational/logbook history until these observations agree with the typed-derived transitions.
 3. Evaluate logbook integration only after engine state/runtime is trustworthy.
 4. Use the first dashboard to decide whether ongoing MasterBus imports provide enough value to justify a schedule. Approve each additional settled-file batch separately; do not turn the importer into an unattended live writer yet.
@@ -135,7 +135,7 @@ Before every live schema change or typed import, compare deployed functions, gra
 
 The repository now contains migration `011_masterbus_engine_history_v1.sql`, which deterministically rebuilds durable engine transitions and runtime intervals from typed native alternator samples only. It uses the deployed 13.25 V strict threshold, 10-second start debounce and 30-second stop debounce, suppresses duplicate samples through the typed primary key, treats gaps over 120 seconds as unknown/data-gap boundaries, leaves sparse open intervals open, and retains raw log/line provenance. It does not read Signal K engine-state output. Indexed consumer views cover engine runtime summaries, recent electrical history and provenance.
 
-A first useful repository-controlled Grafana dashboard/provisioning set is present under `infra/pi5nvme/grafana/`. It has not yet been deployed to the live host; the first typed MasterBus batch is now available for dashboard validation.
+The first repository-controlled Grafana dashboard/provisioning set under `infra/pi5nvme/grafana/` was deployed on 2026-07-21. The datasource was migrated from generated UID `P6F2373E0681BE28D` to stable UID `boat-timescaledb`; dashboard UID `boat-typed-history` is present in Grafana's unified resource store. Bounded reader-role smoke queries returned 2,937 alternator rows and one engine transition for the imported interval.
 
 ### New executable engine-history verification — 2026-07-21
 
@@ -163,7 +163,7 @@ A focused audit of the older canboatjs typed slices confirmed that PGNs `129540`
 ### Remaining gates
 
 - The first native MasterBus batch is imported into live `pi5nvme` PostgreSQL. No N2K batch has been imported live; additional batches remain separately approval-gated.
-- The engine migration is deployed and rebuilt from the imported typed alternator evidence. Grafana provisioning remains repository-only pending deployment review.
+- The engine migration is deployed and rebuilt from the imported typed alternator evidence. Grafana provisioning/dashboard are deployed and verified; the deployment backup is `/home/jack/grafana-history-backup-20260721T153548Z`.
 - Port-only and both-running remain deferred physical observations. Both-off was verified at nighttime with both sense-voltage and field-current inputs at 0 and both derived states `stopped`. Do not describe runtime as trusted operational/logbook history until the remaining observations are recorded.
 
 Read-only live verification on `pi5nvme` confirmed direct `raw_file_id/message_index` schema columns and zero rows in `masterbus_log_files_v1`, `masterbus_alternator_samples_v1`, and N2K raw inventory. The bounded health run at `2026-07-21T08:21:02Z` passed 27/27 checks with picanm, raw receiver, Signal K and MasterBus active; Signal K freshness was 96/104 raw-feed paths and 43/43 MasterBus paths. No live writer or schema mutation was performed.

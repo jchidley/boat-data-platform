@@ -36,10 +36,12 @@ Current state:
 - Engine history has one open starboard interval and no port transition.
 - Both-off and starboard-only physical engine combinations are verified.
 - Port-only and both-running still require safe physical commissioning.
-- Grafana dashboard files exist in the repository but are not deployed.
+- Grafana dashboard UID `boat-typed-history` is deployed with stable datasource UID `boat-timescaledb`.
 - No live N2K typed batch has been imported.
 
 Do not assume this state remains true. Verify it at Checkpoint 0.
+
+Tasks 1–4 were completed on 2026-07-21. A new agent should begin with Task 5 unless explicitly asked to audit or redeploy Grafana.
 
 ## Absolute boundaries
 
@@ -153,7 +155,7 @@ Stop and report; do not repair automatically if:
 - the repository is dirty due to another agent;
 - tests fail.
 
-## Task 1 — make the Grafana dashboard ready for the imported batch
+## Task 1 — make the Grafana dashboard ready for the imported batch (completed)
 
 This is repository-only and safe to perform without live-deployment approval.
 
@@ -214,7 +216,7 @@ git status --short --branch
 
 Do not deploy yet unless the user explicitly approves Grafana deployment.
 
-## Task 2 — preflight Grafana deployment
+## Task 2 — preflight Grafana deployment (completed)
 
 This task is read-only. It may be performed before deployment approval.
 
@@ -259,7 +261,7 @@ Expected:
 
 Stop and report if any datasource, relation, privilege or service check fails. Do not compensate by changing passwords, roles or schema unless separately approved.
 
-## Task 3 — deploy only the Grafana dashboard files
+## Task 3 — deploy only the Grafana dashboard files (completed)
 
 **Approval required:** perform this task only after the user explicitly says to deploy Grafana.
 
@@ -306,7 +308,7 @@ systemctl is-active grafana-server
 "
 ```
 
-## Task 4 — verify Grafana deployment
+## Task 4 — verify Grafana deployment (completed)
 
 Compare repository and deployed checksums:
 

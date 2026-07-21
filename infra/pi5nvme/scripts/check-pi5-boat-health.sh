@@ -50,10 +50,6 @@ process.stdin.on("end", () => {
 ' || true
 fi
 
-echo "--- database freshness ---"
-if command -v psql >/dev/null 2>&1; then
-fi
-
 echo "--- native MasterBus replay logs ---"
 find /srv/boat/masterbus/native-events -maxdepth 1 -type f -name 'masterbus-native-*.jsonl*' -printf '%TY-%Tm-%TdT%TH:%TM:%TSZ %s %p\n' 2>/dev/null | sort | tail -20 || true
 

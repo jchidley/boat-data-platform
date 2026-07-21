@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
+import { execFileSync } from 'node:child_process'
 
 const install = fs.readFileSync('infra/pi5nvme/install-pi5nvme.sh', 'utf8')
 const masterbusInstall = fs.readFileSync('infra/pi5nvme/install-masterbus-tools.sh', 'utf8')
@@ -10,6 +11,16 @@ const logrotate = fs.readFileSync('infra/pi5nvme/logrotate/boat-masterbus-native
 const storageGuard = fs.readFileSync('infra/pi5nvme/scripts/check-derived-storage-pressure.sh', 'utf8')
 const storageGuardTimer = fs.readFileSync('infra/pi5nvme/systemd/boat-derived-storage-guard.timer', 'utf8')
 const healthCheck = fs.readFileSync('scripts/check-steady-state.sh', 'utf8')
+
+test('committed infrastructure shell scripts pass bash syntax validation', () => {
+  const scripts = execFileSync('git', ['ls-files', 'infra/**/*.sh', 'scripts/*.sh'], { encoding: 'utf8' })
+    .trim()
+    .split('\n')
+    .filter(Boolean)
+
+  assert.ok(scripts.includes('infra/pi5nvme/scripts/check-pi5-boat-health.sh'))
+  for (const script of scripts) execFileSync('bash', ['-n', script])
+})
 
 test('MasterBus installer deploys native decoded event logging in the single USB owner', () => {
   assert.match(masterbusInstall, /masterbus-signalk-native\.conf/)

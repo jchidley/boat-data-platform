@@ -104,9 +104,9 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 Complete the new typed historical path in this order:
 
-1. Complete native MasterBus operational validation. Device-discovery restart recovery and live file growth are verified. Still observe an hourly file boundary, daily logrotate compression/retention and a settled-file delete/rebuild; then approve a bounded native typed batch for live PostgreSQL. The schema is deployed empty and no batch has been loaded.
+1. Prove settled-native-file import/delete/rebuild on staging, then approve a bounded native typed batch for live PostgreSQL. Native hourly segmentation is implemented and daily compression/90-day retention configuration is validated; continue monitoring these as operations, not implementation blockers. The live schema is empty and no batch has been loaded.
 2. Select and run the first explicitly bounded seven-PGN staging import. The direct Rust decoder gate is complete for PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`; parity-gate any additional PGN before inclusion.
-3. Implement typed engine transition/runtime history from native MasterBus alternator evidence and verify all four physical engine combinations.
+3. Implement typed engine transition/runtime history from native MasterBus alternator evidence. Starboard-only is physically verified; both-off, port-only and both-running remain a commissioning checklist and must be completed before engine history is declared trustworthy for logbook use.
 4. Point health/Grafana queries at typed tables and build the first historical dashboards.
 5. Evaluate logbook integration after engine state/runtime is trustworthy.
 

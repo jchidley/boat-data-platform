@@ -155,7 +155,7 @@ Pin the `canboat-rs` revision and embedded schema version in `Cargo.lock`; retai
 1. Native capture is deployed inside `masterbus-signalk`, before Signal K mapping, so one process owns the USB interface. `masterbus-native-event-v1` records timestamp, native device/field identity, class/instance/group/name/unit and decoded value.
 2. Selected useful native fields are appended under `/srv/boat/masterbus/native-events/`; unchanged values are suppressed with a 60-second heartbeat. Signal K emission remains independent. If a device absent at startup later appears, the bridge exits so systemd restarts full discovery and subscriptions.
 3. The bounded native converter/importer supports typed alternator, battery, inverter/charger and solar tables with file/line provenance. A real 257-event sample covered all four domains with zero skips and repeated disposable staging import was idempotent.
-4. Discovery-triggered systemd restart recovery and live native-log growth are verified. Still observe an hourly file boundary, daily logrotate compression/retention and settled-file delete/rebuild before approving a limited live PostgreSQL batch. The empty typed schema is deployed; no native batch has been loaded.
+4. Discovery-triggered systemd restart recovery and live native-log growth are verified. Hourly segmentation is implemented in the writer, and daily compression with 90-day retention is configuration-validated; monitor both operationally without blocking implementation. Prove settled-file delete/rebuild before approving a limited live PostgreSQL batch. The empty typed schema is deployed; no native batch has been loaded.
 5. Keep mapped Signal K JSONL only as retained comparison/fallback evidence; its separate logger is removed from normal deployment.
 6. Derive port/starboard engine transitions from typed native alternator evidence and runtime from durable transition intervals.
 
@@ -184,11 +184,15 @@ Live-only apps continue to use Signal K.
 
 ## Immediate work order
 
-1. Finish native MasterBus operational validation at an hourly file boundary and daily compression, prove settled-file delete/rebuild, then approve the first bounded native batch into the deployed empty PostgreSQL schema.
+1. Prove settled-native-file import/delete/rebuild, then approve the first bounded native batch into the deployed empty PostgreSQL schema.
 2. Select and run the first explicitly bounded seven-PGN Rust staging import.
-3. Implement durable engine transitions/runtime from typed native MasterBus alternator history and verify all four live physical engine combinations.
+3. Implement durable engine transitions/runtime from typed native MasterBus alternator history.
 4. Build Grafana health and first useful typed-history dashboards.
 5. Evaluate logbook integration after engine state/runtime is trustworthy.
+
+## Deferred physical commissioning
+
+These observations depend on operating the engines and are not blockers for code handoff: both-off, port-only and both-running. Starboard-only is verified. Record the remaining combinations using [`two-engine-state-plugin-plan.md`](two-engine-state-plugin-plan.md) before declaring engine transitions/runtime trustworthy for operational logbook use.
 
 ## Done means
 

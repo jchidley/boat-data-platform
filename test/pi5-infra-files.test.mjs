@@ -16,6 +16,8 @@ test('MasterBus installer deploys native decoded event logging in the single USB
   assert.match(nativeDropin, /MASTERBUS_NATIVE_LOG_DIR=\/srv\/boat\/masterbus\/native-events/)
   assert.match(nativeDropin, /ReadWritePaths=\/srv\/boat\/masterbus\/native-events/)
   assert.match(nativePatch, /masterbus-native-event-v1/)
+  assert.match(nativePatch, /masterbus-native-\{hour\}0000Z\.jsonl/)
+  assert.match(nativePatch, /if hour != self\.hour/)
   assert.match(nativePatch, /new MasterBus device appeared; restarting discovery/)
   assert.match(install, /disable --now boat-masterbus-signalk-log\.service/)
 })
@@ -36,6 +38,7 @@ test('derived storage guard enforces the 85 percent threshold without touching r
 
 test('native MasterBus JSONL logrotate compresses replay logs without deleting recent history', () => {
   assert.match(logrotate, /\/srv\/boat\/masterbus\/native-events\/\*\.jsonl/)
+  assert.match(logrotate, /daily/)
   assert.match(logrotate, /rotate 90/)
   assert.match(logrotate, /compress/)
   assert.match(logrotate, /copytruncate/)

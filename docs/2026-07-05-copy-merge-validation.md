@@ -135,7 +135,7 @@ During a physical starboard-only run at approximately 1500 RPM, Signal K reporte
 - Validation samples are deliberately small.
 - No broad historical import has been approved.
 - The 2026-07-21 bounded real-data comparison selected typed-only direct provenance: 20 MB versus 55 MB for envelope-plus-typed, a 63.1% reduction across 118,149 decoded envelopes and 109,768 typed rows.
-- Both the older mapped Signal K sample and the native pre-mapping field-event sample have converter evidence; hourly boundary/rotation, daily compression and settled-file delete/rebuild remain operational gates for the native source.
+- Both the older mapped Signal K sample and the native pre-mapping field-event sample have converter evidence. Hourly segmentation and daily compression/90-day retention are implementation/configuration validated and remain routine monitoring; settled-file delete/rebuild remains the batch-acceptance gate.
 - Each newly supported PGN needs a bounded representative sample and test fixture.
 
 ## Reproduce safely

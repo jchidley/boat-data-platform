@@ -63,9 +63,9 @@ Current hyphenated input names are boat-specific deployed Signal K paths. New ma
 - No MasterBus writes.
 - No engine or charging control.
 
-## Physical validation status
+## Deferred physical commissioning
 
-Capture all four combinations. Starboard-only was verified on 2026-07-21 at approximately 1500 RPM: starboard sense voltage was about 13.7 V, field current about 3.0 A, alternator voltage about 13.6–13.7 V and the output was `started`; port sense voltage was 0 V and its output was `stopped`.
+Physical combinations are a commissioning checklist, not a blocker for implementation handoff. Starboard-only was verified on 2026-07-21 at approximately 1500 RPM: starboard sense voltage was about 13.7 V, field current about 3.0 A, alternator voltage about 13.6–13.7 V and the output was `started`; port sense voltage was 0 V and its output was `stopped`. Complete the remaining observations when those engine states are safely available, before using derived runtime as trusted operational/logbook history.
 
 | Port engine | Starboard engine | Expected outputs | Status |
 |---|---|---|---|

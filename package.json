@@ -8,6 +8,8 @@
     "collect:masterbus-log": "node scripts/collect-masterbus-signalk-log.mjs",
     "convert:masterbus-copy": "node scripts/masterbus-jsonl-to-copy.mjs",
     "import:n2k:v2-copy": "node scripts/import-n2k-v2-copy.mjs",
+    "build:n2k-rust": "cargo build --release --manifest-path tools/n2k-rust-importer/Cargo.toml",
+    "test:n2k-rust": "cargo test --release --manifest-path tools/n2k-rust-importer/Cargo.toml",
     "inventory:n2k": "node scripts/n2k-inventory.mjs",
     "inventory:device-extraction": "node scripts/build-device-extraction-report.mjs",
     "health:picanm": "bash infra/picanm/scripts/check-picanm-health.sh",

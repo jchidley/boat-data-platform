@@ -141,17 +141,19 @@ Current typed coverage includes navigation, heading, steering, speed, depth, dis
 
 #### Historical decoder migration
 
-Keep the existing Signal K/canboatjs live path unchanged. Before the first significant limited historical import, evaluate a pinned `canboat-rs` release as the offline PostgreSQL decoder.
+Keep the existing Signal K/canboatjs live path unchanged. The offline PostgreSQL path now has an incremental direct Rust converter under `tools/n2k-rust-importer/`. It embeds a pinned `canboat-core`, reads edge candump text itself, decodes in SI units and emits typed COPY TSV without analyzer JSON. Provenance is the one-based source candump line where the message begins, including fast packets.
 
-The migration gate is:
+Initial direct typed coverage is PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`. On a bounded 10,000-line real sample, Rust and canboatjs produced identical row counts for all seven typed PGNs; Rust decoded 6,001 total messages versus 5,891 from canboatjs. The Rust wrapper imported twice idempotently into disposable PostgreSQL staging, retained 6,001 summary messages and emptied staging.
 
-1. add a tested adapter from edge candump text to CANboat PLAIN/FAST while preserving source-line provenance;
-2. run canboatjs and `canboat-rs` over the same bounded real files;
-3. compare typed counts, values, SI units, fast-packet timestamps, incomplete-packet handling and PGNs decoded by only one implementation;
-4. import both outputs into disposable staging databases and prove idempotent delete/rebuild;
-5. adopt Rust only when timestamp and message-position differences are understood.
+Before Rust becomes the default or runs a significant limited import:
 
-The initial Rust path may continue emitting analyzer-compatible JSON into the existing typed converter. Embedding `canboat-core` and emitting COPY rows directly is a later optimisation, not a prerequisite. Pin the binary version, checksum and embedded CANboat schema version; retain canboatjs as a fallback through the first validated limited import.
+1. compare values within field resolution, SI units and first-frame fast-packet timestamps on several bounded real files;
+2. test malformed and incomplete packets explicitly;
+3. explain PGNs decoded by only one implementation;
+4. port and validate each additional typed PGN needed by the first historical consumers;
+5. prove delete/rebuild with the final selected PGN set.
+
+Pin the `canboat-rs` revision and embedded schema version in `Cargo.lock`; retain canboatjs as the comparison oracle and fallback through the first validated limited import.
 
 ### 3. Finish the typed MasterBus path
 

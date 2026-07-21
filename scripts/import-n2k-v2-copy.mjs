@@ -22,7 +22,9 @@ Options:
   --max-runtime-sec N   Timeout for each analyzer/psql process (default: 300)
   --research-mode MODE  none (default), untyped, or selected
   --research-pgn LIST   Comma-separated PGNs required with selected research mode
+  --decoder MODE        js (default) or rust; rust emits typed TSV directly
   --analyzer CMD        analyzerjs command/path (default: ANALYZERJS or common Signal K path)
+  --rust-importer CMD   Rust importer binary (default: tools/n2k-rust-importer/target/release/n2k-rust-importer)
   --psql CMD            psql command/path (default: psql)
   --keep-work           Keep generated work directory
   --dry-run             Prepare/analyze/convert only; do not touch PostgreSQL
@@ -44,10 +46,12 @@ const maxInputBytes = Number(arg('--max-input-bytes') ?? process.env.N2K_IMPORT_
 const maxRuntimeSec = Number(arg('--max-runtime-sec') ?? process.env.N2K_IMPORT_MAX_RUNTIME_SEC ?? 300)
 const researchMode = arg('--research-mode') || 'none'
 const researchPgn = arg('--research-pgn')
+const decoder = arg('--decoder') || 'js'
 const keepWork = has('--keep-work')
 const dryRun = has('--dry-run')
 const psqlCmd = arg('--psql') || process.env.PSQL || 'psql'
 const analyzerCmd = arg('--analyzer') || process.env.ANALYZERJS || '/usr/lib/node_modules/signalk-server/node_modules/@canboat/canboatjs/dist/bin/analyzerjs.js'
+const rustImporterCmd = arg('--rust-importer') || process.env.N2K_RUST_IMPORTER || path.resolve(scriptDir, '../tools/n2k-rust-importer/target/release/n2k-rust-importer')
 const workDir = arg('--work-dir') || fs.mkdtempSync(path.join(os.tmpdir(), 'n2k-v2-copy-'))
 
 if (!rawFile) { console.error(usage); process.exit(2) }
@@ -65,6 +69,14 @@ if (!Number.isInteger(maxInputBytes) || maxInputBytes < 0 || !Number.isInteger(m
 }
 if (!['none', 'untyped', 'selected'].includes(researchMode) || (researchMode === 'selected' && !researchPgn)) {
   console.error('--research-mode must be none, untyped, or selected; selected requires --research-pgn')
+  process.exit(2)
+}
+if (!['js', 'rust'].includes(decoder)) {
+  console.error('--decoder must be js or rust')
+  process.exit(2)
+}
+if (decoder === 'rust' && researchMode !== 'none') {
+  console.error('the incremental Rust importer currently supports --research-mode none only')
   process.exit(2)
 }
 if (!fs.existsSync(rawFile)) {
@@ -187,19 +199,32 @@ async function main() {
   const preparedStat = fs.statSync(preparedRaw)
   if (preparedStat.size === 0) throw new Error('prepared raw sample is empty')
 
-  const [analyzerExe, analyzerPrefixArgs] = analyzerInvocation()
-  await run(analyzerExe, [...analyzerPrefixArgs, '--file', preparedRaw], { stdio: ['ignore', fs.openSync(analyzerJsonl, 'w'), 'pipe'] })
-
   const converter = path.join(scriptDir, 'analyzer-jsonl-to-n2k-copy.mjs')
   const converterArgs = id => [converter, '--log-file-id', String(id), '--frames-tsv', framesTsv, '--fields-tsv', fieldsTsv, '--typed-dir', typedDir, '--research-mode', researchMode, ...(researchPgn ? ['--research-pgn', researchPgn] : [])]
-  const conv = await new Promise((resolve, reject) => {
-    const input = fs.openSync(analyzerJsonl, 'r')
-    const child = spawn(process.execPath, converterArgs(1), { stdio: [input, 'pipe', 'pipe'] })
-    let stderr = ''
-    child.stderr.on('data', d => { stderr += d })
-    child.on('error', reject)
-    child.on('close', code => code === 0 ? resolve(stderr.trim()) : reject(new Error(`converter failed with ${code}\n${stderr}`)))
-  })
+
+  if (decoder === 'js') {
+    const [analyzerExe, analyzerPrefixArgs] = analyzerInvocation()
+    await run(analyzerExe, [...analyzerPrefixArgs, '--file', preparedRaw], { stdio: ['ignore', fs.openSync(analyzerJsonl, 'w'), 'pipe'] })
+  } else if (!fs.existsSync(rustImporterCmd)) {
+    throw new Error(`Rust importer not found: ${rustImporterCmd}; build it with cargo build --release --manifest-path tools/n2k-rust-importer/Cargo.toml`)
+  }
+
+  async function convert(id) {
+    if (decoder === 'rust') {
+      const result = await run(rustImporterCmd, ['--raw-file', preparedRaw, '--log-file-id', String(id), '--frames-tsv', framesTsv, '--fields-tsv', fieldsTsv, '--typed-dir', typedDir])
+      return result.stderr.trim()
+    }
+    return await new Promise((resolve, reject) => {
+      const input = fs.openSync(analyzerJsonl, 'r')
+      const child = spawn(process.execPath, converterArgs(id), { stdio: [input, 'pipe', 'pipe'] })
+      let stderr = ''
+      child.stderr.on('data', d => { stderr += d })
+      child.on('error', reject)
+      child.on('close', code => code === 0 ? resolve(stderr.trim()) : reject(new Error(`converter failed with ${code}\n${stderr}`)))
+    })
+  }
+
+  const conv = await convert(1)
   let convertStats = {}
   try { convertStats = JSON.parse(conv) } catch { convertStats = { raw: conv } }
 
@@ -235,14 +260,7 @@ async function main() {
   fs.rmSync(fieldsTsv, { force: true })
   fs.rmSync(typedDir, { recursive: true, force: true })
   fs.mkdirSync(typedDir, { recursive: true })
-  const conv2 = await new Promise((resolve, reject) => {
-    const input = fs.openSync(analyzerJsonl, 'r')
-    const child = spawn(process.execPath, converterArgs(rawFileId), { stdio: [input, 'pipe', 'pipe'] })
-    let stderr = ''
-    child.stderr.on('data', d => { stderr += d })
-    child.on('error', reject)
-    child.on('close', code => code === 0 ? resolve(stderr.trim()) : reject(new Error(`converter failed with ${code}\n${stderr}`)))
-  })
+  const conv2 = await convert(rawFileId)
   try { convertStats = JSON.parse(conv2) } catch { convertStats = { raw: conv2 } }
 
   const copySqlPath = path.join(workDir, 'copy-and-merge.sql')

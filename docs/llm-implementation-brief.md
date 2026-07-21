@@ -102,7 +102,7 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 Complete the new typed historical path in this order:
 
-1. Before a significant limited N2K import, evaluate a pinned `canboat-rs` release offline against canboatjs on identical bounded real files. Add a candump-to-PLAIN adapter, preserve source-line provenance, compare typed values/counts and resolve fast-packet timestamp/message-position differences. Keep live Signal K/canboatjs unchanged.
+1. Complete the direct Rust historical-decoder gate. `tools/n2k-rust-importer/` now embeds pinned `canboat-core`, reads candump directly and emits seven typed PGN TSV shapes without analyzer JSON. Extend value/timestamp/malformed-packet parity testing and port only the additional PGNs needed for the first limited import. Keep live Signal K/canboatjs unchanged and retain it as the oracle/fallback.
 2. Validate real alternator, inverter/charger and solar MasterBus replay when representative states are available; battery replay is validated.
 3. Implement typed engine transition/runtime history from MasterBus alternator evidence.
 4. Point health/Grafana queries at typed tables.

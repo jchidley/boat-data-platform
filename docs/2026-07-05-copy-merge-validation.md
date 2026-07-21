@@ -62,6 +62,24 @@ Validated typed PGNs:
 
 Tests included synthetic rows for all supported shapes and small real analyzer samples for representative navigation, steering, GNSS, AIS and environmental messages. Non-null depth and nested list rows for satellites/routes were explicitly checked.
 
+## Direct Rust decoder validation
+
+`tools/n2k-rust-importer/` embeds `canboat-core` revision `d0f7f24a41b1274f63b71f08703539554523858f` with CANboat schema `7.1.0`. It reads candump directly, uses one-based source-line provenance, decodes in SI units and emits typed TSV without analyzer JSON.
+
+A 10,000-line real sample produced:
+
+```text
+Rust decoded messages:       6001
+canboatjs decoded messages:  5891
+Rust selected typed rows:    3002
+research rows:                  0
+malformed rows:                 0
+```
+
+Rust and canboatjs produced identical row counts for each implemented typed PGN: `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`. Across the sample, corresponding numeric differences were below `3e-14`. Rust deliberately preserves the raw edge timestamp to microseconds and records the one-based source line, rather than canboatjs's decoded-record index and millisecond timestamp formatting.
+
+The bounded wrapper imported the Rust output twice into disposable PostgreSQL without duplicates; frame staging emptied and summary count remained 6,001. Rust is not yet the default because malformed/incomplete packet, Rust-only decode and additional-file comparisons still need broader fixtures.
+
 ## MasterBus path validated
 
 ```text

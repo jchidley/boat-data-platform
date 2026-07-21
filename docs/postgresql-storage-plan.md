@@ -39,9 +39,11 @@ Normal operation does not replay PostgreSQL history into Signal K.
 
 ## Historical decoder policy
 
-Signal K continues using its deployed canboatjs decoder for live state. The offline PostgreSQL path may migrate to a pinned `canboat-rs` release after bounded dual-decoder validation. Rust must consume an adapter that preserves the original candump source-line position; decoder output sequence numbers are not raw provenance.
+Signal K continues using its deployed canboatjs decoder for live state. The offline PostgreSQL path has a direct Rust implementation under `tools/n2k-rust-importer/`. It embeds a revision-pinned `canboat-core`, parses edge candump records, reassembles messages, decodes in SI units and emits COPY TSV directly. It does not emit or retain analyzer JSON.
 
-Acceptance requires equivalent supported typed row counts, understood numeric differences, SI units, explicit fast-packet timestamp semantics, bounded malformed/incomplete-packet behavior, and a successful staging delete/rebuild. Record the binary checksum and embedded CANboat schema version. Initially retain analyzer-compatible JSON between Rust and the existing typed converter; direct `canboat-core`-to-COPY integration is optional future optimisation.
+Rust provenance is the one-based source candump line where the message begins; decoder output sequence numbers are never provenance. Current coverage is intentionally limited to seven typed PGNs and is selected with `--decoder rust` in the bounded wrapper. canboatjs remains the default comparison path until acceptance is complete.
+
+Acceptance requires equivalent supported typed row counts, values within field resolution, explicit first-frame fast-packet timestamps, bounded malformed/incomplete-packet behavior, explained Rust-only decodes and a successful staging delete/rebuild. Record the pinned revision and embedded CANboat schema version in conversion evidence.
 
 ## N2K storage
 

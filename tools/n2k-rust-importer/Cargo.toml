@@ -1,0 +1,11 @@
+[package]
+name = "n2k-rust-importer"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[dependencies]
+anyhow = "1"
+flate2 = "1"
+canboat = { git = "https://github.com/canboat/canboat-rs.git", rev = "d0f7f24a41b1274f63b71f08703539554523858f", default-features = false, features = ["decode"] }

@@ -13,12 +13,16 @@ test('N2K v2 wrapper exposes safe COPY/import workflow in help', () => {
   assert.match(result.stdout, /--sample-lines N/)
   assert.match(result.stdout, /--allow-full-file/)
   assert.match(result.stdout, /--research-mode MODE/)
+  assert.match(result.stdout, /--decoder MODE/)
+  assert.match(result.stdout, /--rust-importer CMD/)
   assert.match(result.stdout, /--max-runtime-sec N/)
   assert.match(result.stdout, /safe v2 relational\/COPY path/)
 })
 
 test('N2K v2 wrapper orchestrates analyzer, converter, COPY and merge', () => {
   assert.match(source, /analyzer-jsonl-to-n2k-copy\.mjs/)
+  assert.match(source, /tools\/n2k-rust-importer\/target\/release\/n2k-rust-importer/)
+  assert.match(source, /decoder === 'rust'/)
   assert.match(source, /INSERT INTO n2k_raw_files_v2/)
   assert.match(source, /copyCommand\('n2k_frames_stage_v2'/)
   assert.match(source, /researchMode = arg\('--research-mode'\) \|\| 'none'/)

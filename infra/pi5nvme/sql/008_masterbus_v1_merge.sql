@@ -15,7 +15,6 @@ AS $$
 DECLARE
   v_first timestamptz;
   v_last timestamptz;
-  v_count bigint;
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM masterbus_log_files_v1 WHERE masterbus_log_file_id = p_log_file_id) THEN
     RAISE EXCEPTION 'masterbus_log_files_v1 row % does not exist', p_log_file_id;
@@ -118,7 +117,7 @@ BEGIN
     charge_current_a = coalesce(EXCLUDED.charge_current_a, masterbus_solar_samples_v1.charge_current_a),
     yield_total_wh = coalesce(EXCLUDED.yield_total_wh, masterbus_solar_samples_v1.yield_total_wh);
 
-  SELECT min(time), max(time), count(DISTINCT raw_line_number) INTO v_first, v_last, v_count
+  SELECT min(time), max(time) INTO v_first, v_last
   FROM (
     SELECT time, raw_line_number FROM masterbus_alternator_samples_v1 WHERE raw_log_file_id = p_log_file_id
     UNION ALL SELECT time, raw_line_number FROM masterbus_battery_samples_v1 WHERE raw_log_file_id = p_log_file_id
@@ -129,7 +128,6 @@ BEGIN
   UPDATE masterbus_log_files_v1
   SET first_event_time = v_first,
       last_event_time = v_last,
-      line_count = v_count,
       import_status = 'imported',
       imported_at = now(),
       updated_at = now()

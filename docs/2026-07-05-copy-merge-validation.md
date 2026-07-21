@@ -89,13 +89,15 @@ Synthetic validation confirmed:
 - sparse update merging;
 - alternator, battery, inverter/charger and solar rows.
 
-A bounded real MasterBus replay-log validation is still required.
+A bounded real MasterBus replay-log validation completed on 2026-07-21. A 65-second capture contained 638 battery deltas from `battery-2` and `house-batt`; conversion emitted 638 typed staging rows with no skips, and merge coalesced them into 221 timestamp/device samples. Voltage, current, temperature, state-of-charge and time-remaining values were present. No alternator, inverter/charger or solar updates occurred during this stationary sample, so each still requires representative real-data validation.
+
+This validation found and fixed an inventory bug: merge previously replaced the source JSONL `line_count` with the number of coalesced typed rows. Source line count now remains immutable import provenance.
 
 ## Current limitations
 
 - Validation samples are deliberately small.
 - No broad historical import has been approved.
-- The final N2K provenance choice—typed-only versus envelope-plus-typed—still requires a measured storage/query comparison.
+- The 2026-07-21 bounded real-data comparison selected typed-only direct provenance: 20 MB versus 55 MB for envelope-plus-typed, a 63.1% reduction across 118,149 decoded envelopes and 109,768 typed rows.
 - MasterBus replay currently contains mapped fields, not every native field.
 - Each newly supported PGN needs a bounded representative sample and test fixture.
 
@@ -116,8 +118,8 @@ Do not run a complete-file import on live `pi5nvme`. Follow [`2026-07-04-backfil
 Before expanding historical volume:
 
 1. tests pass;
-2. typed-only/envelope storage comparison is recorded;
-3. a small real MasterBus replay log passes typed merge validation;
+2. the importer/schema implements the selected typed-only direct-provenance model;
+3. representative real alternator, inverter/charger and solar logs pass typed merge validation;
 4. duplicate import remains idempotent;
 5. row counts and representative values match source decoder output;
 6. resource use stays within declared limits;

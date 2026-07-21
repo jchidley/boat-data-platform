@@ -63,7 +63,7 @@ health_observations and health views
 unlogged staging tables used by bounded COPY imports
 ```
 
-`n2k_frames_v2` remains pending the measured typed-only versus envelope-plus-typed decision. Do not load broad history into it until that decision is made.
+The bounded staging comparison selected typed-only direct provenance. `n2k_frames_v2` is not an end-state historical table; do not load broad history into it. Remove its persistent role when the importer writes `raw_file_id` and `message_index` directly to typed tables.
 
 `n2k_research_fields_v2` remains available only for explicit bounded research. Normal imports must produce zero research rows.
 

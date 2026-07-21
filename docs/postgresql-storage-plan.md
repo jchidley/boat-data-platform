@@ -60,16 +60,15 @@ Normal conversion uses:
 - explicit permission for full-file conversion;
 - input-size and process-runtime limits.
 
-The current frame-envelope table is a validation and provenance mechanism. Before broad retention, compare:
+The final model is typed-only provenance: each typed row carries `raw_file_id` and `message_index` directly. Complete frame envelopes remain in authoritative candump files and are not retained broadly in PostgreSQL.
 
-1. typed rows carrying `raw_file_id` and `message_index`; and
-2. envelope-plus-typed rows.
+A bounded 2026-07-21 staging measurement used 200,000 real CAN frames, producing 118,149 decoded envelopes and 109,768 typed rows. On plain PostgreSQL 17 with representative indexes, envelope-plus-typed used 55 MB and typed-only used 20 MB. Typed-only reduced measured storage by 63.1%. TimescaleDB chunk overhead and compression may change absolute sizes, but do not justify duplicating every decoded message already preserved in raw files.
 
-Retain complete envelopes only if measured query or provenance value justifies their volume.
+`n2k_frames_v2` may remain only as disposable COPY/merge staging until the importer writes direct typed provenance. It is not an end-state historical table.
 
 ## Signal K history collector removal
 
-The general Signal K history collector is not part of the two-path design and has been removed from the repository. Apply [`postgresql-end-state-migration.md`](postgresql-end-state-migration.md) when `pi5nvme` is reachable to remove its deployed service, derived table and other duplicate objects after dependency checks.
+The general Signal K history collector is not part of the two-path design. [`postgresql-end-state-migration.md`](postgresql-end-state-migration.md) removed its repository and live-host service, derived table and other duplicate objects on 2026-07-21.
 
 Typed MasterBus and engine-event history must come from the source replay path, not Signal K.
 
@@ -115,7 +114,7 @@ The storage design is complete when:
 - raw N2K archives remain continuous, checksummed and replayable;
 - selected typed N2K rows trace back to raw file and message position;
 - normal conversion emits no research rows;
-- complete frame-envelope retention has a measured decision;
+- typed rows carry direct raw-file/message provenance and complete frame envelopes are not retained;
 - each retained historical fact has one documented owner;
 - only the live Signal K and typed PostgreSQL processing paths remain;
 - durable engine events and runtime are derived from typed MasterBus history;

@@ -130,8 +130,8 @@ Done operationally; continue validating:
 ### 2. Finish the typed N2K path
 
 1. Keep research output disabled by default.
-2. Decide typed-only versus envelope-plus-typed storage with a measured sample.
-3. Carry `raw_file_id` and message position for provenance.
+2. Use the measured typed-only model; do not retain complete decoded envelopes in PostgreSQL.
+3. Carry `raw_file_id` and message position directly on typed rows for provenance.
 4. Validate supported PGNs with bounded real samples.
 5. Import only PGNs needed by current dashboards and analysis.
 6. Prove idempotent restart and failure cleanup.
@@ -170,12 +170,11 @@ Live-only apps continue to use Signal K.
 
 ## Immediate work order
 
-1. Measure typed-only versus envelope-plus-typed N2K storage using a bounded staging sample.
-2. Choose and document the final typed-table provenance model.
-3. Validate MasterBus replay into typed tables.
-4. Implement durable engine transitions/runtime from typed MasterBus history.
-5. Build Grafana health and first useful typed-history dashboards.
-6. Evaluate logbook integration after engine state/runtime is trustworthy.
+1. Implement direct `raw_file_id`/message-position provenance in typed N2K tables and remove persistent frame envelopes.
+2. Validate real alternator, inverter/charger and solar MasterBus replay; battery replay is validated.
+3. Implement durable engine transitions/runtime from typed MasterBus history.
+4. Build Grafana health and first useful typed-history dashboards.
+5. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Done means
 

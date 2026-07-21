@@ -77,4 +77,5 @@ test('MasterBus v1 merge SQL covers typed tables and import status', () => {
   assert.match(masterbusSql, /coalesce\(EXCLUDED\.sense_voltage_v/)
   assert.match(masterbusSql, /GROUP BY time, alternator_key, source, raw_log_file_id/)
   assert.match(masterbusSql, /bool_or\(inverter_enabled\)/)
+  assert.doesNotMatch(masterbusSql, /line_count\s*=/)
 })

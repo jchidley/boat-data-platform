@@ -100,13 +100,12 @@ Raw candump is authoritative for N2K. MasterBus snapshots and replay logs must b
 
 Complete the new typed historical path in this order:
 
-1. On staging, compare typed-only storage with envelope-plus-typed storage using a bounded real sample.
-2. Select the final provenance model.
-3. Validate MasterBus replay into typed tables with a small real log.
-4. Implement typed engine transition/runtime history from MasterBus alternator evidence.
-5. Point health/Grafana queries at typed tables.
-6. Build the first historical Grafana dashboards.
-7. Evaluate logbook integration after engine state/runtime is trustworthy.
+1. Change the N2K schema/importer to write `raw_file_id` and `message_index` directly into typed tables and remove persistent frame-envelope retention.
+2. Validate real alternator, inverter/charger and solar MasterBus replay when representative states are available; battery replay is validated.
+3. Implement typed engine transition/runtime history from MasterBus alternator evidence.
+4. Point health/Grafana queries at typed tables.
+5. Build the first historical Grafana dashboards.
+6. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Do not do
 

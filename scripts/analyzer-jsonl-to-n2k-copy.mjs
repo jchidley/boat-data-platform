@@ -156,9 +156,9 @@ function switchIndicators(fields) {
 
 function satelliteRows(c) {
   const list = Array.isArray(c.rawFields?.list) ? c.rawFields.list : []
-  if (!list.length) {
-    return [[c.logFileId, c.messageIndex, c.time, c.src, int(f(c.fields, 'SID')), text(f(c.fields, 'Range Residual Mode')), int(f(c.fields, 'Sats in View')), null, null, null, null, null, null, null]]
-  }
+  // No child row exists when the repeating list is absent/empty. Emitting a
+  // placeholder would violate satellite_index NOT NULL and invent a fact.
+  if (!list.length) return []
   return list.map((sat, idx) => {
     const m = fieldMap(sat)
     return [c.logFileId, c.messageIndex, c.time, c.src, int(f(c.fields, 'SID')), text(f(c.fields, 'Range Residual Mode')), int(f(c.fields, 'Sats in View')), idx, int(f(m, 'PRN')), num(f(m, 'Elevation')), num(f(m, 'Azimuth')), num(f(m, 'SNR')), num(f(m, 'Range residuals')), text(f(m, 'Status'))]
@@ -168,7 +168,9 @@ function satelliteRows(c) {
 function routeWaypointRows(c) {
   const list = Array.isArray(c.rawFields?.list) ? c.rawFields.list : []
   const base = [c.logFileId, c.messageIndex, c.time, c.src, int(f(c.fields, 'Start RPS#')), int(f(c.fields, 'nItems')), int(f(c.fields, 'Database ID')), int(f(c.fields, 'Route ID')), text(f(c.fields, 'Navigation direction in route')), text(f(c.fields, 'Supplementary Route/WP data available')), text(f(c.fields, 'Route Name'))]
-  if (!list.length) return [[...base, null, null, null, null, null]]
+  // The parent message remains represented by frame/file summaries. Do not
+  // invent a waypoint child with a null list position.
+  if (!list.length) return []
   return list.map((wp, idx) => {
     const m = fieldMap(wp)
     return [...base, idx, int(f(m, 'WP ID')), text(f(m, 'WP Name')), num(f(m, 'WP Latitude')), num(f(m, 'WP Longitude'))]

@@ -318,6 +318,52 @@ test('writes PGN-shaped typed TSV rows when requested', () => {
   assert.deepEqual(temperature316, ['42', '22', '2026-07-05T15:00:11.000Z', '35', '6', '2', 'Sea Temperature', '288.15', '289.15'])
 })
 
+test('nested PGNs preserve list order and repeated identities without placeholder rows', () => {
+  const input = [
+    JSON.stringify({
+      input: ['(1783263700.000000) can0 19FA040B#0011223344556677'],
+      pgn: 129540,
+      src: 11,
+      fields: { SID: 1, 'Sats in View': 2, list: [
+        { PRN: 7, SNR: 40 },
+        { PRN: 7, SNR: 41 }
+      ] }
+    }),
+    JSON.stringify({
+      input: ['(1783263701.000000) can0 1DF9050C#0011223344556677'],
+      pgn: 129285,
+      src: 12,
+      fields: { nItems: 2, list: [
+        { 'WP ID': 5, 'WP Name': 'first' },
+        { 'WP ID': 5, 'WP Name': 'second' }
+      ] }
+    }),
+    JSON.stringify({
+      input: ['(1783263702.000000) can0 19FA040B#0011223344556677'],
+      pgn: 129540,
+      src: 11,
+      fields: { SID: 2, 'Sats in View': 0, list: [] }
+    }),
+    JSON.stringify({
+      input: ['(1783263703.000000) can0 1DF9050C#0011223344556677'],
+      pgn: 129285,
+      src: 12,
+      fields: { nItems: 0 }
+    })
+  ].join('\n') + '\n'
+
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'n2k-copy-nested-test-'))
+  const typedDir = path.join(temp, 'typed')
+  const { result } = runFixture(input, ['--typed-dir', typedDir])
+  assert.equal(result.status, 0, result.stderr)
+
+  const satellites = fs.readFileSync(path.join(typedDir, 'n2k_gnss_satellites_129540_stage_v2.tsv'), 'utf8').trim().split('\n').map(line => line.split('\t'))
+  assert.deepEqual(satellites.map(row => [row[7], row[8], row[11]]), [['0', '7', '40'], ['1', '7', '41']])
+
+  const waypoints = fs.readFileSync(path.join(typedDir, 'n2k_route_waypoint_129285_stage_v2.tsv'), 'utf8').trim().split('\n').map(line => line.split('\t'))
+  assert.deepEqual(waypoints.map(row => [row[11], row[12], row[13]]), [['0', '5', 'first'], ['1', '5', 'second']])
+})
+
 test('skips malformed and non-decoded JSON rows', () => {
   const input = '{bad json}\n' + JSON.stringify({ fields: { A: 1 } }) + '\n'
   const { result } = runFixture(input)

@@ -21,7 +21,7 @@
       "type": "stat", "title": "Completed runtime",
       "gridPos": {"h": 6, "w": 8, "x": 0, "y": 8},
       "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
-      "targets": [{"rawSql": "SELECT engine_key, round((completed_runtime_seconds / 3600.0)::numeric, 2) AS runtime_hours FROM v_masterbus_engine_runtime_summary_v1", "format": "table", "refId": "A"}],
+      "targets": [{"rawSql": "SELECT engine_key, round((sum(duration_seconds) / 3600.0)::numeric, 2) AS runtime_hours FROM masterbus_engine_runtime_intervals_v1 WHERE $__timeFilter(started_at) AND end_reason <> 'open' GROUP BY engine_key ORDER BY engine_key LIMIT 100", "format": "table", "refId": "A"}],
       "options": {"reduceOptions": {"calcs": ["lastNotNull"]}, "textMode": "auto"}
     },
     {
@@ -35,7 +35,7 @@
       "type": "table", "title": "Latest acquisition provenance",
       "gridPos": {"h": 6, "w": 24, "x": 0, "y": 14},
       "datasource": {"type": "postgres", "uid": "boat-timescaledb"},
-      "targets": [{"rawSql": "SELECT device_class, device_key, max(time) AS last_seen, max(source) AS source, max(raw_log_file_id) AS raw_log_file_id FROM v_masterbus_recent_electrical_v1 GROUP BY device_class, device_key ORDER BY last_seen DESC LIMIT 100", "format": "table", "refId": "A"}],
+      "targets": [{"rawSql": "SELECT device_class, device_key, max(time) AS last_seen, max(source) AS source, max(raw_log_file_id) AS raw_log_file_id FROM v_masterbus_recent_electrical_v1 WHERE $__timeFilter(time) GROUP BY device_class, device_key ORDER BY last_seen DESC LIMIT 100", "format": "table", "refId": "A"}],
       "options": {"showHeader": true}
     }
   ],

@@ -31,6 +31,13 @@ test('N2K v2 schema uses direct typed provenance and grants staging privileges',
   assert.match(n2kSchemaSql, /GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO boat_ingest;/)
 })
 
+test('nested PGN rows use source-list position rather than mutable child identity', () => {
+  assert.match(n2kSchemaSql, /n2k_route_waypoint_129285_v2[\s\S]*PRIMARY KEY \(time, raw_file_id, message_index, waypoint_index\)/)
+  assert.match(n2kSchemaSql, /n2k_gnss_satellites_129540_v2[\s\S]*PRIMARY KEY \(time, raw_file_id, message_index, satellite_index\)/)
+  assert.match(n2kSql, /ON CONFLICT \(time, raw_file_id, message_index, waypoint_index\) DO UPDATE/)
+  assert.match(n2kSql, /ON CONFLICT \(time, raw_file_id, message_index, satellite_index\) DO UPDATE/)
+})
+
 test('N2K v2 merge SQL covers direct-provenance typed PGNs, summaries, and status', () => {
   assert.match(n2kSql, /CREATE OR REPLACE FUNCTION n2k_merge_staged_file_v2\(p_raw_file_id bigint\)/)
   for (const table of [
@@ -83,8 +90,13 @@ test('engine history SQL is native-source, deterministic, indexed, and gap-aware
   assert.match(engineSql, /p_stop_debounce_seconds double precision DEFAULT 30/)
   assert.match(engineSql, /data_gap/)
   assert.match(engineSql, /TRUNCATE public\.masterbus_engine_runtime_intervals_v1/)
-  assert.match(engineSql, /ORDER BY time, raw_log_file_id NULLS LAST, raw_line_number NULLS LAST/)
+  assert.match(engineSql, /LOCK TABLE public\.masterbus_alternator_samples_v1 IN SHARE MODE/)
+  assert.match(engineSql, /ORDER BY time, raw_log_file_id NULLS LAST, raw_line_number NULLS LAST, source/)
+  assert.match(engineSql, /start_raw_line_number integer/)
+  assert.match(engineSql, /end_raw_line_number integer/)
   assert.match(engineSql, /CREATE INDEX IF NOT EXISTS masterbus_engine_transitions_v1_time_idx/)
+  assert.match(engineSql, /masterbus_alternator_samples_v1_time_idx/)
+  assert.match(engineSql, /IF EXISTS \(SELECT FROM pg_roles WHERE rolname = 'grafana_reader'\)/)
   assert.match(engineSql, /v_masterbus_engine_runtime_summary_v1/)
   assert.doesNotMatch(engineSql, /propulsion\.port\.state|signalk-two-engine-state/)
 })

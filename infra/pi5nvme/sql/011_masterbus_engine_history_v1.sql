@@ -1,6 +1,11 @@
 -- Durable engine history derived only from typed native MasterBus alternator samples.
 -- No Signal K engine-state output is read here. Rebuild is deterministic: all
 -- derived rows are replaced from the selected typed evidence.
+-- Call rebuild_masterbus_engine_history_v1 inside a transaction. It takes a
+-- SHARE lock on the source table before TRUNCATE so a concurrent typed merge
+-- cannot change the evidence set during the rebuild. TRUNCATE therefore takes
+-- ACCESS EXCLUSIVE locks on the two derived tables; callers should use a
+-- bounded transaction and expect readers of those tables to wait briefly.
 
 CREATE TABLE IF NOT EXISTS public.masterbus_engine_transitions_v1 (
   engine_key text NOT NULL,
@@ -30,7 +35,9 @@ CREATE TABLE IF NOT EXISTS public.masterbus_engine_runtime_intervals_v1 (
   start_evidence_time timestamptz NOT NULL,
   end_evidence_time timestamptz,
   start_raw_log_file_id bigint REFERENCES public.masterbus_log_files_v1(masterbus_log_file_id),
+  start_raw_line_number integer,
   end_raw_log_file_id bigint REFERENCES public.masterbus_log_files_v1(masterbus_log_file_id),
+  end_raw_line_number integer,
   source text NOT NULL DEFAULT 'masterbus-native',
   PRIMARY KEY (engine_key, started_at),
   CHECK (end_reason IN ('stopped', 'data_gap', 'open')),
@@ -39,6 +46,10 @@ CREATE TABLE IF NOT EXISTS public.masterbus_engine_runtime_intervals_v1 (
 );
 CREATE INDEX IF NOT EXISTS masterbus_engine_runtime_v1_time_idx
   ON public.masterbus_engine_runtime_intervals_v1 (engine_key, started_at DESC);
+CREATE INDEX IF NOT EXISTS masterbus_alternator_samples_v1_time_idx
+  ON public.masterbus_alternator_samples_v1 (time DESC);
+CREATE INDEX IF NOT EXISTS masterbus_battery_samples_v1_time_idx
+  ON public.masterbus_battery_samples_v1 (time DESC);
 
 CREATE OR REPLACE FUNCTION public.rebuild_masterbus_engine_history_v1(
   p_threshold_v double precision DEFAULT 13.25,
@@ -57,13 +68,19 @@ DECLARE
   v_last_time timestamptz;
   v_last_raw_file_id bigint;
   v_last_raw_line integer;
+  v_last_source text;
   v_debounce double precision;
   v_transition_time timestamptz;
 BEGIN
-  IF p_start_debounce_seconds < 0 OR p_stop_debounce_seconds < 0 OR p_max_gap_seconds <= 0 THEN
+  IF p_threshold_v IS NULL OR p_threshold_v IN ('NaN'::double precision, 'Infinity'::double precision, '-Infinity'::double precision)
+     OR p_start_debounce_seconds IS NULL OR p_start_debounce_seconds IN ('NaN'::double precision, 'Infinity'::double precision, '-Infinity'::double precision)
+     OR p_stop_debounce_seconds IS NULL OR p_stop_debounce_seconds IN ('NaN'::double precision, 'Infinity'::double precision, '-Infinity'::double precision)
+     OR p_max_gap_seconds IS NULL OR p_max_gap_seconds IN ('NaN'::double precision, 'Infinity'::double precision, '-Infinity'::double precision)
+     OR p_start_debounce_seconds < 0 OR p_stop_debounce_seconds < 0 OR p_max_gap_seconds <= 0 THEN
     RAISE EXCEPTION 'invalid engine history parameters';
   END IF;
 
+  LOCK TABLE public.masterbus_alternator_samples_v1 IN SHARE MODE;
   TRUNCATE public.masterbus_engine_runtime_intervals_v1,
            public.masterbus_engine_transitions_v1;
 
@@ -79,12 +96,13 @@ BEGIN
     v_last_time := NULL;
     v_last_raw_file_id := NULL;
     v_last_raw_line := NULL;
+    v_last_source := NULL;
 
     FOR s IN
-      SELECT time, alternator_key, raw_log_file_id, raw_line_number, sense_voltage_v
+      SELECT time, alternator_key, raw_log_file_id, raw_line_number, source, sense_voltage_v
       FROM public.masterbus_alternator_samples_v1
       WHERE alternator_key = e.alternator_key
-      ORDER BY time, raw_log_file_id NULLS LAST, raw_line_number NULLS LAST
+      ORDER BY time, raw_log_file_id NULLS LAST, raw_line_number NULLS LAST, source
     LOOP
       IF s.sense_voltage_v IS NULL THEN
         CONTINUE;
@@ -98,10 +116,11 @@ BEGIN
           INSERT INTO public.masterbus_engine_transitions_v1(
             engine_key, event_time, event_type, state, evidence_time,
             alternator_key, raw_log_file_id, raw_line_number,
-            threshold_v, debounce_seconds
+            threshold_v, debounce_seconds, source
           ) VALUES (
             e.engine_key, v_last_time, 'data_gap', 'unknown', v_last_time,
-            e.alternator_key, v_last_raw_file_id, v_last_raw_line, p_threshold_v, 0
+            e.alternator_key, v_last_raw_file_id, v_last_raw_line, p_threshold_v, 0,
+            v_last_source
           ) ON CONFLICT DO NOTHING;
         END IF;
         v_state := NULL;
@@ -137,11 +156,11 @@ BEGIN
           INSERT INTO public.masterbus_engine_transitions_v1(
             engine_key, event_time, event_type, state, evidence_time,
             alternator_key, raw_log_file_id, raw_line_number,
-            threshold_v, debounce_seconds
+            threshold_v, debounce_seconds, source
           ) VALUES (
             e.engine_key, v_transition_time, 'started', 'started', s.time,
             e.alternator_key, s.raw_log_file_id, s.raw_line_number,
-            p_threshold_v, v_debounce
+            p_threshold_v, v_debounce, s.source
           ) ON CONFLICT DO NOTHING;
           v_state := 'started';
           v_candidate := NULL;
@@ -150,11 +169,11 @@ BEGIN
           INSERT INTO public.masterbus_engine_transitions_v1(
             engine_key, event_time, event_type, state, evidence_time,
             alternator_key, raw_log_file_id, raw_line_number,
-            threshold_v, debounce_seconds
+            threshold_v, debounce_seconds, source
           ) VALUES (
             e.engine_key, v_transition_time, 'stopped', 'stopped', s.time,
             e.alternator_key, s.raw_log_file_id, s.raw_line_number,
-            p_threshold_v, v_debounce
+            p_threshold_v, v_debounce, s.source
           ) ON CONFLICT DO NOTHING;
           v_state := 'stopped';
           v_candidate := NULL;
@@ -170,6 +189,7 @@ BEGIN
       v_last_time := s.time;
       v_last_raw_file_id := s.raw_log_file_id;
       v_last_raw_line := s.raw_line_number;
+      v_last_source := s.source;
     END LOOP;
   END LOOP;
 
@@ -179,7 +199,8 @@ BEGIN
   INSERT INTO public.masterbus_engine_runtime_intervals_v1(
     engine_key, started_at, ended_at, duration_seconds, end_reason,
     start_evidence_time, end_evidence_time,
-    start_raw_log_file_id, end_raw_log_file_id
+    start_raw_log_file_id, start_raw_line_number,
+    end_raw_log_file_id, end_raw_line_number, source
   )
   SELECT t.engine_key,
          t.event_time,
@@ -192,7 +213,10 @@ BEGIN
          t.evidence_time,
          n.evidence_time,
          t.raw_log_file_id,
-         n.raw_log_file_id
+         t.raw_line_number,
+         n.raw_log_file_id,
+         n.raw_line_number,
+         t.source
   FROM public.masterbus_engine_transitions_v1 t
   LEFT JOIN LATERAL (
     SELECT n.*
@@ -230,13 +254,21 @@ SELECT time, battery_key, 'battery', voltage_v, current_a, NULL,
 FROM public.masterbus_battery_samples_v1
 WHERE time >= now() - interval '24 hours';
 
-GRANT SELECT ON public.masterbus_engine_transitions_v1,
-  public.masterbus_engine_runtime_intervals_v1,
-  public.v_masterbus_engine_runtime_summary_v1,
-  public.v_masterbus_recent_electrical_v1 TO grafana_reader, boat_ingest;
-GRANT EXECUTE ON FUNCTION public.rebuild_masterbus_engine_history_v1(double precision, double precision, double precision, double precision) TO boat_ingest;
 DO $$
 BEGIN
+  IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'grafana_reader') THEN
+    GRANT SELECT ON public.masterbus_engine_transitions_v1,
+      public.masterbus_engine_runtime_intervals_v1,
+      public.v_masterbus_engine_runtime_summary_v1,
+      public.v_masterbus_recent_electrical_v1 TO grafana_reader;
+  END IF;
+  IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'boat_ingest') THEN
+    GRANT SELECT ON public.masterbus_engine_transitions_v1,
+      public.masterbus_engine_runtime_intervals_v1,
+      public.v_masterbus_engine_runtime_summary_v1,
+      public.v_masterbus_recent_electrical_v1 TO boat_ingest;
+    GRANT EXECUTE ON FUNCTION public.rebuild_masterbus_engine_history_v1(double precision, double precision, double precision, double precision) TO boat_ingest;
+  END IF;
   IF EXISTS (SELECT FROM pg_roles WHERE rolname = 'jack') THEN
     GRANT SELECT ON public.masterbus_engine_transitions_v1,
       public.masterbus_engine_runtime_intervals_v1,

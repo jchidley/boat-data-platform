@@ -106,8 +106,8 @@ Complete the new typed historical path in this order:
 
 1. Prove settled-native-file import/delete/rebuild on staging, then approve a bounded native typed batch for live PostgreSQL. Native hourly segmentation is implemented and daily compression/90-day retention configuration is validated; continue monitoring these as operations, not implementation blockers. The live schema is empty and no batch has been loaded.
 2. Select and run the first explicitly bounded seven-PGN staging import. The direct Rust decoder gate is complete for PGNs `127245`, `127250`, `128259`, `128267`, `129025`, `129026` and `130306`; parity-gate any additional PGN before inclusion.
-3. Implement typed engine transition/runtime history from native MasterBus alternator evidence. Starboard-only is physically verified; both-off, port-only and both-running remain a commissioning checklist and must be completed before engine history is declared trustworthy for logbook use.
-4. Point health/Grafana queries at typed tables and build the first historical dashboards.
+3. Verify the repository engine transition/runtime migration with the committed disposable PostgreSQL integration test. The migration remains undeployed live; starboard-only is physically verified, while both-off, port-only and both-running remain a commissioning checklist and must be completed before engine history is declared trustworthy for logbook use.
+4. Point health/Grafana queries at typed tables and build the first historical dashboards; repository dashboard files remain undeployed.
 5. Evaluate logbook integration after engine state/runtime is trustworthy.
 
 ## Do not do
@@ -134,6 +134,14 @@ Complete the new typed historical path in this order:
 The repository now contains migration `011_masterbus_engine_history_v1.sql`, which deterministically rebuilds durable engine transitions and runtime intervals from typed native alternator samples only. It uses the deployed 13.25 V strict threshold, 10-second start debounce and 30-second stop debounce, suppresses duplicate samples through the typed primary key, treats gaps over 120 seconds as unknown/data-gap boundaries, leaves sparse open intervals open, and retains raw log/line provenance. It does not read Signal K engine-state output. Indexed consumer views cover engine runtime summaries, recent electrical history and provenance.
 
 A first useful repository-controlled Grafana dashboard/provisioning set is present under `infra/pi5nvme/grafana/`, but it has not been deployed to the live host because the live typed tables remain empty and no live import approval exists.
+
+### New executable engine-history verification — 2026-07-21
+
+This is newly rerun evidence from the current repository, distinct from the inherited bounded native and N2K staging records below. `npm run test:engine-history:integration` passed against PostgreSQL 17.10 in a disposable database created through the local Unix socket and dropped with `DROP DATABASE ... WITH (FORCE)` in cleanup. TimescaleDB was not present and was not required. The test applied a minimum MasterBus inventory/device/alternator/battery schema plus `011_masterbus_engine_history_v1.sql`, then rebuilt deterministic fixtures covering threshold equality/strictness, both debounce boundaries, chatter, duplicate/sparse same-key samples, nulls, exact and over-limit gaps, source-file boundaries, closed/data-gap/open intervals, provenance, port/starboard isolation, invalid parameters and repeated delete/rebuild. It asserted 7 transition rows, 4 interval rows, 2 summary rows and 230 seconds of completed runtime; the open interval was excluded. The latest run took 224 ms measured inside the test, peaked at 60,396 KiB Node RSS and reported a disposable database size of 8,197,811 bytes. The temporary database was removed successfully.
+
+The migration now records source labels and raw line numbers on transition and runtime interval provenance, locks the typed alternator source during a bounded rebuild, adds time indexes used by recent-electrical consumers, and guards optional-role grants. This changes repository implementation only; the migration was not deployed to live PostgreSQL.
+
+A focused audit of the older canboatjs typed slices confirmed that PGNs `129540` and `129285` key nested children by source-list position (`satellite_index`/`waypoint_index`) within raw file, message and timestamp. Repeated PRNs or waypoint ids therefore remain distinct and ordered; empty lists now emit no invented child row. AIS `129039`, `129809` and `129810` have synthetic converter/schema/merge coverage but the cited bounded real sample contained zero rows, so they are not representative-real-data validated. Do not use or Rust-port these older slices without an identified consumer and the required representative/parity gate.
 
 ### Completed disposable staging gates
 

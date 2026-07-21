@@ -4,6 +4,22 @@
 
 Record the evidence that the typed N2K and MasterBus conversion paths work on bounded samples. This is validation evidence, not an operational backfill approval.
 
+## Newly rerun executable engine-history validation — 2026-07-21
+
+This section is newly rerun evidence from the repository state after commit `2833005`; the bounded native and N2K records elsewhere in this document are inherited evidence unless explicitly marked otherwise.
+
+Exact command:
+
+```bash
+npm run test:engine-history:integration
+```
+
+The test created a uniquely named PostgreSQL database on the local Unix socket, applied a minimum disposable MasterBus schema (log inventory, device inventory, alternator samples and battery samples), then applied `infra/pi5nvme/sql/011_masterbus_engine_history_v1.sql`. It dropped the database with `DROP DATABASE ... WITH (FORCE)` from a `finally` cleanup path. PostgreSQL was 17.10; TimescaleDB was absent and not required. No live or remote database target is permitted by the test's connection guard.
+
+Fixtures and assertions covered: strict `13.25 V` equality versus above-threshold evidence; 10-second start and 30-second stop debounce including exact boundaries; short threshold chatter; duplicate source events and sparse same-timestamp coalescing under the typed key; deterministic timestamp/raw-file/line ordering; null sense-voltage samples; exact 120-second and greater-than-120-second gaps while stopped and running; source-file boundaries; one normally stopped interval, one `data_gap` interval and one open interval; exclusion of open runtime from completed totals; port/starboard isolation; transition and interval source/file/line provenance; invalid parameters; repeated rebuild; and delete-derived-rows/rebuild recovery. The source inventory foreign key was also checked to reject deletion while provenance was referenced.
+
+The test asserted exactly **7 transitions**, **4 runtime intervals**, **2 summary rows** and **230 completed runtime seconds**. The latest disposable run measured **336 ms**, peak Node RSS **60,144 KiB**, database size **8,197,811 bytes**, and reported TimescaleDB `false`. Cleanup removed the temporary database successfully. The final test-suite commit hash will be recorded here after the verification commit is created; no live migration, import or Grafana deployment was performed.
+
 ## N2K path validated
 
 ```text
@@ -137,6 +153,8 @@ During a physical starboard-only run at approximately 1500 RPM, Signal K reporte
 - The 2026-07-21 bounded real-data comparison selected typed-only direct provenance: 20 MB versus 55 MB for envelope-plus-typed, a 63.1% reduction across 118,149 decoded envelopes and 109,768 typed rows.
 - Both the older mapped Signal K sample and the native pre-mapping field-event sample have converter evidence. Hourly segmentation and daily compression/90-day retention are implementation/configuration validated and remain routine monitoring; settled-file delete/rebuild remains the batch-acceptance gate.
 - Each newly supported PGN needs a bounded representative sample and test fixture.
+- The cited AIS sample had real rows for `129038` and `129794`, but zero rows for `129039`, `129809` and `129810`. Those three have synthetic converter/schema/merge coverage only and must not be described as representative-real-data validated.
+- Nested `129540` satellite and `129285` waypoint children are keyed by source-list position within `(time, raw_file_id, message_index)`, not by PRN or waypoint id. This preserves order and repeated identities across idempotent merges. Empty lists emit zero child rows rather than an invalid/invented null-index row.
 
 ## Reproduce safely
 
